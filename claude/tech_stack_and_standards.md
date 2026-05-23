@@ -18,6 +18,27 @@
 - 预定义验证规则：`createVD`、`updateVD`、`listVD`、`detailVD`、`deleteVD`
 - 使用模型定义的枚举进行枚举验证
 
+### 模型规范
+- 模型文件使用 `.model.js` 后缀，例如：`User.model.js`、`Account.model.js`
+- 模型文件放置于 `src/models/` 目录下，按功能模块分组
+- 枚举值通过 `Model.modelEnums` 统一访问，不直接访问模型上的枚举数组
+- 模型中包含适当索引定义以优化查询性能
+- 使用 `timestamps: true` 自动管理创建和更新时间
+- 软删除支持字段（如 `deletedAt`）
+- 使用 `immutable: true` 定义创建后不可修改的字段
+- 使用 `select: false` 隐藏敏感字段（如密码）
+- 使用 `immutableFront: true` 标记前端不可传递的字段
+
+### 服务层规范
+- 服务文件使用 `SV` 后缀，如 `UserSV`
+- 服务类包含标准 CRUD 方法：`list`, `detail`, `create`, `update`, `delete`
+- 包含适当的错误处理和日志记录
+
+### 控制器规范
+- 控制器文件使用 `CT` 后缀，如 `UserCT`
+- 使用 `asyncHandler` 包装异步函数
+- 包含统一错误处理机制
+
 ## 命名约定
 
 ### 文件
@@ -56,11 +77,20 @@
 - 防止并发登录的会话管理
 - 基于角色的 API 权限
 - 安全的令牌存储和处理
+- 刷新令牌使用 Argon2 算法哈希存储
+- 并发登录预防机制，确保同一账号不能在多设备同时登录
 
 ### 前端安全字段
 - 使用 `immutableFront: true` 在模型中标识前端不可修改的字段
 - 在服务层使用 `deleteImmutableFront` 工具函数过滤前端传入的不可变字段
 - 用于保护系统关键字段（如 `lastLoginAt`、`lastLoginIP`、`updatedBy` 等）不被前端恶意修改
+
+### 权限验证系统
+- **认证中间件 (`authenticate`)**: 验证 JWT 令牌的有效性，检查会话状态，防止并发登录
+- **用户授权中间件 (`userAuthorize`)**: 检查用户是否有访问特定 API 的权限，非管理员用户需要特定权限才能访问受保护的资源
+- **学生授权中间件 (`studentAuthorize`)**: 限制特定操作仅限学生账户使用
+- **会话管理**: 通过 `currentSessionId` 字段管理用户会话，确保账号安全
+- **权限层级**: 管理员拥有完全访问权限，普通用户和学生账户受到相应限制
 
 ## 开发命令
 
