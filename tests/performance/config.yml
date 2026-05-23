@@ -1,0 +1,57 @@
+config:
+  target: "http://localhost:8000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50
+      name: "Warm up phase"
+    - duration: 120
+      arrivalRate: 50
+      name: "Sustained load"
+  payload:
+    path: "users.csv"
+    fields:
+      - "code"
+      - "password"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+
+scenarios:
+  - name: "User authentication flow"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            code: "{{ code }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.data.token"
+              as: "token"
+      
+      - get:
+          url: "/api/users"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      
+      - get:
+          url: "/api/auth/profile"
+          headers:
+            Authorization: "Bearer {{ token }}"
+
+  - name: "Product operations"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            code: "ADMIN001"
+            password: "admin123"
+          capture:
+            - json: "$.data.token"
+              as: "token"
+      
+      - get:
+          url: "/api/products"
+          headers:
+            Authorization: "Bearer {{ token }}" 

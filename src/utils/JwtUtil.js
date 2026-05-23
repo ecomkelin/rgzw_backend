@@ -1,0 +1,82 @@
+const jwt = require('jsonwebtoken');
+
+/**
+ * JWT工具类
+ * 用于处理令牌的生成、验证等操作
+ */
+class JwtUtil {
+  /**
+   * 生成访问令牌
+   * @param {Object} payload - 令牌载荷
+   * @returns {string} 访问令牌
+   */
+  static generateAccessToken(payload) {
+    // 生成访问令牌，默认5分钟
+
+    const expiresIn = process.env.ACCESS_TOKEN_EXPIRED || '5m';
+    try {
+      return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn });
+    } catch (error) {
+      console.error('Error generating access token:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 生成刷新令牌
+   * @param {Object} payload - 令牌载荷
+   * @returns {string} 刷新令牌
+   */
+  static generateRefreshToken(_id, sessionId) {
+    // 生成刷新令牌，默认7天
+    const expiresIn = process.env.REFRESH_TOKEN_EXPIRED || '7d';
+    return jwt.sign({ _id, sessionId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn });
+  }
+
+  /**
+   * 计算刷新令牌过期时间
+   * @returns {Date} 过期时间
+   */
+  static generateExpiresAt() {
+    // 计算刷新令牌过期时间，默认7天后
+    const refreshTokenExpiresAt = new Date();
+    const daysToAdd = parseInt(process.env.REFRESH_TOKEN_DAYS || '7', 10);
+    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + daysToAdd);
+    return refreshTokenExpiresAt;
+  }
+
+  /**
+   * 验证访问令牌
+   * @param {string} token - 访问令牌
+   * @returns {Object|null} 解码后的载荷或null
+   */
+  static verifyAccessToken(token) {
+    try {
+      if (!token) return null;
+
+      return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    } catch (error) {
+      console.error('Access token verification error:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * 验证刷新令牌
+   * @param {string} refreshToken - 刷新令牌
+   * @returns {Object|null} 解码后的载荷或null
+   */
+  static verifyRefreshToken(refreshToken) {
+    try {
+      if (!refreshToken) return null;
+
+      return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (error) {
+      console.error('Refresh token verification error:', error.message);
+      return null;
+    }
+  }
+
+}
+
+module.exports = JwtUtil;
