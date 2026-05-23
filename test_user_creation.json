@@ -2,7 +2,7 @@
   "user": {
     "isActive": true,
     "sort": 0,
-    "roleSimp": "manager",
+    "roleTemp": "manager",
     "nickname": "张三经理",
     "avatar": "/avatars/default.jpg"
   },

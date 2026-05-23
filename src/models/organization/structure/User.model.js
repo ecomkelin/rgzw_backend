@@ -13,7 +13,7 @@ const doc = {
 
     Depts: [{ type: ObjectId, ref: 'Dept' }],
 
-    roleSimp: { type: String, enum: roleSimpEnums, default: 'teacher', required: true }, // 用户身份类型 organization / teacher / student
+    roleTemp: { type: String, enum: roleSimpEnums, default: 'teacher', required: true }, // 用户身份类型 organization / teacher / student
     nickname: { type: String, required: true }, // 昵称
 
     avatar: { type: String }, // 头像URL

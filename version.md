@@ -1,5 +1,11 @@
 # 版本更新日志
 
+## v1.3.0
+- 测试了之前的修改
+- 完成了 student 模块
+- roleSimp 变成了 roleTemp: 因为这只是临时用的
+# student 每测试
+
 ## v1.2.0
 - 完成了 user 模块
 - v1.1.0 按照方法2 优化了， 但是发现不需要 decoded 只是在payload上添加上信息就好

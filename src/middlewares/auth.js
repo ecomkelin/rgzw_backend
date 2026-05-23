@@ -5,7 +5,7 @@ const ApiPermission = require("@models/authorization/roleApi/ApiPermission.model
 const UserApiPermission = require("@models/authorization/roleApi/UserApiPermission.model");
 const OrgMD = require("@models/organization/structure/Org.model"); // 添加对机构服务的引用
 const UserMD = require("@models/organization/structure/User.model");
-const StudentMD = require("@models/student/Student.model");
+const StudentMD = require("@/models/school/student/Student.model");
 
 // 认证中间件
 exports.authenticate = async (req, res, next) => {

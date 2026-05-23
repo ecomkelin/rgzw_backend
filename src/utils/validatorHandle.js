@@ -36,6 +36,10 @@ exports.commonBodyRules = {
         body(field)
             .notEmpty().withMessage(`${field} 不能为空`)
             .isArray({ max: options.maxLength }).withMessage(options.msg || `${field} 必须是数组，且长度不能超过 ${options.maxLength}`),
+    optionalArray: (field, options = { maxLength: 10000, msg }) =>
+        body(field)
+            .optional()
+            .isArray({ max: options.maxLength }).withMessage(options.msg || `${field} 必须是数组，且长度不能超过 ${options.maxLength}`),
 
     // ObjectId 验证
     validateObjectId: (field, msg) =>
@@ -66,13 +70,21 @@ exports.commonBodyRules = {
             .isIn(enums)
             .withMessage(`${field} 只能是 ${enums.join('/')} 中的一种`),
 
+    validateDate: (field, msg) =>
+        body(field)
+            .notEmpty().withMessage(`${field} 不能为空`)
+            .isDate().withMessage(msg || `${field} 必须是合法的日期`),
+    optionalDate: (field, msg) =>
+        body(field)
+            .optional()
+            .isDate().withMessage(msg || `${field} 必须是合法的日期`),
+
     // 布尔值验证
     validateBoolean: (field, msg) =>
         body(field)
             .notEmpty().withMessage(`${field} 不能为空`)
             .isBoolean().withMessage(msg || `${field} 必须是布尔值(true/false)`)
             .toBoolean(),
-
     optionalBoolean: (field, msg) =>
         body(field)
             .optional()
@@ -107,42 +119,60 @@ exports.commonBodyRules = {
             .trim()
             .isLength({ max: options.maxLength, min: options.minLength }).withMessage(`${field} 长度不能超过 ${options.maxLength} 个字符, 不能低于 ${options.minLength}`),
 
+    validateEmail: (field, msg) =>
+        body(field)
+            .notEmpty().withMessage(`${field} 不能为空`)
+            .isEmail().withMessage(msg || `${field} 必须是合法的邮箱地址`)
+            .normalizeEmail(),
+
+    optionalEmail: (field, msg) =>
+        body(field)
+            .optional()
+            .isEmail().withMessage(msg || `${field} 必须是合法的邮箱地址`)
+            .normalizeEmail(),
+
     // URL 验证
+    validateUrl: (field, msg) =>
+        body(field)
+            .notEmpty().withMessage(`${field} 不能为空`)
+            .isURL({ protocols: ['http', 'https'] })
+            .withMessage(msg || `${field} 必须是合法的 HTTP/HTTPS 链接`),
+
     optionalUrl: (field, msg) =>
         body(field)
             .optional()
             .isURL({ protocols: ['http', 'https'] })
-            .withMessage(msg || `${field} 必须是合法的 HTTP/HTTPS 链接`)
+            .withMessage(msg || `${field} 必须是合法的 HTTP/HTTPS 链接`),
+    validatePhone: (field, msg) =>
+        body(field)
+            .notEmpty().withMessage(`${field} 不能为空`)
+            .isMobilePhone('any').withMessage(msg || `${field} 必须是合法的手机号`),
+
+    optionalPhone: (field, msg) =>
+        body(field)
+            .optional()
+            .isMobilePhone('any').withMessage(msg || `${field} 必须是合法的手机号`),
+
+    validatePassword: (field, options = { minLength: 8, maxLength: 16, msg }) =>
+        body(field)
+            .notEmpty().withMessage(`${field} 不能为空`)
+            .isString().withMessage(options.msg || `${field} 必须是字符串`)
+            .isLength({ min: options.minLength, max: options.maxLength }).withMessage(`${field} 长度必须在 ${options.minLength} 到 ${options.maxLength} 个字符之间`),
+    optionalPassword: (field, options = { minLength: 8, maxLength: 16, msg }) =>
+        body(field)
+            .optional()
+            .isString().withMessage(options.msg || `${field} 必须是字符串`)
+            .isLength({ min: options.minLength, max: options.maxLength }).withMessage(`${field} 长度必须在 ${options.minLength} 到 ${options.maxLength} 个字符之间`),
 };
 
 // ====================== 2. Param 参数通用规则（路径参数） ======================
 exports.commonParamRules = {
-    // 数组验证（路径参数不常见，仅保留 validate 版本）
-    validateArray: (field, options = { maxLength: 10000, msg }) =>
-        param(field)
-            .notEmpty().withMessage(`${field} 不能为空`)
-            .isArray({ max: options.maxLength }).withMessage(options.msg || `${field} 必须是数组，且长度不能超过 ${options.maxLength}`),
     // ObjectId 验证（路径参数几乎都是必填，仅保留 validate 版本）
     validateObjectId: (field, msg) =>
         param(field)
             .notEmpty().withMessage(`${field} 不能为空`)
             .custom(value => ObjectId.isValid(value))
             .withMessage(msg || `${field} 必须是合法的 ObjectId`),
-
-    // 字符串验证（如路径中的非 ObjectId 字符串参数）
-    validateString: (field, options = { maxLength: 10000, minLength: 0, msg }) =>
-        param(field)
-            .notEmpty().withMessage(`${field} 不能为空`)
-            .isString().withMessage(options.msg || `${field} 必须是字符串`)
-            .trim()
-            .isLength({ max: options.maxLength, min: options.minLength }).withMessage(`${field} 长度不能超过 ${options.maxLength} 个字符, 不能低于 ${options.minLength}`),
-
-    // 数字验证（如路径中的 ID 数字）
-    validateNumber: (field, msg, options = { min: 0 }) =>
-        param(field)
-            .notEmpty().withMessage(`${field} 不能为空`)
-            .isInt(options).withMessage(msg || `${field} 必须是大于等于 ${options.min} 的整数`)
-            .toInt()
 };
 
 // ====================== 3. Query 参数通用规则（URL 查询参数） ======================
@@ -186,6 +216,8 @@ exports.commonQueryRules = {
             .trim()
             .isLength({ max: options.maxLength, min: options.minLength }).withMessage(`${field} 长度不能超过 ${options.maxLength} 个字符, 不能低于 ${options.minLength}`),
 };
+
+
 
 
 const maxPageSize = process.env.MAX_HANDLE_ITEM || 1000; // 设置默认值

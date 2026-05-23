@@ -18,15 +18,15 @@ const checkPermission = (permissionType) => {
           break;
         case 'create':
           // 创建权限：管理员角色
-          hasPermission = payload.roleSimp === 'manager';
+          hasPermission = payload.currentUser.roleTemp === 'manager';
           break;
         case 'edit':
           // 编辑权限：管理员角色
-          hasPermission = payload.roleSimp === 'manager';
+          hasPermission = payload.currentUser.roleTemp === 'manager';
           break;
         case 'delete':
           // 删除权限：管理员角色（注意原代码有个拼写错误 manger -> manager）
-          hasPermission = payload.roleSimp === 'manager';
+          hasPermission = payload.currentUser.roleTemp === 'manager';
           break;
         default:
           hasPermission = false;

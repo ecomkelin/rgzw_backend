@@ -8,7 +8,7 @@ const createMockPayload = (overrides = {}) => {
     _id: new mongoose.Types.ObjectId(),
     Org_id: new mongoose.Types.ObjectId(),
     isAdmin: false,
-    roleSimp: 'manager',
+    roleTemp: 'manager',
     ...overrides
   };
 };

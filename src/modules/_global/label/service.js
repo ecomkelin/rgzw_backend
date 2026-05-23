@@ -18,7 +18,7 @@ class LabelSV {
       if (!payload.isAdmin) query.Org = payload.currentUser?.Org;
       if (!query.mould) query.mould = mouldEnums[0];
 
-      if (!payload.isAdmin || payload.currentUser?.roleSimp !== 'manager') {
+      if (!payload.isAdmin || payload.currentUser?.roleTemp !== 'manager') {
         query.isActive = true;
       }
 

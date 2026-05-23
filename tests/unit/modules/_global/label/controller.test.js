@@ -22,7 +22,7 @@ const mockPayload = {
   _id: new mongoose.Types.ObjectId(),
   Org_id: new mongoose.Types.ObjectId(),
   isAdmin: false,
-  roleSimp: 'staff'
+  roleTemp: 'staff'
 };
 
 // Mock response object

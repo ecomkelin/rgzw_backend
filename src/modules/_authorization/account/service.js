@@ -1,6 +1,6 @@
 const AccountMD = require('@models/authorization/Account.model');
 const UserMD = require('@models/organization/structure/User.model');
-const StudentMD = require('@models/student/Student.model');
+const StudentMD = require('@/models/school/student/Student.model');
 const { formatOptions } = require('@utils/formatOptions');
 const { deleteImmutableFront } = require('@utils/validatorModel');
 
@@ -47,7 +47,7 @@ class AccountSV {
       if (payload.isAdmin) {
         // 管理员可以查看任何账户
         const item = await AccountMD.findById(_id)
-          .populate('currentUser', '_id nickname roleSimp Org isActive')
+          .populate('currentUser', '_id nickname roleTemp Org isActive')
           .populate('currentStudent', '_id name displayName isActive');
 
         if (!item) {
@@ -63,7 +63,7 @@ class AccountSV {
 
         // 获取自己的账户及关联信息
         const item = await AccountMD.findById(_id)
-          .populate('currentUser', '_id nickname roleSimp Org isActive')
+          .populate('currentUser', '_id nickname roleTemp Org isActive')
           .populate('currentStudent', '_id name displayName isActive');
 
         if (!item) {
@@ -116,7 +116,7 @@ class AccountSV {
 
       // 返回时排除密码哈希字段
       const populatedItem = await AccountMD.findById(item._id)
-        .populate('currentUser', '_id nickname roleSimp Org isActive')
+        .populate('currentUser', '_id nickname roleTemp Org isActive')
         .populate('currentStudent', '_id name displayName isActive');
 
       return { item: populatedItem };
@@ -163,7 +163,7 @@ class AccountSV {
 
       // 返回时排除密码哈希字段
       const populatedItem = await AccountMD.findById(item._id)
-        .populate('currentUser', '_id nickname roleSimp Org isActive')
+        .populate('currentUser', '_id nickname roleTemp Org isActive')
         .populate('currentStudent', '_id name displayName isActive');
 
       return { item: populatedItem };
@@ -180,7 +180,7 @@ class AccountSV {
   async selfDetail(payload) {
     try {
       const item = await AccountMD.findById(payload._id)
-        .populate('currentUser', '_id nickname roleSimp Org isActive')
+        .populate('currentUser', '_id nickname roleTemp Org isActive')
         .populate('currentStudent', '_id name displayName isActive');
 
       if (!item) {

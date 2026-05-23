@@ -7,7 +7,7 @@ exports.createVD = [
   commonBodyRules.optionalBoolean('user.isActive'),
   commonBodyRules.optionalNumber('user.sort'),
   commonBodyRules.optionalString('user.avatar', { minLength: 4, maxLength: 50 }),
-  commonBodyRules.validateEnum('user.roleSimp', userModelEnums.roleSimpEnums),
+  commonBodyRules.validateEnum('user.roleTemp', userModelEnums.roleSimpEnums),
   commonBodyRules.validateString('user.nickname', { minLength: 2, maxLength: 26 }),
 
   commonBodyRules.optionalObjectId('user.Org'),
@@ -34,7 +34,7 @@ exports.updateVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalNumber('sort'),
-  commonBodyRules.optionalEnum('roleSimp', userModelEnums.roleSimpEnums),
+  commonBodyRules.optionalEnum('roleTemp', userModelEnums.roleSimpEnums),
   commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 26 }),
   commonBodyRules.optionalString('avatar', { minLength: 4, maxLength: 50 }),
 

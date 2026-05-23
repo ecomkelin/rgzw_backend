@@ -22,7 +22,7 @@ class UserSV {
 
       // 权限控制：管理员可以查看所有，经理只能查看自己公司的
       if (!payload.isAdmin) {
-        if (payload.roleSimp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           throw new Error("没有权限查看用户列表");
         } else {
           query.Org = payload.currentUser?.Org; // 经理只能查看自己公司的用户
@@ -55,9 +55,9 @@ class UserSV {
 
       // 权限控制：管理员可以查看任意用户，经理只能查看自己公司的用户
       if (!payload.isAdmin) {
-        if (payload.roleSimp === 'manager' && item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (payload.currentUser.roleTemp === 'manager' && item.Org.toString() !== payload.currentUser?.Org.toString()) {
           throw new Error("没有权限查看其他公司的用户");
-        } else if (!payload.roleSimp) {
+        } else if (!payload.currentUser.roleTemp) {
           throw new Error("没有权限查看用户信息");
         }
       }
@@ -73,68 +73,18 @@ class UserSV {
     try {
       // 权限验证：管理员可以为任意公司创建用户，经理只能为自己公司创建用户
       if (!payload.isAdmin) {
-        if (payload.roleSimp === 'manager') {
+        if (payload.currentUser.roleTemp === 'manager') {
           // 如果指定了Org，必须与当前用户所在Org相同
-          if (doc.Org && doc.Org.toString() !== payload.currentUser?.Org.toString()) {
-            throw new Error("经理只能为自己的公司创建用户");
-          }
-          // 如果没有指定Org，默认设置为当前用户所在Org
-          if (!doc.Org) {
-            doc.Org = payload.currentUser?.Org;
-          }
+          doc.Org = payload.currentUser?.Org;
         } else {
           throw new Error("没有权限创建用户");
         }
-      }
-
-      // 如果没有指定Account，且提供了account信息，则创建新账户
-      if (!doc.Account && doc.account) {
-        // 检查是否为管理员才能创建账户
-        if (!payload.isAdmin) {
-          throw new Error("只有管理员可以创建账户");
-        }
-
-        // 创建新的账户
-        const accountData = doc.account;
-
-        // 确保新创建的账户不是管理员
-        accountData.isAdmin = false;
-
-        // 处理密码
-        if (accountData.password) {
-          accountData.passwordHash = accountData.password;
-          delete accountData.password;
-        }
-
-        deleteImmutableFront(accountData, AccountMD.doc);
-        accountData.createdBy = payload._id;
-        accountData.updatedBy = payload._id;
-
-        const existing = await AccountMD.findOne({
-          $or: [
-            { code: accountData.code },
-            { phone: accountData.phone ? accountData.phone : null }
-          ]
-        });
-
-        if (existing && (existing.code === accountData.code || (accountData.phone && existing.phone === accountData.phone))) {
-          throw new Error('手机号或账号已被占用');
-        }
-
-        const newAccount = new AccountMD(accountData);
-        await newAccount.save();
-        doc.Account = newAccount._id;
-      } else if (!doc.Account) {
-        throw new Error("必须提供Account信息或account创建信息");
-      }
-
-      // 如果没有提供Org，但提供了Account，尝试从Account获取相关信息
-      if (!doc.Org && doc.Account) {
-        // 在非管理员情况下，使用当前用户所在Org
-        if (!payload.isAdmin && payload.roleSimp === 'manager') {
+      } else {
+        if (!doc.Org) {
           doc.Org = payload.currentUser?.Org;
         }
       }
+
 
       deleteImmutableFront(doc, UserMD.doc);
       doc.createdBy = payload._id;
@@ -170,9 +120,9 @@ class UserSV {
       }
 
       if (!payload.isAdmin) {
-        if (payload.roleSimp === 'manager' && targetUser.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (payload.currentUser?.roleTemp === 'manager' && targetUser.Org.toString() !== payload.currentUser?.Org.toString()) {
           throw new Error("没有权限更新其他公司的用户");
-        } else if (!payload.roleSimp) {
+        } else if (!payload.currentUser.roleTemp) {
           throw new Error("没有权限更新用户");
         }
       }

@@ -55,7 +55,7 @@ const userSeeds = [
   {
     Account: '693e7c42963e26d1f80344aa',
     _id: "693e7c42963e26d1f80344ac",
-    roleSimp: 'manager',
+    roleTemp: 'manager',
     nickname: '系统管理员',
     Org: '693e7b24b558d56179c0f7ae',  // 梓潼学校
   },
@@ -63,7 +63,7 @@ const userSeeds = [
   {
     Account: '693e7c42963e26d1f80344aa',
     _id: "693e7c42963e26d1f80344c0",  // 新的用户ID
-    roleSimp: 'manager',
+    roleTemp: 'manager',
     nickname: '绵阳校区管理员',
     Org: '693e7b24b558d56179c0f7af',  // 绵阳智慧教育
   },
@@ -71,7 +71,7 @@ const userSeeds = [
   {
     Account: '693e7c42963e26d1f80344b2',
     _id: "693e7c42963e26d1f80344b8",
-    roleSimp: 'teacher',
+    roleTemp: 'teacher',
     nickname: '老师',
     Org: '693e7b24b558d56179c0f7ae',  // 梓潼学校
   }

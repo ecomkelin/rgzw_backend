@@ -47,6 +47,8 @@ const doc = {
 
     createBy: { type: ObjectId, ref: 'User' }, // 创建人
     updateBy: { type: ObjectId, ref: 'User' }, // 创建人
+
+    Org: { type: ObjectId, ref: 'Org' }, // 机构ID，冗余字段，方便查询  
 };
 const docSchema = new Schema(doc, { timestamps: true });
 

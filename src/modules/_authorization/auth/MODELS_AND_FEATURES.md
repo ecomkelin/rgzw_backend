@@ -26,7 +26,7 @@
 - `Account`: 关联的账号ID
 - `Org`: 所属组织
 - `Depts`: 所属部门列表
-- `roleSimp`: 用户角色（manager/teacher）
+- `roleTemp`: 用户角色（manager/teacher）
 - `nickname`: 昵称
 
 **重要特性**：
