@@ -10,7 +10,7 @@ exports.validatorErrorHandle = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         // 添加验证错误日志
-        console.log('Validation error:', {
+        console.error('@utils/validatorHandle validatorErrorHandle', {
             url: req.url,
             method: req.method,
             errors: errors.array(),

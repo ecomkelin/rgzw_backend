@@ -1,11 +1,11 @@
-const Service = require('./service');
+const OrgSV = require('./service');
 const ApiResponse = require('../../../utils/response');
 const asyncHandler = require('../../../utils/asyncHandler');
 
 class OrgCT {
   list = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.list(req.validData, req.payload);
+      const data = await OrgSV.list(req.validData, req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (error) {
       console.error("OrgCT list error: ", error.message)
@@ -15,7 +15,7 @@ class OrgCT {
 
   detail = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.detail(req.params.id, req.payload);
+      const data = await OrgSV.detail(req.params.id, req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (error) {
       console.error("OrgCT detail error: ", error.message)
@@ -25,7 +25,7 @@ class OrgCT {
 
   create = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.create(req.validData, req.payload);
+      const data = await OrgSV.create(req.validData, req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (error) {
       console.error("OrgCT create error: ", error.message)
@@ -35,7 +35,7 @@ class OrgCT {
 
   update = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.update(req.params.id, req.validData, req.payload);
+      const data = await OrgSV.update(req.params.id, req.validData, req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (error) {
       console.error("OrgCT update error: ", error.message)
@@ -45,7 +45,7 @@ class OrgCT {
 
   selfDetail = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.selfDetail(req.payload);
+      const data = await OrgSV.selfDetail(req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (error) {
       console.error("OrgCT selfDetail error: ", error.message)
@@ -54,4 +54,4 @@ class OrgCT {
   });
 }
 
-module.exports = new OrgCT(); 
+module.exports = new OrgCT();
