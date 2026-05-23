@@ -33,7 +33,6 @@ docSchema.index({ 'name': 'text', 'description': 'text' }); // 文本搜索优�
 
 const Model = mongoose.model('Label', docSchema);
 
-Model.mouldEnums = mouldEnums;
 Model.doc = doc;
 Model.modelEnums = { mouldEnums };
 

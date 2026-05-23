@@ -1,10 +1,10 @@
 const { ObjectId } = require('mongoose').Types;
 const { validatorErrorHandle, commonBodyRules, commonParamRules, commonQueryRules, validatorOptions } = require('@utils/validatorHandle');
-const { mouldEnums } = require('@models/global/Label.model');
+const { modelEnums } = require('@models/global/Label.model');
 
 // 1. 创建标签验证（Body 参数为主，大量必填）
 exports.createVD = [
-  commonBodyRules.validateEnum('mould', mouldEnums),
+  commonBodyRules.validateEnum('mould', modelEnums.mouldEnums),
   commonBodyRules.validateString('name', { maxLength: 100, msg: '标签名称必须是字符串' }),
   commonBodyRules.optionalString('description', { maxLength: 500 }),
   commonBodyRules.optionalUrl('posterUrl'),
@@ -27,7 +27,7 @@ exports.updateVD = [
 // 3. 查询标签列表（Query 参数为主，全可选）
 exports.listVD = [
   commonBodyRules.optionalString('regExp', { maxLength: 100 }),
-  commonBodyRules.optionalEnum('mould', mouldEnums), // 业务默认
+  commonBodyRules.optionalEnum('mould', modelEnums.mouldEnums), // 业务默认
   commonBodyRules.optionalBoolean('isActive'),
   ...validatorOptions,
   validatorErrorHandle
