@@ -104,7 +104,7 @@ class AccountSV {
       }
 
       deleteImmutableFront(doc, AccountMD.doc);
-      doc.createdBy = payload._id;
+      doc.createdBy = payload.currentUser?._id;
 
       const existing = await AccountMD.findOne({ $or: [{ code: doc.code }, { phone: doc.phone }] });
       if (existing) {
@@ -239,10 +239,9 @@ class AccountSV {
           filteredDoc[key] = value;
         }
       }
-      console.log(2222, 'AccountSV selfUpdate filtered doc:', filteredDoc);
 
-      const account = await AccountMD.findById(payload._id);
-      if (!account || !account.isActive) {
+      const Account = await AccountMD.findById(payload._id);
+      if (!Account || !Account.isActive) {
         throw new Error('找不到您的账户数据或者账户已被禁用');
       }
 
@@ -252,7 +251,7 @@ class AccountSV {
         delete filteredDoc.password;
       }
 
-      const item = Object.assign(account, filteredDoc);
+      const item = Object.assign(Account, filteredDoc);
       await item.save();
 
       // 返回时不包含密码哈希

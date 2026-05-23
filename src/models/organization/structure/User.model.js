@@ -1,6 +1,6 @@
 // models/user.js (用户)
 const mongoose = require("mongoose");
-const { deleteImmutableFront } = require("../../../utils/validatorModel");
+const { deleteImmutableFront } = require("@utils/validatorModel");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
@@ -10,9 +10,6 @@ const doc = {
     // 对应的账号ID，一个账号可以对应多个身份（User），但一个身份只能对应一个账号
     Account: { type: ObjectId, ref: 'Account', required: true, immutable: true },
     Org: { type: ObjectId, ref: 'Org', required: true, immutable: true },
-
-    // 默认使用的身份，用户可以切换不同的身份（User）来使用系统，但每次登录后默认使用这个身份
-    isDefault: { type: Boolean, default: false },
 
     Depts: [{ type: ObjectId, ref: 'Dept' }],
 

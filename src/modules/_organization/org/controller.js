@@ -1,6 +1,6 @@
 const OrgSV = require('./service');
-const ApiResponse = require('../../../utils/response');
-const asyncHandler = require('../../../utils/asyncHandler');
+const ApiResponse = require('@utils/response');
+const asyncHandler = require('@utils/asyncHandler');
 
 class OrgCT {
   list = asyncHandler(async (req, res) => {

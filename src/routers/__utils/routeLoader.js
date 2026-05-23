@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const RouteCollector = require("../../utils/routeCollector");
+const RouteCollector = require("@utils/routeCollector");
 
 /**
  * 递归加载路由文件

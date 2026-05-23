@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const RouteCollector = require("../../utils/routeCollector");
-const cache = require("../../utils/cache");
+const RouteCollector = require("@utils/routeCollector");
+const cache = require("@utils/cache");
 
 /**
  * 应用分页到数组

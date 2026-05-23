@@ -1,4 +1,4 @@
-const { validatorErrorHandle, commonBodyRules, commonParamRules, validatorOptions } = require('../../../../utils/validatorHandle');
+const { validatorErrorHandle, commonBodyRules, commonParamRules, validatorOptions } = require('@utils/validatorHandle');
 
 exports.createVD = [
   // Body 参数：可选规则

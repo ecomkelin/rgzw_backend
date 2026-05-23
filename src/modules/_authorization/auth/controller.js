@@ -1,7 +1,7 @@
 const AuthSV = require('./service');
 const { validationResult } = require('express-validator');
-const ApiResponse = require('../../../utils/response');
-const asyncHandler = require('../../../utils/asyncHandler');
+const ApiResponse = require('@utils/response');
+const asyncHandler = require('@utils/asyncHandler');
 
 class LoginCT {
   authorizationRes(res, { account, accessToken, refreshToken, refreshTokenExpiresAt }) {

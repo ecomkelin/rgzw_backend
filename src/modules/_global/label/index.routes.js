@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const LabelCT = require('./controller');
-const { authenticate } = require('../../../middlewares/auth');
+const { authenticate } = require('@middlewares/auth');
 const { createVD, updateVD, listVD, detailVD, deleteVD, deleteIdsVD } = require('./middlewares/validator');
 const { readPermission, createPermission, editPermission, deletePermission } = require('./middlewares/permission');
 const { softDeleteMiddleware } = require('./middlewares/softDelete');
@@ -25,11 +25,11 @@ router.post('/restore/:id', authenticate, editPermission, detailVD, async (req, 
   try {
     const softDeleteUtils = require('./utils/softDeleteUtils');
     const result = await softDeleteUtils.restoreDeletedLabel(req.params.id, req.payload);
-    const ApiResponse = require('../../../utils/response');
+    const ApiResponse = require('@utils/response');
     return res.status(200).json(ApiResponse.success(result));
   } catch (error) {
     console.error("Label restore error: ", error.message);
-    const ApiResponse = require('../../../utils/response');
+    const ApiResponse = require('@utils/response');
     return res.status(500).json(ApiResponse.serverError());
   }
 });
@@ -39,11 +39,11 @@ router.delete('/permanent/:id', authenticate, deletePermission, detailVD, async 
   try {
     const softDeleteUtils = require('./utils/softDeleteUtils');
     const result = await softDeleteUtils.permanentDeleteLabel(req.params.id, req.payload);
-    const ApiResponse = require('../../../utils/response');
+    const ApiResponse = require('@utils/response');
     return res.status(200).json(ApiResponse.success(result));
   } catch (error) {
     console.error("Label permanent delete error: ", error.message);
-    const ApiResponse = require('../../../utils/response');
+    const ApiResponse = require('@utils/response');
     return res.status(500).json(ApiResponse.serverError());
   }
 });
@@ -53,11 +53,11 @@ router.post('/deleted-list', authenticate, readPermission, listVD, async (req, r
   try {
     const softDeleteUtils = require('./utils/softDeleteUtils');
     const result = await softDeleteUtils.getDeletedLabels(req.payload, req.validData.options || {});
-    const ApiResponse = require('../../../utils/response');
+    const ApiResponse = require('@utils/response');
     return res.status(200).json(ApiResponse.success(result));
   } catch (error) {
     console.error("Label get deleted list error: ", error.message);
-    const ApiResponse = require('../../../utils/response');
+    const ApiResponse = require('@utils/response');
     return res.status(500).json(ApiResponse.serverError());
   }
 });

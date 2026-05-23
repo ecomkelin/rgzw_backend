@@ -1,4 +1,4 @@
-const ApiResponse = require('../../../../utils/response');
+const ApiResponse = require('@utils/response');
 
 // 通用权限检查函数
 const checkPermission = (permissionType) => {

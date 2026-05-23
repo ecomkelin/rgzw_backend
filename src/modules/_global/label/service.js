@@ -15,10 +15,10 @@ class LabelSV {
       }
       delete query.regExp;
 
-      if (!payload.isAdmin) query.Org = payload.Org_id;
+      if (!payload.isAdmin) query.Org = payload.currentUser?.Org;
       if (!query.mould) query.mould = mouldEnums[0];
 
-      if (!payload.isAdmin || payload.roleSimp !== 'manager') {
+      if (!payload.isAdmin || payload.currentUser?.roleSimp !== 'manager') {
         query.isActive = true;
       }
 
@@ -55,7 +55,7 @@ class LabelSV {
       if (!item) {
         throw new Error("此数据已不存在");
       }
-      if (!payload.isAdmin && item.Org.toString() !== payload.Org_id) {
+      if (!payload.isAdmin && item.Org.toString() !== payload.currentUser?.Org) {
         throw new Error("您无权查看其他公司的数据");
       }
       return { item };
@@ -68,8 +68,8 @@ class LabelSV {
 
   async create(doc, payload) {
     try {
-      doc.Org = payload.Org_id;
-      doc.createdBy = payload._id;
+      doc.Org = payload.currentUser?.Org;
+      doc.createdBy = payload.currentUser?._id;
 
       const _item = new LabelMD(doc);
       const item = await _item.save();
@@ -98,7 +98,7 @@ class LabelSV {
       if (!Label) {
         throw new Error('标签不存在');
       }
-      if (Label.Org.toString() !== payload.Org_id) {
+      if (Label.Org.toString() !== payload.currentUser?.Org) {
         throw new Error('无权限操作该标签');
       }
 
@@ -122,7 +122,7 @@ class LabelSV {
     try {
       if (soft) {
         // 软删除实现
-        const updateQuery = { _id, Org: payload.Org_id };
+        const updateQuery = { _id, Org: payload.currentUser?.Org };
         const updateData = {
           isActive: false,
           updatedBy: payload._id,
@@ -139,7 +139,7 @@ class LabelSV {
         };
       } else {
         // 硬删除实现
-        const deleteQuery = { _id, Org: payload.Org_id };
+        const deleteQuery = { _id, Org: payload.currentUser?.Org };
         const deleteInfo = await LabelMD.deleteOne(deleteQuery);
 
         // 返回删除的详细信息
@@ -170,7 +170,7 @@ class LabelSV {
         // 软删除实现
         const updateQuery = {
           _id: { $in: ids },
-          Org: payload.Org_id
+          Org: payload.currentUser?.Org
         };
 
         const updateData = {
@@ -190,7 +190,7 @@ class LabelSV {
         // 硬删除实现
         const deleteQuery = {
           _id: { $in: ids },
-          Org: payload.Org_id
+          Org: payload.currentUser?.Org
         }
         const deleteInfo = await LabelMD.deleteMany(deleteQuery);
 

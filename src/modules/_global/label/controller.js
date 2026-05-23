@@ -1,6 +1,6 @@
 const LabelSV = require('./service');
-const ApiResponse = require('../../../utils/response');
-const asyncHandler = require('../../../utils/asyncHandler');
+const ApiResponse = require('@utils/response');
+const asyncHandler = require('@utils/asyncHandler');
 
 class LabelCT {
   list = asyncHandler(async (req, res) => {

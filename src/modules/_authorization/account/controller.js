@@ -1,20 +1,14 @@
 const Service = require('./service');
-const ApiResponse = require('../../../utils/response');
-const asyncHandler = require('../../../utils/asyncHandler');
+const ApiResponse = require('@utils/response');
+const asyncHandler = require('@utils/asyncHandler');
 
 class AccountCT {
   list = asyncHandler(async (req, res) => {
     try {
-      console.log('AccountCT list method called for user:', req.payload._id);
-
       const data = await Service.list(req.validData, req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (error) {
-      console.error("AccountCT list error: ", {
-        message: error.message,
-        userId: req.payload._id,
-        timestamp: new Date().toISOString()
-      });
+      console.error("AccountCT list error: ", error);
 
       // 在生产环境中，不要暴露内部错误细节
       if (process.env.NODE_ENV === 'production') {
@@ -40,7 +34,7 @@ class AccountCT {
       const data = await Service.create(req.validData, req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (error) {
-      console.error("AccountCT create error: ", error.message);
+      console.error("AccountCT create error: ", error);
       return res.status(500).json(ApiResponse.serverError());
     }
   });

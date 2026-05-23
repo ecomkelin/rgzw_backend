@@ -25,14 +25,12 @@
 **关键字段**：
 - `Account`: 关联的账号ID
 - `Org`: 所属组织
-- `isDefault`: 是否为默认身份
 - `Depts`: 所属部门列表
 - `roleSimp`: 用户角色（manager/teacher）
 - `nickname`: 昵称
 
 **重要特性**：
 - 一个账号可对应多个用户身份
-- 通过 `isDefault` 字段标记默认使用身份
 - 支持灵活的组织结构
 
 ### 3. Student 模型 (src/models/student/Student.model.js)

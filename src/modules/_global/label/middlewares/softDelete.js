@@ -1,5 +1,5 @@
 const LabelMD = require('@models/global/Label.model');
-const ApiResponse = require('../../../../utils/response');
+const ApiResponse = require('@utils/response');
 
 /**
  * 可选的软删除中间件 - 根据请求参数决定是硬删除还是软删除
@@ -26,7 +26,7 @@ const performSoftDelete = async (_id, payload) => {
   try {
     const updateQuery = {
       _id,
-      Org: payload.Org_id
+      Org: payload.currentUser?.Org
     };
     const updateData = {
       isActive: false,
@@ -63,7 +63,7 @@ const performSoftDeleteMany = async (query, payload) => {
 
     const updateQuery = {
       _id: { $in: ids },
-      Org: payload.Org_id
+      Org: payload.currentUser?.Org
     };
 
     const updateData = {

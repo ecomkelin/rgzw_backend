@@ -7,7 +7,7 @@ const restoreDeletedLabel = async (_id, payload) => {
   try {
     const updateQuery = {
       _id,
-      Org: payload.Org_id,
+      Org: payload.currentUser?.Org,
       isActive: false // 确保标签确实是被标记为删除的
     };
 
@@ -39,7 +39,7 @@ const permanentDeleteLabel = async (_id, payload) => {
   try {
     const deleteQuery = {
       _id,
-      Org: payload.Org_id,
+      Org: payload.currentUser?.Org,
       isActive: false // 确保标签确实已被标记为删除
     };
 
@@ -61,7 +61,7 @@ const permanentDeleteLabel = async (_id, payload) => {
 const getDeletedLabels = async (payload, options = {}) => {
   try {
     const query = {
-      Org: payload.Org_id,
+      Org: payload.currentUser?.Org,
       isActive: false // 只获取已删除的标签
     };
 

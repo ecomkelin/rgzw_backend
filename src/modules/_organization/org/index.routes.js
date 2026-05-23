@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const OrgCT = require('./controller');
-const { authenticate } = require('../../../middlewares/auth');
+const { authenticate } = require('@middlewares/auth');
 const { updateVD, createVD, listVD, detailVD } = require('./middlewares/validator');
 const { readPermission, createPermission, editPermission, managePermission } = require('./middlewares/permission');
 
