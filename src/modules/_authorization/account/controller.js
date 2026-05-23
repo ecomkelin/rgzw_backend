@@ -74,6 +74,7 @@ class AccountCT {
       return res.status(500).json(ApiResponse.serverError());
     }
   });
+
 }
 
 module.exports = new AccountCT();

@@ -93,7 +93,6 @@ class LabelSV {
       delete doc.Org; // 防止修改所属组织
       delete doc.module; // 防止修改所属模块
       delete doc.createdAt; // 防止修改创建时间
-      doc.updatedBy = payload._id;
 
       const Label = await LabelMD.findById(_id);
       if (!Label) {

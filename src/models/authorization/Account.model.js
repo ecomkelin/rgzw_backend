@@ -10,11 +10,12 @@ const doc = {
   code: { type: String, required: true, immutable: true },
   passwordHash: { type: String, select: false, required: true },
   phone: { type: String }, // 联系电话
+  nickname: { type: String }, // 昵称
 
   // 账号信息
   // 角色类型：superAdmin（超级管理员）/orgAdmin（机构管理员）/staff（员工）
   accountType: { type: String, enum: accountTypeEnums, default: "User", immutable: true },
-  isAdmin: { type: Boolean, default: false }, // 只有user 角色类型的账号才有isAdmin字段，表示是否是管理员账号
+  isAdmin: { type: Boolean, default: false, immutable: true }, // 只有user 角色类型的账号才有isAdmin字段，表示是否是管理员账号
   currentUser: { type: ObjectId, ref: 'User' }, // 关联的用户ID，accountType为User时关联User，为Student时关联Student
   currentStudent: { type: ObjectId, ref: 'Student' }, // 关联的学生ID，accountType为Student时关联Student
 
@@ -28,7 +29,7 @@ const doc = {
   // 现在住址 主要是为了方便查看和统计分析，实际使用中以Province/City/Area为准
   currentAddress: { type: String },
   Nation: { type: ObjectId, ref: 'Nation' }, // 民族
-  Provence: { type: ObjectId, ref: 'Province' }, // 省份
+  Province: { type: ObjectId, ref: 'Province' }, // 省份 - 修正拼写错误
   City: { type: ObjectId, ref: 'City' }, // 城市
   Area: { type: ObjectId, ref: 'Area' }, // 区县
 

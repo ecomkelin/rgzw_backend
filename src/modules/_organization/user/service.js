@@ -42,7 +42,6 @@ class UserSV {
     try {
       deleteImmutableFront(doc, UserMD.doc);
       doc.createdBy = payload._id;
-      doc.updatedBy = payload._id;
       const existing = await UserMD.findOne({ Org: doc.Org, Account: doc.Account });
       if (existing) {
         throw new Error('一个账号只能在同一组织下使用唯一的身份');
@@ -60,7 +59,6 @@ class UserSV {
   async update(_id, doc, payload) {
     try {
       deleteImmutableFront(doc, UserMD.doc);
-      doc.updatedBy = payload._id;
 
       const User = await UserMD.findById(_id);
       if (!User) {
@@ -100,7 +98,6 @@ class UserSV {
         const field = UserMD.doc[key];
         if (field.immutableFront === true) delete doc[key]
       }
-      doc.updatedBy = payload._id;
 
       const User = await UserMD.findById(payload.User_id);
       if (!User) {

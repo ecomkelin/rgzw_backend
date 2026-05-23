@@ -105,7 +105,6 @@ class OrgSV {
 
       deleteImmutableFront(doc, OrgMD.doc);
       doc.createdBy = payload._id;
-      doc.updatedBy = payload._id;
 
       // 检查是否已经有主机构
       if (doc.isMain) {
@@ -143,7 +142,6 @@ class OrgSV {
       }
 
       deleteImmutableFront(doc, OrgMD.doc);
-      doc.updatedBy = payload._id;
 
       const Org = await OrgMD.findById(_id);
       if (!Org) {

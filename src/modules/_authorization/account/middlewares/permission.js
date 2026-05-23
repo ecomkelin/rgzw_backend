@@ -13,15 +13,19 @@ const checkPermission = (permissionType) => {
 
       switch(permissionType) {
         case 'read':
-          // 读取权限：超级管理员或普通管理员
+          // 读取权限：只有管理员可以读取其他账户信息
           hasPermission = payload.isAdmin === true;
           break;
         case 'create':
-          // 创建权限：超级管理员或经理角色
-          hasPermission = payload.isAdmin === true || payload.roleSimp === 'manager';
+          // 创建权限：只有管理员可以创建账户
+          hasPermission = payload.isAdmin === true;
           break;
         case 'edit':
-          // 编辑权限：超级管理员
+          // 编辑权限：只有管理员可以编辑账户
+          hasPermission = payload.isAdmin === true;
+          break;
+        case 'manage':
+          // 管理权限：只有管理员可以管理账户（激活/禁用等）
           hasPermission = payload.isAdmin === true;
           break;
         default:
@@ -32,7 +36,8 @@ const checkPermission = (permissionType) => {
         const permissionMessages = {
           read: "需要读取权限",
           create: "需要创建权限",
-          edit: "需要编辑权限"
+          edit: "需要编辑权限",
+          manage: "需要管理权限"
         };
 
         return res.status(403).json(
@@ -51,3 +56,4 @@ const checkPermission = (permissionType) => {
 exports.readPermission = checkPermission('read');
 exports.createPermission = checkPermission('create');
 exports.editPermission = checkPermission('edit');
+exports.managePermission = checkPermission('manage');

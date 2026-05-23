@@ -1,5 +1,13 @@
 # 版本更新日志
 
+## v1.1.0
+- 完成了 account 模块
+# 发现了一个问题
+- createBy 这个 需要时 User 而不是 Account
+- 所以我需要把 currentUser 放到 payload 中
+- 方法1 直接在payload 中添加 缺点每次切换账户 要重新发放token
+- 方法2 token转化的叫 decoded， payload 是在decoded基础上增加的信息（推荐）
+
 ## v1.0.0
 - 完成了 Org 模块
 
