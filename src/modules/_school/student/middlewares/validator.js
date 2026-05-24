@@ -4,11 +4,11 @@ const { modelEnums: accountModelEnums } = require('@models/authorization/Account
 
 exports.createVD = [
   // Body 参数：可选规则
+  commonBodyRules.validateString('student.name', { minLength: 2, maxLength: 50 }),
+  commonBodyRules.optionalDate('student.birthday'),
   commonBodyRules.optionalBoolean('student.isActive'),
   commonBodyRules.optionalString('student.phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('student.identity', { minLength: 15, maxLength: 18 }),
-  commonBodyRules.optionalString('student.name', { minLength: 2, maxLength: 50 }),
-  commonBodyRules.optionalDate('student.birthday'),
   commonBodyRules.optionalEnum('student.gender', ['Male', 'Female']),
   commonBodyRules.optionalString('student.address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('student.currentAddress', { minLength: 5, maxLength: 200 }),

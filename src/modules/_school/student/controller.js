@@ -88,17 +88,6 @@ class StudentCT {
     }
   });
 
-  // 新增：激活/禁用学生
-  toggleStudentStatus = asyncHandler(async (req, res) => {
-    try {
-      const data = await StudentSV.toggleStudentStatus(req.params.id, req.body.isActive, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("StudentCT toggleStudentStatus error: ", error.message);
-      return res.status(500).json(ApiResponse.serverError());
-    }
-  });
-
   // 注释：查看自己的学生信息（暂不启用）
   /*
   selfDetail = asyncHandler(async (req, res) => {

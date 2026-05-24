@@ -1,5 +1,4 @@
 const UserMD = require('@models/organization/structure/User.model');
-const AccountMD = require('@models/authorization/Account.model');
 const { formatOptions } = require('@utils/formatOptions');
 const { deleteImmutableFront } = require('@utils/validatorModel');
 
@@ -57,7 +56,7 @@ class UserSV {
       if (!payload.isAdmin) {
         if (payload.currentUser.roleTemp === 'manager' && item.Org.toString() !== payload.currentUser?.Org.toString()) {
           throw new Error("没有权限查看其他公司的用户");
-        } else if (!payload.currentUser.roleTemp) {
+        } else {
           throw new Error("没有权限查看用户信息");
         }
       }
@@ -87,7 +86,7 @@ class UserSV {
 
 
       deleteImmutableFront(doc, UserMD.doc);
-      doc.createdBy = payload._id;
+      doc.createdBy = payload.currentUser?._id;
 
       // 检查同一账号在同一组织下是否有重复的身份
       const existing = await UserMD.findOne({ Org: doc.Org, Account: doc.Account });
@@ -120,9 +119,12 @@ class UserSV {
       }
 
       if (!payload.isAdmin) {
+        delete doc.isActive; // 经理不能修改用户的激活状态
+        delete doc.Org; // 经理不能修改用户的组织归属
+
         if (payload.currentUser?.roleTemp === 'manager' && targetUser.Org.toString() !== payload.currentUser?.Org.toString()) {
           throw new Error("没有权限更新其他公司的用户");
-        } else if (!payload.currentUser.roleTemp) {
+        } else {
           throw new Error("没有权限更新用户");
         }
       }
@@ -158,18 +160,11 @@ class UserSV {
         if (field.immutableFront === true) delete doc[key]
       }
 
-      const Account = await AccountMD.findById(payload._id);
-      if (!Account || !Account.isActive) {
-        throw new Error("您的账户信息不存在或已被禁用");
-      }
-      if (Account.accountType !== 'User' || !Account.currentUser) {
-        throw new Error("您的账户没有关联的用户身份");
-      }
-      const user = await UserMD.findById(Account.currentUser);
-      if (!user || !user.isActive) {
+      const User = await UserMD.findById(payload.currentUser);
+      if (!User || !User.isActive) {
         throw new Error('找不到您的身份数据或者您的身份已被禁用');
       }
-      const item = Object.assign(user, doc);
+      const item = Object.assign(User, doc);
       await item.save();
       return { item };
     } catch (error) {

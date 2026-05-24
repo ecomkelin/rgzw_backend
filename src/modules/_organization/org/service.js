@@ -1,7 +1,4 @@
 const OrgMD = require('@models/organization/structure/Org.model');
-const UserMD = require('@models/organization/structure/User.model');
-const StudentMD = require('@/models/school/student/Student.model');
-const AccountMD = require('@models/authorization/Account.model');
 const { formatOptions } = require('@utils/formatOptions');
 const { deleteImmutableFront } = require('@utils/validatorModel');
 
@@ -23,30 +20,16 @@ class OrgSV {
       delete query.regExp;
 
       // 权限控制
-      if (payload.isAdmin) {
-        // 管理员可以查看所有机构
-        const items = await OrgMD
-          .find(query)
-          .sort(sort)
-          .limit(pageSize).skip(skip)
-
-        return { items, query };
-      } else {
-        // 普通用户只能查看自己所在的机构
-        const user = await UserMD.findOne({ Account: payload._id });
-        if (!user) {
-          return { items: [], query: {} };
-        }
-
-        query._id = user.Org; // 限制查询为用户所在的机构
-
-        const items = await OrgMD
-          .find(query)
-          .sort(sort)
-          .limit(pageSize).skip(skip)
-
-        return { items, query };
+      // 管理员可以查看所有机构
+      if (!payload.isAdmin) {
+        throw new Error("管理员没有权限查看机构列表");
       }
+      const items = await OrgMD
+        .find(query)
+        .sort(sort)
+        .limit(pageSize).skip(skip)
+
+      return { items, query };
     } catch (error) {
       console.error('OrgSV list error:', error.message);
       throw error;
@@ -60,31 +43,15 @@ class OrgSV {
    */
   async detail(_id, payload) {
     try {
-      if (payload.isAdmin) {
-        // 管理员可以查看任何机构
-        const item = await OrgMD.findById(_id);
-        if (!item) {
-          throw new Error("此数据已不存在");
-        }
-        return { item };
-      } else {
-        // 普通用户只能查看自己所在的机构
-        const user = await UserMD.findOne({ Account: payload._id });
-        if (!user) {
-          throw new Error("用户不存在");
-        }
-
-        if (user.Org.toString() !== _id.toString()) {
-          throw new Error("没有权限访问此机构");
-        }
-
-        const item = await OrgMD.findById(_id);
-        if (!item) {
-          throw new Error("此数据已不存在");
-        }
-
-        return { item };
+      // 管理员可以查看任何机构
+      if (!payload.isAdmin) {
+        throw new Error("管理员没有权限查看机构详情");
       }
+      const item = await OrgMD.findById(_id);
+      if (!item) {
+        throw new Error("此数据已不存在");
+      }
+      return { item };
     } catch (error) {
       console.error('OrgSV detail error:', error.message);
       throw error;
@@ -98,13 +65,12 @@ class OrgSV {
   async create(doc, payload) {
     try {
       // 验证权限
-      const account = await AccountMD.findById(payload._id);
-      if (!account || !account.isAdmin) {
+      if (!payload.isAdmin) {
         throw new Error("只有管理员才能创建机构");
       }
 
       deleteImmutableFront(doc, OrgMD.doc);
-      doc.createdBy = payload._id;
+      doc.createdBy = payload.currentUser?._id;
 
       // 检查是否已经有主机构
       if (doc.isMain) {
@@ -136,8 +102,7 @@ class OrgSV {
   async update(_id, doc, payload) {
     try {
       // 验证权限
-      const account = await AccountMD.findById(payload._id);
-      if (!account || !account.isAdmin) {
+      if (!payload.isAdmin) {
         throw new Error("只有管理员才能更新机构");
       }
 
@@ -168,26 +133,18 @@ class OrgSV {
    */
   async selfDetail(payload) {
     try {
-      const account = await AccountMD.findById(payload._id);
-      if (!account || !account.isActive) {
-        throw new Error("账户不存在或者被禁用");
-      }
-      if (account.accountType !== 'User' || account.currentUser == null) {
+      if (payload.accountType !== 'User' || payload.currentUser == null) {
         throw new Error("账户类型不正确或者没有关联的用户");
       }
-
-      const user = await UserMD.findById(account.currentUser).populate('Org');
-      if (!user || !user.isActive) {
-        throw new Error("用户不存在或者被禁用");
-      }
-      if (!user.Org) {
+      if (!payload.currentUser._id || !payload.currentUser.Org) {
         throw new Error("用户没有关联的机构");
       }
 
-      const item = await OrgMD.findById(user.Org)
+      const item = await OrgMD.findById(payload.currentUser.Org);
       if (!item || !item.isActive) {
         throw new Error("您的公司已经不存在或已被禁用");
       }
+
       return { item };
     } catch (error) {
       console.error('OrgSV selfDetail error:', error.message);

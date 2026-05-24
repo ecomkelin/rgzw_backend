@@ -1,5 +1,4 @@
 const StudentMD = require('@models/school/student/Student.model');
-const AccountMD = require('@models/authorization/Account.model');
 const { formatOptions } = require('@utils/formatOptions');
 const { deleteImmutableFront } = require('@utils/validatorModel');
 
@@ -52,7 +51,7 @@ class StudentSV {
       if (!payload.isAdmin) {
         if (payload.currentUser.roleTemp === 'manager' && item.Org.toString() !== payload.currentUser?.Org.toString()) {
           throw new Error("没有权限查看其他公司的学生");
-        } else if (!payload.currentUser.roleTemp) {
+        } else {
           throw new Error("没有权限查看学生信息");
         }
       }
@@ -66,70 +65,21 @@ class StudentSV {
 
   async create(doc, payload) {
     try {
-      // 权限验证：isAdmin=true 和 roleTemp='manager' 都可以创建学生
+      // 权限验证：isAdmin=true 和 roleTemp='manager' 都可以创建学生 设置学生的Org
       if (!payload.isAdmin) {
         if (payload.currentUser.roleTemp === 'manager') {
-          // 如果指定了Org，必须与当前用户所在Org相同
-          if (doc.Org && doc.Org.toString() !== payload.currentUser?.Org.toString()) {
-            throw new Error("经理只能为自己的公司创建学生");
-          }
-          // 如果没有指定Org，默认设置为当前用户所在Org
-          if (!doc.Org) {
-            doc.Org = payload.currentUser?.Org;
-          }
+          doc.Org = payload.currentUser?.Org;
         } else {
           throw new Error("没有权限创建学生");
         }
-      }
-
-      // 如果没有指定Account，且提供了account信息，则创建新账户
-      if (!doc.Account && doc.account) {
-        // 检查是否为管理员才能创建账户
-        if (!payload.isAdmin) {
-          throw new Error("只有管理员可以创建账户");
+      } else {
+        if (!doc.Org) {
+          doc.Org = payload.currentUser?.Org;
         }
-
-        // 创建新的账户
-        const accountData = doc.account;
-
-        // 确保新创建的账户不是管理员
-        accountData.isAdmin = false;
-
-        // 处理密码
-        if (accountData.password) {
-          accountData.passwordHash = accountData.password;
-          delete accountData.password;
-        }
-
-        deleteImmutableFront(accountData, AccountMD.doc);
-        accountData.createdBy = payload._id;
-        accountData.updatedBy = payload._id;
-
-        const existing = await AccountMD.findOne({
-          $or: [
-            { code: accountData.code },
-            { phone: accountData.phone ? accountData.phone : null }
-          ]
-        });
-
-        if (existing && (existing.code === accountData.code || (accountData.phone && existing.phone === accountData.phone))) {
-          throw new Error('手机号或账号已被占用');
-        }
-
-        const newAccount = new AccountMD(accountData);
-        await newAccount.save();
-        doc.Account = newAccount._id;
-      } else if (!doc.Account) {
-        throw new Error("必须提供Account信息或account创建信息");
-      }
-
-      // 如果没有提供Org，使用当前用户所在Org
-      if (!doc.Org && !payload.isAdmin && payload.currentUser.roleTemp === 'manager') {
-        doc.Org = payload.currentUser?.Org;
       }
 
       deleteImmutableFront(doc, StudentMD.doc);
-      doc.createdBy = payload._id;
+      doc.createdBy = payload.currentUser?._id;
 
       const item = new StudentMD(doc);
       await item.save();
@@ -156,9 +106,12 @@ class StudentSV {
       }
 
       if (!payload.isAdmin) {
+        delete doc.isActive; // 经理不能修改用户的激活状态
+        delete doc.Org; // 经理不能修改用户的组织归属
+
         if (payload.currentUser.roleTemp === 'manager' && targetStudent.Org.toString() !== payload.currentUser?.Org.toString()) {
           throw new Error("没有权限更新其他公司的学生");
-        } else if (!payload.currentUser.roleTemp) {
+        } else {
           throw new Error("没有权限更新学生");
         }
       }
@@ -185,37 +138,6 @@ class StudentSV {
     }
   }
 
-  /**
-   * 激活/禁用学生
-   * - 只有管理员可以操作
-   */
-  async toggleStudentStatus(_id, isActive, payload) {
-    try {
-      // 权限验证：只有管理员可以操作
-      if (!payload.isAdmin) {
-        throw new Error("只有管理员才能修改学生状态");
-      }
-
-      const student = await StudentMD.findById(_id);
-      if (!student) {
-        throw new Error("学生不存在");
-      }
-
-      student.isActive = isActive;
-      student.updatedBy = payload._id;
-      await student.save();
-
-      // 返回时填充相关数据
-      const populatedStudent = await StudentMD.findById(student._id)
-        .populate('Account', 'code name phone isActive isAdmin')
-        .populate('Org', 'name isMain');
-
-      return { item: populatedStudent };
-    } catch (error) {
-      console.error('StudentSV toggleStudentStatus error:', error.message);
-      throw error;
-    }
-  }
 
   async selfUpdate(doc, payload) {
     try {

@@ -14,7 +14,6 @@ router.post('/create', authenticate, createPermission, createVD, Controller.crea
 
 // 修改和管理学生
 router.put('/:id', authenticate, editPermission, updateVD, Controller.update);
-router.patch('/:id/status', authenticate, managePermission, detailVD, Controller.toggleStudentStatus);
 
 // 注释：查看自己的学生信息（暂不启用）
 // router.get('/self/detail', authenticate, Controller.selfDetail);

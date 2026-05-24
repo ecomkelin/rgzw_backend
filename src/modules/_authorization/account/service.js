@@ -1,6 +1,4 @@
 const AccountMD = require('@models/authorization/Account.model');
-const UserMD = require('@models/organization/structure/User.model');
-const StudentMD = require('@/models/school/student/Student.model');
 const { formatOptions } = require('@utils/formatOptions');
 const { deleteImmutableFront } = require('@utils/validatorModel');
 
