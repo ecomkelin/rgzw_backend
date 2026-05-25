@@ -1,4 +1,4 @@
-const AccountMD = require('@models/authorization/Account.model');
+const { AccountModel } = require('@models/authorization/Account.dao');
 const UtilsJwt = require('@utils/JwtUtil');
 
 class LoginSV {
@@ -7,22 +7,10 @@ class LoginSV {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   }
 
-  getPayloadWithAccount = (Account) => {
-    if (!Account) {
-      throw new Error('Account object is required');
-    }
-    const payload = {
-      _id: Account._id,
-      accountType: Account.accountType,
-      isAdmin: Account.isAdmin,
-      sessionId: Account.currentSessionId,
-    }
-    return payload;
-  }
 
   async login(code, password) {
     try {
-      const Account = await AccountMD.findOne({ code: code.toUpperCase(), isActive: true })
+      const Account = await AccountModel.findOne({ code: code.toUpperCase(), isActive: true })
         .select('+passwordHash');
 
       if (!Account) {
@@ -37,7 +25,6 @@ class LoginSV {
       // 生成唯一的sessionId 防止多次登录 Generate a unique session ID for this login
       const sessionId = this.generateSessionId();
       // 设置新会话前 清除已经存在的 session
-      // This ensures that the old session is invalidated
       if (Account.currentSessionId) {
         // The previous session will become invalid as soon as we update currentSessionId
       }
@@ -46,9 +33,8 @@ class LoginSV {
       await Account.save();
 
       // account user 组合生成 payload
-      const payload = this.getPayloadWithAccount(Account);
 
-      const accessToken = UtilsJwt.generateAccessToken(payload);
+      const accessToken = UtilsJwt.generateAccessToken(Account);
       const refreshToken = UtilsJwt.generateRefreshToken(Account._id, sessionId);
       const refreshTokenExpiresAt = UtilsJwt.generateExpiresAt();
 
@@ -66,7 +52,7 @@ class LoginSV {
         throw new Error('无效的刷新令牌');
       }
 
-      const Account = await AccountMD.findOne({ _id: decoded._id, isActive: true })
+      const Account = await AccountModel.findOne({ _id: decoded._id, isActive: true })
         .select('+currentSessionId')
 
       if (!Account) {
@@ -82,9 +68,7 @@ class LoginSV {
       Account.currentSessionId = sessionId;
       await Account.save();
 
-      const payload = this.getPayloadWithAccount(Account);
-
-      const accessToken = UtilsJwt.generateAccessToken(payload);
+      const accessToken = UtilsJwt.generateAccessToken(Account);
       const refreshToken = UtilsJwt.generateRefreshToken(Account._id, sessionId);
       const refreshTokenExpiresAt = UtilsJwt.generateExpiresAt();
 
@@ -95,14 +79,15 @@ class LoginSV {
     }
   }
 
-  async logout(_id, token) {
+  async logout(payload) {
     try {
-      const account = await AccountMD.findById(_id);
+      const { _id } = payload;
+      const account = await AccountModel.findById(_id);
       if (!account) {
         return false;
       }
 
-      await AccountMD.findByIdAndUpdate(_id, {
+      await AccountModel.findByIdAndUpdate(_id, {
         $unset: {
           'currentSessionId': ""
         },
@@ -125,13 +110,13 @@ class LoginSV {
    */
   async forceLogoutAllDevices(_id) {
     try {
-      const account = await AccountMD.findById(_id);
+      const account = await AccountModel.findById(_id);
       if (!account) {
         return false;
       }
 
       // Clear all session-related data to force logout from all devices
-      await AccountMD.findByIdAndUpdate(_id, {
+      await AccountModel.findByIdAndUpdate(_id, {
         $unset: {
           'currentSessionId': ""
         },

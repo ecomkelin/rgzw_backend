@@ -45,7 +45,7 @@
 - 使用 `validatorErrorHandle` 统一处理验证错误
 - **特殊说明（列表接口的复杂验证）**：
   - `regExp` 模糊查询：接受字符串类型的模糊搜索参数，验证长度限制
-  - `options` 配置对象：包含分页、排序等参数，使用 `validatorOptions` 验证格式
+  - `options` 配置对象：包含分页、排序等参数，使用 `listOptionsValidator` 验证格式
   - 分页参数验证：page（页码）必须是 ≥1 的整数，pageSize（每页数量）必须在 [1, MAX_HANDLE_ITEM] 范围内
   - 排序参数验证：sortObj 必须是对象格式，键值对中的值只能是 1（升序）或 -1（降序）
 

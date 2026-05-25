@@ -1,12 +1,9 @@
-const StudentMD = require('@models/school/student/Student.model');
-const { formatOptions } = require('@utils/formatOptions');
-const { deleteImmutableFront } = require('@utils/validatorModel');
+const { StudentModel, StudentDOC } = require('@models/school/student/Student.dao');
+const { deleteImmutableFront } = require('@/utils/fieldAttributes');
 
 class StudentSV {
   async list(query = {}, payload = {}) {
     try {
-      const { pageSize, skip, sort } = formatOptions(query.options);
-      delete query.options;
 
       // 如果 regExp = "" 为否
       if (query.regExp) {
@@ -23,7 +20,7 @@ class StudentSV {
         }
       }
 
-      const items = await StudentMD
+      const items = await StudentModel
         .find(query)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain')
@@ -39,7 +36,7 @@ class StudentSV {
 
   async detail(_id, payload) {
     try {
-      const item = await StudentMD.findById(_id)
+      const item = await StudentModel.findById(_id)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain');
 
@@ -78,14 +75,14 @@ class StudentSV {
         }
       }
 
-      deleteImmutableFront(doc, StudentMD.doc);
+      deleteImmutableFront(doc, StudentDOC);
       doc.createdBy = payload.currentUser?._id;
 
-      const item = new StudentMD(doc);
+      const item = new StudentModel(doc);
       await item.save();
 
       // 返回时填充相关数据
-      const populatedItem = await StudentMD.findById(item._id)
+      const populatedItem = await StudentModel.findById(item._id)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain');
 
@@ -100,7 +97,7 @@ class StudentSV {
   async update(_id, doc, payload) {
     try {
       // 权限验证：isAdmin=true 可以更新任意学生，roleTemp='manager' 只能更新本公司学生
-      const targetStudent = await StudentMD.findById(_id);
+      const targetStudent = await StudentModel.findById(_id);
       if (!targetStudent) {
         throw new Error('学生不存在');
       }
@@ -120,14 +117,14 @@ class StudentSV {
       delete doc.Account; // 不允许更换账户
       delete doc.Org;     // 不允许更换组织
 
-      deleteImmutableFront(doc, StudentMD.doc);
+      deleteImmutableFront(doc, StudentDOC);
       doc.updatedBy = payload._id;
 
       const item = Object.assign(targetStudent, doc);
       await item.save();
 
       // 返回时填充相关数据
-      const populatedItem = await StudentMD.findById(item._id)
+      const populatedItem = await StudentModel.findById(item._id)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain');
 
@@ -142,8 +139,8 @@ class StudentSV {
   async selfUpdate(doc, payload) {
     try {
       delete doc._id;
-      for (const key in StudentMD.doc) {
-        const field = StudentMD.doc[key];
+      for (const key in StudentDOC) {
+        const field = StudentDOC[key];
         if (field.immutableFront === true) delete doc[key]
       }
 

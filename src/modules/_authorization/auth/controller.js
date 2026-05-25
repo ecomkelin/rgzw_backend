@@ -1,6 +1,5 @@
 const AuthSV = require('./service');
-const { validationResult } = require('express-validator');
-const ApiResponse = require('@utils/response');
+const ApiResponse = require('@utils/responsed');
 const asyncHandler = require('@utils/asyncHandler');
 
 class LoginCT {
@@ -14,25 +13,23 @@ class LoginCT {
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30天
     });
     // 构建返回的认证数据
-    res.json(ApiResponse.success({
-      accessToken,
-      account
+    res.status(200).json(ApiResponse.success({
+      data: {
+        accessToken,
+        account
+      }
     }));
   }
   // 用户登录
-  login = asyncHandler(async (req, res, next) => {
+  login = asyncHandler(async (req, res) => {
     try {
-      const { code, password } = req.body;
+      const { code, password } = req.validData || {};
       const authResRtData = await AuthSV.login(code, password);
+
       return this.authorizationRes(res, authResRtData);
-    } catch (error) {
-      console.error('LoginCT login error:', error.message);
-      // 处理特定的认证错误
-      if (error.message.includes('用户不存在') || error.message.includes('密码错误')) {
-        return res.status(401).json(ApiResponse.unauthorizedError(error.message));
-      }
-      // 其他错误返回服务器错误
-      return res.status(500).json(ApiResponse.serverError());
+    } catch (e) {
+      console.error("LoginCT login error:", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 
@@ -42,36 +39,29 @@ class LoginCT {
       // 1. 从 Cookie 中获取 refreshToken
       let refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
-        return res.status(401).json({ message: 'refreshToken 不存在，请重新登录' });
+        throw ({ code: 401, message: 'refreshToken 不存在，请重新登录' })
       }
 
       const authResRtData = await AuthSV.refreshToken(refreshToken);
+
       return this.authorizationRes(res, authResRtData);
-    } catch (error) {
-      console.error('LoginCT refreshToken error:', error.message);
-
-      // 处理特定的刷新令牌错误
-      if (error.message.includes('无效的刷新令牌')) {
-        return res.status(401).json(ApiResponse.unauthorizedError(error.message));
-      }
-
-      // 其他错误返回服务器错误
-      return res.status(500).json(ApiResponse.serverError());
+    } catch (e) {
+      console.error("LoginCT refreshToken error:", e);
+      return res.json(ApiResponse.error(e))
     }
   });
 
   // 登出
   logout = asyncHandler(async (req, res) => {
     try {
-      const result = await AuthSV.logout(req.payload._id, req.token);
+      const result = await AuthSV.logout(req.payload);
       if (!result) {
-        res.status(400).json(ApiResponse.error('退出失败'));
-        return;
+        throw ({ code: 400, message: "退出失败" })
       }
-      res.json(ApiResponse.success(null, '登出成功'));
-    } catch (error) {
-      console.error('LoginCT logout error:', error.message);
-      return res.status(500).json(ApiResponse.serverError())
+      return res.status(200).json(ApiResponse.success({ message: "成功退出" }));
+    } catch (e) {
+      console.error('LoginCT logout error:', e);
+      return res.json(ApiResponse.error(e))
     }
   });
 

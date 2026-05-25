@@ -1,11 +1,10 @@
 const { verifyAccessToken } = require("@utils/JwtUtil");
-const SessionValidator = require("@utils/sessionValidator");
-const AccountMD = require("@models/authorization/Account.model");
+const { AccountModel } = require("@models/authorization/Account.dao");
 const ApiPermission = require("@models/authorization/roleApi/ApiPermission.model");
 const UserApiPermission = require("@models/authorization/roleApi/UserApiPermission.model");
-const OrgMD = require("@models/organization/structure/Org.model"); // 添加对机构服务的引用
-const UserMD = require("@models/organization/structure/User.model");
-const StudentMD = require("@/models/school/student/Student.model");
+const { OrgModel } = require("@models/organization/structure/Org.dao"); // 添加对机构服务的引用
+const { UserModel } = require("@models/organization/structure/User.dao");
+const { StudentModel } = require("@/models/school/student/Student.dao");
 
 // 认证中间件
 exports.authenticate = async (req, res, next) => {
@@ -22,17 +21,22 @@ exports.authenticate = async (req, res, next) => {
       return res.status(401).json({ message: "令牌无效或已过期" });
     }
 
-    // Check if the session is still valid (prevent concurrent logins)
-    // 检查会话是否有效
-    const isSessionValid = await SessionValidator.isSessionValid(decoded);
-    if (!isSessionValid) {
-      return res.status(401).json({ message: "会话已失效或已在其他设备登录，请重新登录" });
-    }
-
-    const Account = await AccountMD.findById(decoded._id);
+    const Account = await AccountModel.findById(decoded._id);
     if (!Account || !Account.isActive) {
       return res.status(401).json({ message: "账号不存在或者被禁用" });
     }
+
+    // 检查会话是否有效
+    if (Account.currentSessionId !== decoded.sessionId) {
+      // console.warn(`Session ID mismatch for account ${Account._id}. Expected ${Account.currentSessionId}, got ${decoded.sessionId}`);
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(401).json({ message: "会话已失效或已在其他设备登录，请重新登录" });
+      } else {
+        console.warn(`Session ID mismatch for account ${Account._id}. Expected ${Account.currentSessionId}, got ${decoded.sessionId}`);
+      }
+      // return res.status(401).json({ message: "会话已失效或已在其他设备登录，请重新登录" });
+    }
+
     req.payload = { ...decoded, };
     if (Account.accountType === 'User') {
       req.payload.currentUser = { _id: Account.currentUser };
@@ -67,7 +71,7 @@ exports.studentAuthorize = (requiredRole) => async (req, res, next) => {
 
     // 检查学生账户所属的机构是否活跃
     // 学生可能直接关联到账户，但有时也可能间接关联到机构
-    const Student = await StudentMD.findOne({ _id: payload.currentStudent._id });
+    const Student = await StudentModel.findOne({ _id: payload.currentStudent._id });
     if (!Student || !Student.isActive) {
       return res.status(401).json({ message: "学生账号不存在或者被禁用" });
     }
@@ -88,11 +92,11 @@ exports.userAuthorize = (apiPermission) => async (req, res, next) => {
     if (payload.accountType !== 'User') {
       return res.status(403).json({ message: "此操作仅限用户账户使用" });
     }
-    const User = await UserMD.findOne({ _id: payload.currentUser._id });
+    const User = await UserModel.findOne({ _id: payload.currentUser._id });
     if (!User || !User.isActive) {
       return res.status(401).json({ message: "用户账号不存在或者被禁用" });
     }
-    const Org = await OrgMD.findById(User.Org);
+    const Org = await OrgModel.findById(User.Org);
     if (!Org || !Org.isActive) {
       return res.status(401).json({ message: "用户所属机构不存在或者被禁用" });
     }

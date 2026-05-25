@@ -104,14 +104,6 @@ describe('Label Soft Delete Utils Unit Tests', () => {
       ];
       const mockOptions = { page: 1, limit: 10 };
 
-      // Mock formatOptions utility
-      jest.mock('@utils/formatOptions', () => ({
-        formatOptions: jest.fn().mockReturnValue({
-          pageSize: 10,
-          skip: 0,
-          sort: { createdAt: -1 }
-        })
-      }));
 
       LabelMD.find = jest.fn().mockReturnThis();
       LabelMD.populate = jest.fn().mockReturnThis();
@@ -133,14 +125,6 @@ describe('Label Soft Delete Utils Unit Tests', () => {
     it('should filter by mould if provided', async () => {
       const mockOptions = { mould: 'Subject', page: 1, limit: 10 };
       const mockDeletedLabels = [{ name: 'Subject Label', mould: 'Subject', isActive: false }];
-
-      jest.mock('@utils/formatOptions', () => ({
-        formatOptions: jest.fn().mockReturnValue({
-          pageSize: 10,
-          skip: 0,
-          sort: { createdAt: -1 }
-        })
-      }));
 
       LabelMD.find = jest.fn().mockReturnThis();
       LabelMD.populate = jest.fn().mockReturnThis();

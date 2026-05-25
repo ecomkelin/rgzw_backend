@@ -91,6 +91,16 @@ exports.commonBodyRules = {
             .isBoolean().withMessage(msg || `${field} 必须是布尔值(true/false)`)
             .toBoolean(),
 
+    // 对象验证
+    validateObject: (field, msg) =>
+        body(field)
+            .notEmpty().withMessage(`${field} 不能为空`)
+            .isObject().withMessage(msg || `${field} 必须是对象格式`),
+    optionalObject: (field, msg) =>
+        body(field)
+            .optional()
+            .isObject().withMessage(msg || `${field} 必须是对象格式`),
+
     // 数字验证
     validateNumber: (field, msg, options = { min: 0 }) =>
         body(field)
@@ -221,40 +231,117 @@ exports.commonQueryRules = {
 
 
 const maxPageSize = process.env.MAX_HANDLE_ITEM || 1000; // 设置默认值
-exports.validatorOptions = [
-    // 1. options 可选传，传了则必须是对象
+// --------------------------
+// 🔥 主 populate 数组
+// --------------------------
+const populateValidator = [
+    body('options.populate')
+        .optional()
+        .isArray().withMessage('populate 必须是数组')
+        .customSanitizer(val => Array.isArray(val) ? val : []),
+
+    // --------------------------
+    // 🔥 每一项的 path（必填 + 白名单）
+    // --------------------------
+    body('options.populate.*.path')
+        .notEmpty().withMessage('populate.path 不能为空')
+        .isString().withMessage('populate.path 必须是字符串')
+        .matches(/^[a-z0-9_]+$/i).withMessage('path 格式非法'),
+
+    // --------------------------
+    // 🔥 select
+    // --------------------------
+    body('options.populate.*.select')
+        .optional()
+        .isString().withMessage('populate.select 必须是字符串')
+        .matches(/^[a-z0-9_\s]+$/i).withMessage('select 格式非法'),
+
+    // --------------------------
+    // 🔥 match（过滤条件）
+    // --------------------------
+    body('options.populate.*.match')
+        .optional()
+        .isObject().withMessage('populate.match 必须是对象'),
+
+    // --------------------------
+    // 🔥 options（sort/limit/skip）
+    // --------------------------
+    body('options.populate.*.options')
+        .optional()
+        .isObject().withMessage('populate.options 必须是对象'),
+
+    body('options.populate.*.options.sort')
+        .optional()
+        .isObject(),
+
+    body('options.populate.*.options.limit')
+        .optional()
+        .isInt({ min: 1, max: 100 }),
+
+    body('options.populate.*.options.skip')
+        .optional()
+        .isInt({ min: 0 }),
+
+    // --------------------------
+    // 🔥 嵌套 populate（递归第二层）
+    // --------------------------
+    body('options.populate.*.populate')
+        .optional()
+        .isArray().withMessage('嵌套 populate 必须是数组'),
+
+    body('options.populate.*.populate.*.path')
+        .optional()
+        .isString()
+        .matches(/^[a-z0-9_]+$/i)
+        .custom((path) => {
+            const allowedPaths = ['leaderId', 'deptId', 'parentId']; // 二级嵌套白名单
+            if (!allowedPaths.includes(path)) {
+                throw new Error(`嵌套填充不允许：${path}`);
+            }
+            return true;
+        }),
+
+    body('options.populate.*.populate.*.select')
+        .optional()
+        .isString()
+];
+exports.listOptionsValidator = [
     body('options')
         .optional()
         .isObject()
         .withMessage('options 必须是对象格式'),
 
-    // 2. options.page 可选传，传了则必须是≥1的整数
-    body('options.page')
-        .optional()
-        .isInt({ min: 1 })
-        .withMessage('options.page 必须是大于等于 1 的整数')
-        .toInt(),
-
-    // 3. options.pageSize 可选传，传了则必须在 [1, maxPageSize] 范围内
-    body('options.pageSize')
+    body('options.limit')
         .optional()
         .isInt({ min: 1, max: maxPageSize })
-        .withMessage(`options.pageSize 必须是 1-${maxPageSize} 之间的整数`)
+        .withMessage('options.limit 必须是大于等于 1 的整数')
         .toInt(),
 
-    // 4. options.sortObj 可选传，传了则必须是对象，且值为±1、键为合法字段
+    body('options.skip')
+        .optional()
+        .isInt({ min: 1, max: maxPageSize })
+        .withMessage(`options.skip 必须是 1-${maxPageSize} 之间的整数`)
+        .toInt(),
+
     body('options.sortObj')
         .optional()
         .isObject()
         .withMessage('options.sortObj 必须是对象格式')
         .custom(sortObj => {
-            // 遍历 sortObj 验证每个键值对
             for (const [key, value] of Object.entries(sortObj)) {
-                // 验证排序值只能是 1/-1
                 if (![1, -1].includes(value)) {
                     throw new Error(`sortObj.${key} 的值必须是 1（升序）或 -1（降序）`);
                 }
             }
             return true;
-        })
-];
+        }),
+    ...populateValidator
+]
+
+exports.detailOptionsValidator = [
+    body('options')
+        .optional()
+        .isObject()
+        .withMessage('options 必须是对象格式'),
+    ...populateValidator
+]

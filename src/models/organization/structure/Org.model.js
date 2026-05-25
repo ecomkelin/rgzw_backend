@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
-const doc = {
+const OrgEnums = {};
+const OrgDOC = {
   unionCode: { type: String, required: true }, // 统一社会信用代码
   name: { type: String, required: true },
   nickname: { type: String, required: true },
@@ -28,7 +29,7 @@ const doc = {
   updatedBy: { type: Schema.Types.ObjectId, ref: 'Account', immutableFront: true },
 };
 
-const docSchema = new Schema(doc, { timestamps: true });
+const docSchema = new Schema(OrgDOC, { timestamps: true });
 
 // 为经常查询的字段创建索引
 docSchema.index({ name: 1 }, { unique: true });
@@ -36,7 +37,7 @@ docSchema.index({ unionCode: 1 }, { unique: true });
 docSchema.index({ isActive: 1 });
 
 // 添加中间件，在保存前检查isMain字段的唯一性
-docSchema.pre('save', async function(next) {
+docSchema.pre('save', async function (next) {
   if (this.isMain) {
     // 如果当前文档标记为主机构，将其他机构的isMain设为false
     await this.constructor.updateMany(
@@ -48,7 +49,7 @@ docSchema.pre('save', async function(next) {
 });
 
 // 添加中间件，在更新时处理isMain字段
-docSchema.pre('findOneAndUpdate', async function(next) {
+docSchema.pre('findOneAndUpdate', async function (next) {
   const update = this.getUpdate();
 
   if (update.$set && update.$set.isMain === true) {
@@ -62,8 +63,10 @@ docSchema.pre('findOneAndUpdate', async function(next) {
   next();
 });
 
-const Model = mongoose.model('Org', docSchema);
+const OrgModel = mongoose.model('Org', docSchema);
 
-Model.doc = doc;
-
-module.exports = Model;
+module.exports = {
+  OrgModel,
+  OrgEnums,
+  OrgDOC
+};

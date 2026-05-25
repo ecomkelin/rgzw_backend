@@ -1,14 +1,11 @@
 const { initializeAccounts } = require('./Account.seed');
-const { initializeApiPermissions } = require('./apiPermission.seed'); // 引入API权限种子
 
 // 定义模块初始化顺序（依赖关系）
 const INIT_ORDER = [
-  'ApiPermissions', // API权限优先（其他模块可能依赖权限）
   'Accounts'        // 账户数据
 ];
 
 const INIT_FUNCTIONS = {
-  ApiPermissions: initializeApiPermissions,
   Accounts: initializeAccounts,
 };
 

@@ -1,12 +1,15 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
+
 const argon2 = require("argon2");
 
-const genderEnums = ['male', 'female'];
-const accountTypeEnums = ['User', 'Student'];
+const AccountEnums = {
+  genderEnums: ['male', 'female'],
+  accountTypeEnums: ['User', 'Student']
+};
 
-const doc = {
+const AccountDOC = {
   code: { type: String, required: true, immutable: true },
   passwordHash: { type: String, select: false, required: true },
   phone: { type: String }, // 联系电话
@@ -14,7 +17,7 @@ const doc = {
 
   // 账号信息
   // 角色类型：superAdmin（超级管理员）/orgAdmin（机构管理员）/staff（员工）
-  accountType: { type: String, enum: accountTypeEnums, default: "User", immutable: true },
+  accountType: { type: String, enum: AccountEnums.accountTypeEnums, default: "User", immutable: true },
   isAdmin: { type: Boolean, default: false, immutable: true }, // 只有user 角色类型的账号才有isAdmin字段，表示是否是管理员账号
   currentUser: { type: ObjectId, ref: 'User' }, // 关联的用户ID，accountType为User时关联User，为Student时关联Student
   currentStudent: { type: ObjectId, ref: 'Student' }, // 关联的学生ID，accountType为Student时关联Student
@@ -22,7 +25,7 @@ const doc = {
   // 证件信息
   name: { type: String, required: true },// 用户真实姓名
   identityNo: { type: String, required: true }, // 证件号码 身份证号/护照号
-  gender: { type: String, enum: genderEnums, default: 'male' },
+  gender: { type: String, enum: AccountEnums.genderEnums, default: 'male' },
   birthday: { type: Date }, // 出生日期
   address: { type: String }, // 户籍地址
 
@@ -46,7 +49,7 @@ const doc = {
   createdBy: { type: ObjectId, ref: 'Account', immutable: true },
   updatedBy: { type: ObjectId, ref: 'Account', immutableFront: true },
 };
-const docSchema = new Schema(doc, { timestamps: true })
+const docSchema = new Schema(AccountDOC, { timestamps: true })
 
 // 密码加密中间件
 docSchema.pre("save", async function (next) {
@@ -79,8 +82,10 @@ docSchema.index({ code: 1 }, { unique: true });
 docSchema.index({ phone: 1 }, { unique: true, partialFilterExpression: { phone: { $exists: true, $ne: null } } });
 docSchema.index({ identityNo: 1 }, { unique: true });
 
-const Model = mongoose.model('Account', docSchema);
-Model.doc = doc;
-Model.modelEnums = { genderEnums, accountTypeEnums };
+const AccountModel = mongoose.model('Account', docSchema);
 
-module.exports = Model;
+module.exports = {
+  AccountModel,
+  AccountEnums,
+  AccountDOC
+};

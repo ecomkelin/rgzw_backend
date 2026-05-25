@@ -1,6 +1,5 @@
-const OrgMD = require('@models/organization/structure/Org.model');
-const { formatOptions } = require('@utils/formatOptions');
-const { deleteImmutableFront } = require('@utils/validatorModel');
+const { OrgModel, OrgDOC } = require('@models/organization/structure/Org.dao');
+const { deleteImmutableFront } = require('@/utils/fieldAttributes');
 
 class OrgSV {
   /**
@@ -10,7 +9,6 @@ class OrgSV {
    */
   async list(query = {}, payload) {
     try {
-      const { pageSize, skip, sort } = formatOptions(query.options);
       delete query.options;
 
       // 如果 regExp = "" 为否
@@ -24,7 +22,7 @@ class OrgSV {
       if (!payload.isAdmin) {
         throw new Error("管理员没有权限查看机构列表");
       }
-      const items = await OrgMD
+      const items = await OrgModel
         .find(query)
         .sort(sort)
         .limit(pageSize).skip(skip)
@@ -47,7 +45,7 @@ class OrgSV {
       if (!payload.isAdmin) {
         throw new Error("管理员没有权限查看机构详情");
       }
-      const item = await OrgMD.findById(_id);
+      const item = await OrgModel.findById(_id);
       if (!item) {
         throw new Error("此数据已不存在");
       }
@@ -69,23 +67,23 @@ class OrgSV {
         throw new Error("只有管理员才能创建机构");
       }
 
-      deleteImmutableFront(doc, OrgMD.doc);
+      deleteImmutableFront(doc, OrgDOC);
       doc.createdBy = payload.currentUser?._id;
 
       // 检查是否已经有主机构
       if (doc.isMain) {
-        const existingMainOrg = await OrgMD.findOne({ isMain: true });
+        const existingMainOrg = await OrgModel.findOne({ isMain: true });
         if (existingMainOrg) {
           throw new Error('已经存在一个主机构，不能创建更多主机构');
         }
       }
 
-      const existing = await OrgMD.findOne({ $or: [{ unionCode: doc.unionCode }, { name: doc.name }] });
+      const existing = await OrgModel.findOne({ $or: [{ unionCode: doc.unionCode }, { name: doc.name }] });
       if (existing) {
         throw new Error('具有相同统一社会信用代码或名称的组织已存在');
       }
 
-      const item = new OrgMD(doc);
+      const item = new OrgModel(doc);
       await item.save();
       return { item };
     }
@@ -106,14 +104,14 @@ class OrgSV {
         throw new Error("只有管理员才能更新机构");
       }
 
-      deleteImmutableFront(doc, OrgMD.doc);
+      deleteImmutableFront(doc, OrgModel.doc);
 
-      const Org = await OrgMD.findById(_id);
+      const Org = await OrgModel.findById(_id);
       if (!Org) {
         throw new Error('公司不存在');
       }
 
-      const existing = await OrgMD.findOne({ $or: [{ unionCode: doc.unionCode }, { name: doc.name }], _id: { $ne: _id } });
+      const existing = await OrgModel.findOne({ $or: [{ unionCode: doc.unionCode }, { name: doc.name }], _id: { $ne: _id } });
       if (existing) {
         throw new Error('具有相同统一社会信用代码或名称的组织已存在');
       }
@@ -140,7 +138,7 @@ class OrgSV {
         throw new Error("用户没有关联的机构");
       }
 
-      const item = await OrgMD.findById(payload.currentUser.Org);
+      const item = await OrgModel.findById(payload.currentUser.Org);
       if (!item || !item.isActive) {
         throw new Error("您的公司已经不存在或已被禁用");
       }
@@ -157,7 +155,7 @@ class OrgSV {
    * - 如果机构不活跃，相关用户和学生应无法使用
    */
   async isOrgActive(orgId) {
-    const org = await OrgMD.findById(orgId);
+    const org = await OrgModel.findById(orgId);
     return org && org.isActive === true;
   }
 }

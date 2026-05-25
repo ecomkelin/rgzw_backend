@@ -1,5 +1,5 @@
-const { validatorErrorHandle, commonBodyRules, commonParamRules, validatorOptions } = require('@utils/validatorHandle');
-const { modelEnums: accountModelEnums } = require('@models/authorization/Account.model');
+const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator } = require('@utils/validatorHandle');
+const { AccountEnums } = require('@models/authorization/Account.dao');
 // 注意：这里我们不需要User.model，因为学生模块有自己的验证规则
 
 exports.createVD = [
@@ -9,7 +9,7 @@ exports.createVD = [
   commonBodyRules.optionalBoolean('student.isActive'),
   commonBodyRules.optionalString('student.phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('student.identity', { minLength: 15, maxLength: 18 }),
-  commonBodyRules.optionalEnum('student.gender', ['Male', 'Female']),
+  // commonBodyRules.optionalEnum('student.gender', ['Male', 'Female']),
   commonBodyRules.optionalString('student.address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('student.currentAddress', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('student.company', { minLength: 2, maxLength: 100 }),
@@ -34,7 +34,7 @@ exports.createVD = [
   commonBodyRules.optionalString('account.phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('account.address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('account.identityNo', { minLength: 15, maxLength: 18 }),
-  commonBodyRules.optionalEnum('account.gender', accountModelEnums.genderEnums),
+  commonBodyRules.optionalEnum('account.gender', AccountEnums.genderEnums),
   commonBodyRules.optionalObjectId('account.Nation'),
   commonBodyRules.optionalObjectId('account.Province'), // 修正字段名
   commonBodyRules.optionalObjectId('account.City'),
@@ -78,7 +78,7 @@ exports.listVD = [
   commonBodyRules.optionalObjectId('Org'),
   commonBodyRules.optionalObjectId('Account'),
 
-  ...validatorOptions, // 分页, 排序
+  ...listOptionsValidator, // 分页, 排序
   validatorErrorHandle
 ];
 

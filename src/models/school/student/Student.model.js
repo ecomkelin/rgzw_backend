@@ -8,7 +8,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
-const doc = {
+const StudentEnums = {};
+const StudentDOC = {
     // 对应的账号ID，一个账号可以对应多个身份（Student），但一个身份只能对应一个账号
     Account: { type: ObjectId, ref: 'Account', required: true, immutable: true },
     phone: { type: String },
@@ -50,8 +51,10 @@ const doc = {
 
     Org: { type: ObjectId, ref: 'Org' }, // 机构ID，冗余字段，方便查询  
 };
-const docSchema = new Schema(doc, { timestamps: true });
+const docSchema = new Schema(StudentDOC, { timestamps: true });
 
 docSchema.index({ identity: 1 });
 
-module.exports = mongoose.model('Student', docSchema);
+StudentModel = mongoose.model('Student', docSchema);
+
+module.exports = { StudentModel, StudentEnums, StudentDOC };

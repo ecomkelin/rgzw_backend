@@ -7,11 +7,17 @@ const jwt = require('jsonwebtoken');
 class JwtUtil {
   /**
    * 生成访问令牌
-   * @param {Object} payload - 令牌载荷
+   * @param {Object} Account - 令牌载荷
    * @returns {string} 访问令牌
    */
-  static generateAccessToken(payload) {
+  static generateAccessToken(Account) {
     // 生成访问令牌，默认5分钟
+    const payload = {
+      _id: Account._id,
+      accountType: Account.accountType,
+      isAdmin: Account.isAdmin,
+      sessionId: Account.currentSessionId,
+    }
 
     const expiresIn = process.env.ACCESS_TOKEN_EXPIRED || '5m';
     try {

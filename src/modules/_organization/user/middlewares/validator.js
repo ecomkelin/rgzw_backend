@@ -1,13 +1,13 @@
-const { validatorErrorHandle, commonBodyRules, commonParamRules, validatorOptions } = require('@utils/validatorHandle');
-const { modelEnums: accountModelEnums } = require('@models/authorization/Account.model');
-const { modelEnums: userModelEnums } = require('@models/organization/structure/User.model');
+const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator } = require('@utils/validatorHandle');
+const { AccountEnums } = require('@models/authorization/Account.dao');
+const { UserEnums } = require('@models/organization/structure/User.dao');
 
 exports.createVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalBoolean('user.isActive'),
   commonBodyRules.optionalNumber('user.sort'),
   commonBodyRules.optionalString('user.avatar', { minLength: 4, maxLength: 50 }),
-  commonBodyRules.validateEnum('user.roleTemp', userModelEnums.roleSimpEnums),
+  commonBodyRules.validateEnum('user.roleTemp', UserEnums.roleSimpEnums),
   commonBodyRules.validateString('user.nickname', { minLength: 2, maxLength: 26 }),
 
   commonBodyRules.optionalObjectId('user.Org'),
@@ -19,7 +19,7 @@ exports.createVD = [
   commonBodyRules.optionalString('account.phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('account.address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('account.identityNo', { minLength: 15, maxLength: 18 }),
-  commonBodyRules.optionalEnum('account.gender', accountModelEnums.genderEnums),
+  commonBodyRules.optionalEnum('account.gender', AccountEnums.genderEnums),
   commonBodyRules.optionalObjectId('account.Nation'),
   commonBodyRules.optionalObjectId('account.Province'), // 修正字段名
   commonBodyRules.optionalObjectId('account.City'),
@@ -34,7 +34,7 @@ exports.updateVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalNumber('sort'),
-  commonBodyRules.optionalEnum('roleTemp', userModelEnums.roleSimpEnums),
+  commonBodyRules.optionalEnum('roleTemp', UserEnums.roleSimpEnums),
   commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 26 }),
   commonBodyRules.optionalString('avatar', { minLength: 4, maxLength: 50 }),
 
@@ -48,7 +48,7 @@ exports.listVD = [
   commonBodyRules.optionalObjectId('Org'),
   commonBodyRules.optionalObjectId('Account'),
 
-  ...validatorOptions, // 分页, 排序
+  ...listOptionsValidator, // 分页, 排序
   validatorErrorHandle
 ];
 

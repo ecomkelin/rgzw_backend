@@ -1,71 +1,68 @@
-const Service = require('./service');
-const ApiResponse = require('@utils/response');
+const AccountSV = require('./service');
+const ApiResponse = require('@utils/responsed');
 const asyncHandler = require('@utils/asyncHandler');
 
 class AccountCT {
   list = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.list(req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("AccountCT list error: ", error);
+      const { filter, options } = req.validData || {};
+      const { total, items, permFilter } = await AccountSV.list(req.payload, filter, options);
 
-      // 在生产环境中，不要暴露内部错误细节
-      if (process.env.NODE_ENV === 'production') {
-        return res.status(500).json(ApiResponse.serverError());
-      } else {
-        return res.status(500).json(ApiResponse.serverError(error.message));
-      }
+      return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
+    } catch (e) {
+      console.error("AccountCT list error: ", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 
   detail = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.detail(req.params.id, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("AccountCT detail error: ", error.message);
-      return res.status(500).json(ApiResponse.serverError());
+      const { id, options } = req.validData || {};
+      const { item } = await AccountSV.detail(req.payload, id, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("AccountCT detail error: ", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 
-  create = asyncHandler(async (req, res) => {
+  edit = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.create(req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("AccountCT create error: ", error);
-      return res.status(500).json(ApiResponse.serverError());
-    }
-  });
+      const id = req.validData?.id;
+      const doc = req.validData;
+      delete doc.id
 
-  update = asyncHandler(async (req, res) => {
-    try {
-      const data = await Service.update(req.params.id, req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("AccountCT update error: ", error.message);
-      return res.status(500).json(ApiResponse.serverError());
+      const { item } = await AccountSV.edit(req.payload, req.params.id, req.validData);
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("AccountCT edit error: ", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 
   selfDetail = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.selfDetail(req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("AccountCT selfDetail error: ", error.message);
-      return res.status(500).json(ApiResponse.serverError());
+      const id = req.payload._id;
+      const { options = [] } = req.validData || {};
+      const { item } = await AccountSV.detail(req.payload, id, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("AccountCT selfDetail error: ", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 
   selfUpdate = asyncHandler(async (req, res) => {
     try {
-      const data = await Service.selfUpdate(req.body, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("AccountCT selfUpdate error: ", error.message);
-      return res.status(500).json(ApiResponse.serverError());
+      const id = req.payload?._id;
+      const doc = req.validData
+      const data = await AccountSV.edit(req.payload, id, doc);
+      return res.status(200).json(ApiResponse.success({ data }));
+    } catch (e) {
+      console.error("AccountCT selfUpdate error: ", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 

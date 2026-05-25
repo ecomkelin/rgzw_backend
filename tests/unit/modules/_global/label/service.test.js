@@ -26,11 +26,6 @@ describe('Label Service Unit Tests', () => {
         sort: { createdAt: -1 }
       };
 
-      // Mock formatOptions utility
-      jest.mock('@utils/formatOptions', () => ({
-        formatOptions: jest.fn().mockReturnValue(mockFormattedOptions)
-      }));
-
       // Mock the Label model
       LabelMD.find = jest.fn().mockReturnThis();
       LabelMD.populate = jest.fn().mockReturnThis();
@@ -61,10 +56,6 @@ describe('Label Service Unit Tests', () => {
         skip: 0,
         sort: { createdAt: -1 }
       };
-
-      jest.mock('@utils/formatOptions', () => ({
-        formatOptions: jest.fn().mockReturnValue(mockFormattedOptions)
-      }));
 
       LabelMD.find = jest.fn().mockReturnThis();
       LabelMD.populate = jest.fn().mockReturnThis();

@@ -1,7 +1,7 @@
 const argon2 = require('argon2');
-const AccountModel = require('@models/authorization/Account.model');
-const OrgModel = require('@models/organization/structure/Org.model');
-const UserModel = require('@models/organization/structure/User.model');
+const { AccountModel } = require('@models/authorization/Account.dao');
+const { OrgModel } = require('@models/organization/structure/Org.dao');
+const { UserModel } = require('@models/organization/structure/User.dao');
 
 const orgSeeds = [
   {

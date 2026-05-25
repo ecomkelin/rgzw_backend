@@ -6,5 +6,6 @@ const { validatorErrorHandle, commonBodyRules } = require('@utils/validatorHandl
 exports.loginVD = [
   commonBodyRules.validateString('code', { minLength: 4, maxLength: 16 }),
   commonBodyRules.validateString('password', { minLength: 8, maxLength: 16 }),
+
   validatorErrorHandle
 ];

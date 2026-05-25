@@ -1,4 +1,4 @@
-const { validatorErrorHandle, commonBodyRules, commonParamRules, validatorOptions } = require('@utils/validatorHandle');
+const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator } = require('@utils/validatorHandle');
 
 exports.createVD = [
   // Body 参数：可选规则
@@ -52,7 +52,7 @@ exports.listVD = [
   commonBodyRules.optionalObjectId('City'),
   commonBodyRules.optionalObjectId('Area'),
 
-  ...validatorOptions, // 分页, 排序
+  ...listOptionsValidator, // 分页, 排序
   validatorErrorHandle
 ];
 

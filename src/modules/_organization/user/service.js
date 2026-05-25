@@ -1,6 +1,5 @@
-const UserMD = require('@models/organization/structure/User.model');
-const { formatOptions } = require('@utils/formatOptions');
-const { deleteImmutableFront } = require('@utils/validatorModel');
+const { UserModel, UserDOC } = require('@models/organization/structure/User.dao');
+const { deleteImmutableFront } = require('@/utils/fieldAttributes');
 
 class UserSV {
   async list(query = {}, payload = {}) {
@@ -9,9 +8,6 @@ class UserSV {
         // 管理员可以查看所有用户
         query.Org = payload.currentUser?.Org; // 经理只能查看自己公司的用户
       }
-
-      const { pageSize, skip, sort } = formatOptions(query.options);
-      delete query.options;
 
       // 如果 regExp = "" 为否
       if (query.regExp) {
@@ -28,7 +24,7 @@ class UserSV {
         }
       }
 
-      const items = await UserMD
+      const items = await UserModel
         .find(query)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain')
@@ -44,7 +40,7 @@ class UserSV {
 
   async detail(_id, payload) {
     try {
-      const item = await UserMD.findById(_id)
+      const item = await UserModel.findById(_id)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain');
 
@@ -85,20 +81,20 @@ class UserSV {
       }
 
 
-      deleteImmutableFront(doc, UserMD.doc);
+      deleteImmutableFront(doc, UserDOC);
       doc.createdBy = payload.currentUser?._id;
 
       // 检查同一账号在同一组织下是否有重复的身份
-      const existing = await UserMD.findOne({ Org: doc.Org, Account: doc.Account });
+      const existing = await UserModel.findOne({ Org: doc.Org, Account: doc.Account });
       if (existing) {
         throw new Error('一个账号只能在同一组织下使用唯一的身份');
       }
 
-      const item = new UserMD(doc);
+      const item = new UserModel(doc);
       await item.save();
 
       // 返回时填充相关数据
-      const populatedItem = await UserMD.findById(item._id)
+      const populatedItem = await UserModel.findById(item._id)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain');
 
@@ -113,7 +109,7 @@ class UserSV {
   async update(_id, doc, payload) {
     try {
       // 权限验证：管理员可以更新任意用户，经理只能更新自己公司的用户
-      const targetUser = await UserMD.findById(_id);
+      const targetUser = await UserModel.findById(_id);
       if (!targetUser) {
         throw new Error('用户不存在');
       }
@@ -133,14 +129,14 @@ class UserSV {
       delete doc.Account; // 不允许更换账户
       delete doc.Org;     // 不允许更换组织
 
-      deleteImmutableFront(doc, UserMD.doc);
+      deleteImmutableFront(doc, UserDOC);
       doc.updatedBy = payload._id;
 
       const item = Object.assign(targetUser, doc);
       await item.save();
 
       // 返回时填充相关数据
-      const populatedItem = await UserMD.findById(item._id)
+      const populatedItem = await UserModel.findById(item._id)
         .populate('Account', 'code name phone isActive isAdmin')
         .populate('Org', 'name isMain');
 
@@ -155,12 +151,12 @@ class UserSV {
   async selfUpdate(doc, payload) {
     try {
       delete doc._id;
-      for (const key in UserMD.doc) {
-        const field = UserMD.doc[key];
+      for (const key in UserDOC) {
+        const field = UserDOC[key];
         if (field.immutableFront === true) delete doc[key]
       }
 
-      const User = await UserMD.findById(payload.currentUser);
+      const User = await UserModel.findById(payload.currentUser);
       if (!User || !User.isActive) {
         throw new Error('找不到您的身份数据或者您的身份已被禁用');
       }
