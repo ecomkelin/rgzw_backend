@@ -21,7 +21,7 @@ exports.editVD = [
   validatorErrorHandle
 ];
 
-exports.selfUpdateVD = [
+exports.selfEditVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalString('password', { minLength: 8, maxLength: 16 }),
   commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 50 }), // 允许用户修改昵称

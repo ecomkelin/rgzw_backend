@@ -1,55 +1,67 @@
 const OrgSV = require('./service');
-const ApiResponse = require('@utils/response');
+const ApiResponse = require('@utils/responsed');
 const asyncHandler = require('@utils/asyncHandler');
 
 class OrgCT {
   list = asyncHandler(async (req, res) => {
     try {
-      const data = await OrgSV.list(req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("OrgCT list error: ", error.message)
-      return res.status(500).json(ApiResponse.serverError())
+      const { filter, options } = req.validData || {};
+      const { total, items, permFilter } = await OrgSV.list(req.payload, filter, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
+    } catch (e) {
+      console.error("OrgCT list error: ", e)
+      return res.json(ApiResponse.error(e))
     }
   });
 
   detail = asyncHandler(async (req, res) => {
     try {
-      const data = await OrgSV.detail(req.params.id, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("OrgCT detail error: ", error.message)
-      return res.status(500).json(ApiResponse.serverError())
+      const { id, options } = req.validData || {};
+      const { item } = await OrgSV.detail(req.payload, id, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("OrgCT detail error: ", e)
+      return res.json(ApiResponse.error(e))
     }
   });
 
-  create = asyncHandler(async (req, res) => {
+  add = asyncHandler(async (req, res) => {
     try {
-      const data = await OrgSV.create(req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("OrgCT create error: ", error.message)
-      return res.status(500).json(ApiResponse.serverError())
+      const doc = req.validData;
+      const { item } = await OrgSV.add(req.payload, doc);
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("OrgCT add error: ", e)
+      return res.status(500).json(ApiResponse.error(e))
     }
   });
 
-  update = asyncHandler(async (req, res) => {
+  edit = asyncHandler(async (req, res) => {
     try {
-      const data = await OrgSV.update(req.params.id, req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("OrgCT update error: ", error.message)
-      return res.status(500).json(ApiResponse.serverError())
+      const id = req.validData?.id;
+      const doc = req.validData;
+      delete doc.id
+
+      const { item } = await OrgSV.edit(req.payload, req.params.id, req.validData);
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("OrgCT edit error: ", e)
+      return res.status(500).json(ApiResponse.error(e))
     }
   });
 
   selfDetail = asyncHandler(async (req, res) => {
     try {
-      const data = await OrgSV.selfDetail(req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("OrgCT selfDetail error: ", error.message)
-      return res.status(500).json(ApiResponse.serverError())
+      const id = req.payload?.currentUser?.Org;
+      const { options = [] } = req.validData || {};
+      const { item } = await OrgSV.detail(req.payload, id, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("OrgCT selfDetail error: ", e)
+      return res.status(500).json(ApiResponse.error(e))
     }
   });
 }

@@ -54,11 +54,12 @@ class AccountCT {
     }
   });
 
-  selfUpdate = asyncHandler(async (req, res) => {
+  selfEdit = asyncHandler(async (req, res) => {
     try {
       const id = req.payload?._id;
       const doc = req.validData
       const data = await AccountSV.edit(req.payload, id, doc);
+
       return res.status(200).json(ApiResponse.success({ data }));
     } catch (e) {
       console.error("AccountCT selfUpdate error: ", e);

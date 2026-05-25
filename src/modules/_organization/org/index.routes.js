@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const OrgCT = require('./controller');
-const { authenticate } = require('@middlewares/auth');
-const { updateVD, createVD, listVD, detailVD } = require('./middlewares/validator');
-const { readPermission, createPermission, editPermission, managePermission } = require('./middlewares/permission');
+const { authenticate, userAuthorize } = require('@middlewares/auth');
+const { editVD, addVD, listVD, detailVD } = require('./middlewares/validator');
+const { readPermission, addPermission, editPermission } = require('./middlewares/permission');
 
 // 获取列表和详情
 router.post('/list', authenticate, readPermission, listVD, OrgCT.list);
-router.get('/:id', authenticate, readPermission, detailVD, OrgCT.detail);
+router.post('/detail/:id', authenticate, readPermission, detailVD, OrgCT.detail);
 
 // 创建
-router.post('/create', authenticate, createPermission, createVD, OrgCT.create);
+router.post('/add', authenticate, addPermission, addVD, OrgCT.add);
 
 // 修改
-router.put('/:id', authenticate, editPermission, updateVD, OrgCT.update);
+router.post('/edit/:id', authenticate, editPermission, editVD, OrgCT.edit);
 
 // 查看自己的帐户
-router.get('/detail/self', authenticate, OrgCT.selfDetail);
+router.post('/self', authenticate, userAuthorize(), OrgCT.selfDetail);
 
 module.exports = router;

@@ -43,7 +43,7 @@ const list = async (Model, filter = {}, options = {}) => {
     }
 };
 
-const detail = async (Model, _id, options) => {
+const detail = async (Model, _id, options = {}) => {
     try {
         const { populate = [] } = options;
 

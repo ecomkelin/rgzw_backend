@@ -16,7 +16,7 @@ const checkPermission = (permissionType) => {
           // 读取权限：管理员可以查看所有机构，普通用户只能查看自己所在机构
           hasPermission = payload.isAdmin === true;
           break;
-        case 'create':
+        case 'add':
           // 创建权限：只有管理员
           hasPermission = payload.isAdmin === true;
           break;
@@ -35,7 +35,7 @@ const checkPermission = (permissionType) => {
       if (!hasPermission) {
         const permissionMessages = {
           read: "需要读取权限",
-          create: "需要创建权限",
+          add: "需要创建权限",
           edit: "需要编辑权限",
           manage: "需要管理权限"
         };
@@ -54,6 +54,6 @@ const checkPermission = (permissionType) => {
 };
 
 exports.readPermission = checkPermission('read');
-exports.createPermission = checkPermission('create');
+exports.addPermission = checkPermission('add');
 exports.editPermission = checkPermission('edit');
 exports.managePermission = checkPermission('manage');

@@ -63,9 +63,11 @@ class AccountSV {
   }
 
   /**
-   * 更新账户
-   * - 只有管理员可以更新账户
-   * - 管理员状态不可更改
+   * 
+   * @param {*} payload 
+   * @param {*} _id 
+   * @param {*} doc 
+   * @returns 
    */
   async edit(payload, _id, doc) {
     try {

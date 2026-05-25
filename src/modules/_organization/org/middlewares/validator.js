@@ -1,6 +1,6 @@
-const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator } = require('@utils/validatorHandle');
+const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator, detailOptionsValidator } = require('@utils/validatorHandle');
 
-exports.createVD = [
+exports.addVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalNumber('sort', null, { min: 0 }),
@@ -20,7 +20,7 @@ exports.createVD = [
   validatorErrorHandle
 ];
 
-exports.updateVD = [
+exports.editVD = [
   // Body 参数：可选规则（注意：id参数验证不在这里，而是在路由层面）
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalNumber('sort', null, { min: 0 }),
@@ -42,22 +42,25 @@ exports.updateVD = [
 
 
 exports.listVD = [
-  commonBodyRules.optionalString('regExp', { minLength: 0, maxLength: 50 }), // 增加正则表达式搜索长度
-  commonBodyRules.optionalBoolean('isActive'),
-  commonBodyRules.optionalBoolean('isMain'), // 添加主机构筛选
-  commonBodyRules.optionalString('name', { minLength: 1, maxLength: 100 }), // 名称筛选
-  commonBodyRules.optionalString('unionCode', { minLength: 1, maxLength: 30 }), // 统一代码筛选
-  commonBodyRules.optionalObjectId('Nation'),
-  commonBodyRules.optionalObjectId('Province'), // 使用正确的省份字段名
-  commonBodyRules.optionalObjectId('City'),
-  commonBodyRules.optionalObjectId('Area'),
+  commonBodyRules.optionalObject('filter'),
+  commonBodyRules.optionalString('filter.regExp', { minLength: 0, maxLength: 50 }), // 增加正则表达式搜索长度
+  commonBodyRules.optionalBoolean('filter.isActive'),
+  commonBodyRules.optionalBoolean('filter.isMain'), // 添加主机构筛选
+  commonBodyRules.optionalString('filter.name', { minLength: 1, maxLength: 100 }), // 名称筛选
+  commonBodyRules.optionalString('filter.unionCode', { minLength: 1, maxLength: 30 }), // 统一代码筛选
+  commonBodyRules.optionalObjectId('filter.Nation'),
+  commonBodyRules.optionalObjectId('filter.Province'), // 使用正确的省份字段名
+  commonBodyRules.optionalObjectId('filter.City'),
+  commonBodyRules.optionalObjectId('filter.Area'),
 
-  ...listOptionsValidator, // 分页, 排序
+  ...listOptionsValidator, // options = { limit=100, skip=0, sort={}, populate=[{path: ''}] }
   validatorErrorHandle
 ];
 
 // 4. 查询单条标签（仅 Param 参数）
 exports.detailVD = [
   commonParamRules.validateObjectId('id'),
+  ...detailOptionsValidator, // options = { populate: [{ path: '' }] }
+
   validatorErrorHandle
 ];
