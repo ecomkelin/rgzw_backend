@@ -6,110 +6,96 @@ const asyncHandler = require('@utils/asyncHandler');
 class StudentCT {
   list = asyncHandler(async (req, res) => {
     try {
-      const data = await StudentSV.list(req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("StudentCT list error: ", error);
-      return res.status(500).json(ApiResponse.serverError())
+      const { filter, options } = req.validData || {};
+      const { total, items, permFilter } = await StudentSV.list(req.payload, filter, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
+    } catch (e) {
+      console.error("StudentCT list error: ", e)
+      return res.json(ApiResponse.error(e))
     }
   });
 
   detail = asyncHandler(async (req, res) => {
     try {
-      const data = await StudentSV.detail(req.params.id, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("StudentCT detail error: ", error);
-      return res.status(500).json(ApiResponse.serverError())
+      const { id, options } = req.validData || {};
+      const { item } = await StudentSV.detail(req.payload, id, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("StudentCT detail error: ", e)
+      return res.json(ApiResponse.error(e))
     }
   });
 
-  create = asyncHandler(async (req, res) => {
+  add = asyncHandler(async (req, res) => {
     try {
       const payload = req.payload;
       const doc_Student = req.validData?.student;
 
+      const data = {}
       // 如果没有提供Account，但提供了account信息，则先创建Account
       if (!doc_Student.Account) {
         if (!req.validData.account) {
-          throw new Error("缺少账户信息，无法创建学生");
+          throw ({ code: 400, message: "缺少账户信息，无法创建学生" });
         }
+
         const doc_Account = req.validData.account;
+        const { item: itemAccount } = await AccountSV.add(payload, doc_Account);
+        data.itemAccount = itemAccount;
 
-        // 确保新账户不是管理员
-        doc_Account.isAdmin = false;
-
-        if (!doc_Account.code || !doc_Account.password || !doc_Account.name || !doc_Account.identityNo) {
-          throw new Error("账户信息缺少必填字段（code、password、name、identityNo）");
-        }
-        if (doc_Account.password.length < 8 || doc_Account.password.length > 16) {
-          throw new Error("账户密码长度必须在8到16个字符之间");
-        }
-        if (doc_Account.code.length < 4 || doc_Account.code.length > 16) {
-          throw new Error("账户编码长度必须在4到16个字符之间");
-        }
-        if (doc_Account.name.length < 2 || doc_Account.name.length > 50) {
-          throw new Error("账户名称长度必须在2到50个字符之间");
-        }
-        if (doc_Account.identityNo.length < 15 || doc_Account.identityNo.length > 18) {
-          throw new Error("账户身份证号码长度必须在15到18个字符之间");
-        }
-        if (doc_Account.phone && (doc_Account.phone.length < 10 || doc_Account.phone.length > 15)) {
-          throw new Error("账户电话号码长度必须在10到15个字符之间");
-        }
-
-        const data_account = await AccountSV.create(doc_Account, payload);
-
-        doc_Student.Account = data_account.item._id;
+        doc_Student.Account = itemAccount._id;
       }
 
-      // 根据当前用户的权限和角色设置学生的Org
-      if (!doc_Student.Org) {
-        // 如果没有提供Org，使用当前用户所在的Org
-        doc_Student.Org = payload.currentUser?.Org;
-      }
+      const { item: itemUser } = await UserSV.add(payload, doc_User);
+      data.itemUser = itemUser;
 
-      const data = await StudentSV.create(doc_Student, payload);
-
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("StudentCT create error: ", error);
-      return res.status(500).json(ApiResponse.serverError())
+      return res.status(200).json(ApiResponse.success({ data }));
+    } catch (e) {
+      console.error("StudentCT create error: ", e);
+      return res.status(500).json(ApiResponse.error(e))
     }
   });
 
-  update = asyncHandler(async (req, res) => {
+  edit = asyncHandler(async (req, res) => {
     try {
-      const data = await StudentSV.update(req.params.id, req.validData, req.payload);
-      return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("StudentCT update error: ", error);
-      return res.status(500).json(ApiResponse.serverError())
+      const id = req.validData?.id;
+      const doc = req.validData;
+      delete doc.id
+
+      const { item } = await StudentSV.edit(req.payload, id, doc);
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("StudentCT edit error: ", e)
+      return res.status(500).json(ApiResponse.error(e))
     }
   });
 
-  // 注释：查看自己的学生信息（暂不启用）
+  // 注释：学生账号查看自己的信息（暂不启用）
   /*
   selfDetail = asyncHandler(async (req, res) => {
     try {
       const data = await StudentSV.selfDetail(req.payload);
       return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("StudentCT selfDetail error: ", error.message)
-      return res.status(500).json(ApiResponse.serverError())
+    } catch (e) {
+      console.error("StudentCT selfDetail error: ", e.message)
+      return res.status(500).json(ApiResponse.error(e))
     }
   });
   */
 
+  // 注释：学生账号修改自己的信息（暂不启用）
+  /*
   selfUpdate = asyncHandler(async (req, res) => {
     try {
       const data = await StudentSV.selfUpdate(req.body, req.payload);
       return res.status(200).json(ApiResponse.success(data));
-    } catch (error) {
-      console.error("StudentCT selfUpdate error: ", error)
-      return res.status(500).json(ApiResponse.serverError())
+    } catch (e) {
+      console.error("StudentCT selfUpdate error: ", e)
+      return res.status(500).json(ApiResponse.error(e))
     }
   });
+  */
 }
 
 module.exports = new StudentCT();

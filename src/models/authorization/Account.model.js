@@ -62,8 +62,7 @@ docSchema.pre("save", async function (next) {
         parallelism: 4,
       });
     } catch (error) {
-      next(error);
-      return;
+      return next(error);
     }
   }
   next();
@@ -74,7 +73,7 @@ docSchema.methods.comparePassword = async function (candidatePassword) {
   try {
     return await argon2.verify(this.passwordHash, candidatePassword);
   } catch (error) {
-    throw new Error("密码验证失败");
+    throw ({ code: 400, message: "密码验证失败" });
   }
 };
 

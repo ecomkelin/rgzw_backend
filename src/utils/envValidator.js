@@ -23,7 +23,7 @@ function validateEnvironmentVariables(requiredEnvVars = []) {
     missingEnvVars.forEach(envVar => {
       console.error(`  - ${envVar}`);
     });
-    throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+    throw ({ code: 500, message: `Missing required environment variables: ${missingEnvVars.join(', ')}` });
   }
 
   console.info('✅ 所有必需的环境变量都已设置');
@@ -45,7 +45,7 @@ function validateEnvironmentFormats(validations = {}) {
 
   if (invalidEnvVars.length > 0) {
     console.error(`❌ 无效的环境变量格式: ${invalidEnvVars.join(', ')}`);
-    throw new Error(`Invalid environment variable formats: ${invalidEnvVars.join(', ')}`);
+    throw ({ code: 500, message: `Invalid environment variable formats: ${invalidEnvVars.join(', ')}` });
   }
 }
 

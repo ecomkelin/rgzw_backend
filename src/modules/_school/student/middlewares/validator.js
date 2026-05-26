@@ -2,7 +2,7 @@ const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsVali
 const { AccountEnums } = require('@models/authorization/Account.dao');
 // 注意：这里我们不需要User.model，因为学生模块有自己的验证规则
 
-exports.createVD = [
+exports.addVD = [
   // Body 参数：可选规则
   commonBodyRules.validateString('student.name', { minLength: 2, maxLength: 50 }),
   commonBodyRules.optionalDate('student.birthday'),
@@ -28,13 +28,14 @@ exports.createVD = [
   commonBodyRules.optionalObjectId('student.Org'),
   commonBodyRules.optionalObjectId('student.Account'),
 
-  commonBodyRules.optionalString('account.code', { minLength: 4, maxLength: 16 }),
-  commonBodyRules.optionalString('account.password', { minLength: 8, maxLength: 16 }),
-  commonBodyRules.optionalString('account.name', { minLength: 2, maxLength: 50 }),
+  commonBodyRules.optionalObject('account'),
+  commonBodyRules.subObjValString('account.code', { minLength: 4, maxLength: 16 }),
+  commonBodyRules.subObjValString('account.password', { minLength: 8, maxLength: 16 }),
+  commonBodyRules.subObjValString('account.name', { minLength: 2, maxLength: 50 }),
+  commonBodyRules.subObjValString('account.identityNo', { minLength: 15, maxLength: 18 }),
+  commonBodyRules.optionalEnum('account.gender', AccountEnums.genderEnums),
   commonBodyRules.optionalString('account.phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('account.address', { minLength: 5, maxLength: 200 }),
-  commonBodyRules.optionalString('account.identityNo', { minLength: 15, maxLength: 18 }),
-  commonBodyRules.optionalEnum('account.gender', AccountEnums.genderEnums),
   commonBodyRules.optionalObjectId('account.Nation'),
   commonBodyRules.optionalObjectId('account.Province'), // 修正字段名
   commonBodyRules.optionalObjectId('account.City'),
@@ -43,7 +44,7 @@ exports.createVD = [
   validatorErrorHandle
 ];
 
-exports.updateVD = [
+exports.editVD = [
   // 路径参数：必填 ObjectId
   commonParamRules.validateObjectId('id'),
   // Body 参数：可选规则

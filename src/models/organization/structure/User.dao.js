@@ -18,7 +18,7 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
   try {
-    const item = await DAO.detail(UserModel, _id, options);
+    const { item } = await DAO.detail(UserModel, _id, options);
 
     if (!item) {
       throw ({ code: 404, message: "此 公司 数据已不存在" });
@@ -36,17 +36,17 @@ const detail = async (payload = {}, _id, options) => {
   }
 };
 
-const create = async (payload, doc) => {
+const add = async (payload, doc) => {
   try {
     // 只有管理员可以创建公司
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "只有超级管理员才能创建公司" });
     }
 
-    const item = DAO.add(UserModel, doc);
+    const { item } = await DAO.add(UserModel, doc);
     return { item };
   } catch (e) {
-    console.error('UserDao create e:', e.message);
+    console.error('UserDao add e:', e.message);
     throw e;
   }
 };
@@ -75,7 +75,7 @@ const update = async (payload = {}, _id, doc) => {
       throw new e('手机号或账号已被占用');
     }
 
-    const item = await DAO.edit(UserModel, _id, doc);
+    const { item } = await DAO.edit(UserModel, _id, doc);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
     return { item };
@@ -90,7 +90,7 @@ module.exports = {
   UserDAO: {
     list,
     detail,
-    create,
+    add,
     update,
   },
   UserModel, UserDOC, UserEnums,

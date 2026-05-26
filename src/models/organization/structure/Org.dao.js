@@ -18,7 +18,7 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
   try {
-    const item = await DAO.detail(OrgModel, _id, options);
+    const { item } = await DAO.detail(OrgModel, _id, options);
 
     if (!item) {
       throw ({ code: 404, message: "此 公司 数据已不存在" });
@@ -43,7 +43,7 @@ const create = async (payload, doc) => {
       throw ({ code: 403, message: "只有超级管理员才能创建公司" });
     }
 
-    const item = DAO.add(OrgModel, doc);
+    const { item } = await DAO.add(OrgModel, doc);
     return { item };
   } catch (e) {
     console.error('OrgDao create e:', e.message);
@@ -75,7 +75,7 @@ const update = async (payload = {}, _id, doc) => {
       throw new e('手机号或账号已被占用');
     }
 
-    const item = await DAO.edit(OrgModel, _id, doc);
+    const { item } = await DAO.edit(OrgModel, _id, doc);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
     return { item };

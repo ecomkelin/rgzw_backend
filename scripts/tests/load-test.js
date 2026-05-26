@@ -60,8 +60,8 @@ async function runHealthCheckTest() {
     console.info(autocannon.printResult(result));
 
     return result;
-  } catch (error) {
-    console.error('Health check test failed:', error);
+  } catch (e) {
+    console.error('Health check test failed:', e);
     return null;
   }
 }
@@ -76,8 +76,8 @@ async function runLoginTest() {
     console.info(autocannon.printResult(result));
 
     return result;
-  } catch (error) {
-    console.error('Login test failed:', error);
+  } catch (e) {
+    console.error('Login test failed:', e);
     return null;
   }
 }
@@ -118,8 +118,8 @@ async function runAuthenticatedTests(token) {
     console.info('\nProducts API Results:');
     console.info(autocannon.printResult(productResult));
 
-  } catch (error) {
-    console.error('Authenticated tests failed:', error);
+  } catch (e) {
+    console.error('Authenticated tests failed:', e);
   }
 }
 
@@ -143,8 +143,8 @@ async function getAuthToken() {
 
     const data = await response.json();
     return data.data?.token || data.token;
-  } catch (error) {
-    console.error('Error getting auth token:', error);
+  } catch (e) {
+    console.error('Error getting auth token:', e);
     return null;
   }
 }
@@ -164,9 +164,9 @@ async function runLoadTest() {
     await runAuthenticatedTests(token);
 
     console.info('\nLoad test completed.');
-  } catch (error) {
-    console.error('Load test error:', error);
+  } catch (e) {
+    console.error('Load test error:', e);
   }
 }
 
-runLoadTest().catch(console.error); 
+runLoadTest().catch(console.e); 

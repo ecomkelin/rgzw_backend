@@ -14,8 +14,8 @@ beforeAll(async () => {
     const uri = mongod.getUri();
     await mongoose.connect(uri);
     await initializeUsers();
-  } catch (error) {
-    console.error('Test setup failed:', error);
+  } catch (e) {
+    console.error('Test setup failed:', e);
     throw error;
   }
 });
@@ -28,8 +28,8 @@ afterAll(async () => {
     if (mongod) {
       await mongod.stop();
     }
-  } catch (error) {
-    console.error('Test cleanup failed:', error);
+  } catch (e) {
+    console.error('Test cleanup failed:', e);
   }
 });
 
@@ -43,8 +43,8 @@ beforeEach(async () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       await initializeUsers();
     }
-  } catch (error) {
-    console.error('Test cleanup failed:', error);
+  } catch (e) {
+    console.error('Test cleanup failed:', e);
   }
 });
 

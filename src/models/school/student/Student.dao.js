@@ -4,8 +4,14 @@ const DAO = require('@models/DAO');
 const list = async (payload = {}, filter, options) => {
   try {
     // 验证权限
-    if (!payload.isAdmin) {
-      throw ({ code: 403, message: "只有超级管理员才能查看公司列表" });
+    if (payload.accountType === 'Student') {
+      throw ({ code: 403, message: "您无权查看学生列表" });
+    } else if (payload.accountType === 'User') {
+      if (!payload.isAdmin) {
+        filter.Org = payload.currentUser.Org;
+      }
+    } else {
+      throw ({ code: 403, message: "您的身份有误" })
     }
 
     const { items, total } = await DAO.list(StudentModel, filter, options);
@@ -18,15 +24,23 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
   try {
-    const item = await DAO.detail(StudentModel, _id, options);
+    const { item } = await DAO.detail(StudentModel, _id, options);
 
     if (!item) {
-      throw ({ code: 404, message: "此 公司 数据已不存在" });
+      throw ({ code: 404, message: "此 学生 数据已不存在" });
     }
 
-    // 验证权限 - 管理员可以查看任何公司，普通用户只能查看自己的公司
-    if (!payload.isAdmin && item._id.toString() !== payload.currentStudent?.Student.toString()) {
-      throw ({ code: 403, message: "没有权限访问此公司" });
+    // 验证权限 - 管理员可以查看任何学生，普通用户只能查看自己的学生
+    if (payload.accountType === 'Student') {
+      item._id.toString() !== payload.currentStudent?.Student.toString()
+    } else if (payload.accountType === 'User') {
+      if (!payload.isAdmin) {
+        if (item.Org !== payload.currentUser?.Org) {
+          throw ({ code: 403, message: "您无权查看此学生" })
+        }
+      }
+    } else {
+      throw ({ code: 403, message: "您的身份有误" })
     }
 
     return { item };
@@ -36,14 +50,14 @@ const detail = async (payload = {}, _id, options) => {
   }
 };
 
-const create = async (payload, doc) => {
+const add = async (payload, doc) => {
   try {
-    // 只有管理员可以创建公司
+    // 只有管理员可以创建学生
     if (!payload.isAdmin) {
-      throw ({ code: 403, message: "只有超级管理员才能创建公司" });
+      throw ({ code: 403, message: "只有超级管理员才能创建学生" });
     }
 
-    const item = DAO.add(StudentModel, doc);
+    const { item } = await DAO.add(StudentModel, doc);
     return { item };
   } catch (e) {
     console.error('StudentDao create e:', e.message);
@@ -51,17 +65,17 @@ const create = async (payload, doc) => {
   }
 };
 
-const update = async (payload = {}, _id, doc) => {
+const edit = async (payload = {}, _id, doc) => {
   try {
-    // 验证目标公司是否存在
+    // 验证目标学生是否存在
     const targetStudent = await StudentModel.findById(_id);
     if (!targetStudent) {
-      throw new e('公司不存在');
+      throw new e('学生不存在');
     }
 
-    // 只有管理员可以修改任何公司，普通用户只能修改自己的公司
+    // 只有管理员可以修改任何学生，普通用户只能修改自己的学生
     if (!payload.isAdmin && targetStudent._id.toString() !== payload._id.toString()) {
-      throw ({ code: 403, message: "没有权限修改此公司" });
+      throw ({ code: 403, message: "没有权限修改此学生" });
     }
 
     // 处理密码
@@ -75,7 +89,7 @@ const update = async (payload = {}, _id, doc) => {
       throw new e('手机号或账号已被占用');
     }
 
-    const item = await DAO.edit(StudentModel, _id, doc);
+    const { item } = await DAO.edit(StudentModel, _id, doc);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
     return { item };
@@ -90,8 +104,8 @@ module.exports = {
   StudentDAO: {
     list,
     detail,
-    create,
-    update,
+    add,
+    edit,
   },
   StudentModel, StudentDOC, StudentEnums,
 }

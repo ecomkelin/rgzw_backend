@@ -99,9 +99,9 @@ async function initializeAccounts() {
 
     // 批量插入数据
     console.info('用户数据初始化成功');
-  } catch (error) {
-    console.error('用户数据初始化失败:', error);
-    throw error;
+  } catch (e) {
+    console.error('用户数据初始化失败:', e);
+    throw e;
   }
 }
 

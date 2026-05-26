@@ -57,9 +57,11 @@ describe('Label Controller Unit Tests', () => {
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith(
         ApiResponse.success({
-          items: mockServiceResult.items,
-          query: mockServiceResult.query,
-          pagination: mockServiceResult.pagination
+          data: {
+            items: mockServiceResult.items,
+            query: mockServiceResult.query,
+            pagination: mockServiceResult.pagination
+          }
         })
       );
     });
@@ -76,7 +78,7 @@ describe('Label Controller Unit Tests', () => {
       await LabelCT.list(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.json).toHaveBeenCalledWith(ApiResponse.serverError());
+      expect(mockRes.json).toHaveBeenCalledWith(ApiResponse.error({code: 500}));
     });
   });
 

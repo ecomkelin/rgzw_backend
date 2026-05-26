@@ -13,8 +13,8 @@ async function initSeeds() {
     console.info('开始初始化种子数据...');
     await initializeAll();
     console.info('种子数据初始化完成');
-  } catch (error) {
-    console.error('初始化种子数据失败:', error);
+  } catch (e) {
+    console.error('初始化种子数据失败:', e);
     process.exit(1);
   } finally {
     await mongoose.disconnect();

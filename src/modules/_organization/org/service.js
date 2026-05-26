@@ -13,9 +13,9 @@ class OrgSV {
     try {
       const { items, total, permFilter } = await OrgDAO.list(payload, filter, options);
       return { items, total, permFilter };
-    } catch (error) {
-      console.error('OrgSV list error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('OrgSV list error:', e);
+      throw e;
     }
   }
 
@@ -28,16 +28,16 @@ class OrgSV {
    */
   async detail(payload, _id, options) {
     try {
-      const item = await OrgDAO.detail(payload, _id, options);
+      const { item } = await OrgDAO.detail(payload, _id, options);
 
       if (!item) {
-        throw new Error("此数据已不存在");
+        throw ({ code: 403, message: "此数据已不存在" });
       }
 
       return { item };
-    } catch (error) {
-      console.error('OrgSV detail error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('OrgSV detail error:', e);
+      throw e;
     }
   }
 
@@ -55,9 +55,9 @@ class OrgSV {
 
       return { item };
     }
-    catch (error) {
-      console.error('OrgSV add error:', error.message);
-      throw error;
+    catch (e) {
+      console.error('OrgSV add error:', e);
+      throw e;
     }
   }
 
@@ -73,9 +73,9 @@ class OrgSV {
       deleteImmutableFront(doc, OrgDOC);
       const { item } = await OrgDAO.edit(payload, _id, doc);
       return { item };
-    } catch (error) {
-      console.error('OrgSV edit error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('OrgSV edit error:', e);
+      throw e;
     }
   }
 }

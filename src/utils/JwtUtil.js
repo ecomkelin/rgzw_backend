@@ -22,9 +22,9 @@ class JwtUtil {
     const expiresIn = process.env.ACCESS_TOKEN_EXPIRED || '5m';
     try {
       return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn });
-    } catch (error) {
-      console.error('Error generating access token:', error);
-      throw error;
+    } catch (e) {
+      console.error('Error generating access token:', e);
+      throw e;
     }
   }
 
@@ -58,12 +58,12 @@ class JwtUtil {
    */
   static verifyAccessToken(token) {
     try {
-      if (!token) return null;
+      if (!token) throw ({ code: 400, message: "请传递token" });
 
       return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    } catch (error) {
-      console.error('Access token verification error:', error.message);
-      return null;
+    } catch (e) {
+      console.error('Access token verification error:', e);
+      throw e
     }
   }
 
@@ -74,12 +74,12 @@ class JwtUtil {
    */
   static verifyRefreshToken(refreshToken) {
     try {
-      if (!refreshToken) return null;
+      if (!refreshToken) throw ({ code: 400, message: "请传递 refreshToken" });
 
       return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    } catch (error) {
-      console.error('Refresh token verification error:', error.message);
-      return null;
+    } catch (e) {
+      console.error('Refresh token verification error:', e);
+      throw e
     }
   }
 

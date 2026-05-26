@@ -121,7 +121,15 @@ exports.commonBodyRules = {
             .isString().withMessage(options.msg || `${field} 必须是字符串`)
             .trim()
             .isLength({ max: options.maxLength, min: options.minLength }).withMessage(`${field} 长度不能超过 ${options.maxLength} 个字符, 不能低于 ${options.minLength}`),
-
+    subObjValString: (field, options = { maxLength: 10000, minLength: 0, msg }) => {
+        const objName = field.split('.')[0]
+        return body(field)
+            .if(body(objName).exists())
+            .notEmpty().withMessage(`${field} 不能为空`)
+            .isString().withMessage(options.msg || `${field} 必须是字符串`)
+            .trim()
+            .isLength({ max: options.maxLength, min: options.minLength }).withMessage(`${field} 长度不能超过 ${options.maxLength} 个字符, 不能低于 ${options.minLength}`)
+    },
     optionalString: (field, options = { maxLength: 10000, minLength: 0, msg }) =>
         body(field)
             .optional()
@@ -296,7 +304,7 @@ const populateValidator = [
         .custom((path) => {
             const allowedPaths = ['leaderId', 'deptId', 'parentId']; // 二级嵌套白名单
             if (!allowedPaths.includes(path)) {
-                throw new Error(`嵌套填充不允许：${path}`);
+                throw ({ code: 500, message: `嵌套填充不允许：${path}` });
             }
             return true;
         }),
@@ -330,7 +338,7 @@ exports.listOptionsValidator = [
         .custom(sortObj => {
             for (const [key, value] of Object.entries(sortObj)) {
                 if (![1, -1].includes(value)) {
-                    throw new Error(`sortObj.${key} 的值必须是 1（升序）或 -1（降序）`);
+                    throw ({ code: 500, message: `sortObj.${key} 的值必须是 1（升序）或 -1（降序）` });
                 }
             }
             return true;

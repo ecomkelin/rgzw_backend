@@ -14,12 +14,12 @@ class LoginSV {
         .select('+passwordHash');
 
       if (!Account) {
-        throw new Error('用户不存在或已禁用');
+        throw ({ code: 400, message: '用户不存在或已禁用' });
       }
 
       const isMatch = await Account.comparePassword(password);
       if (!isMatch) {
-        throw new Error('密码错误');
+        throw ({ code: 400, message: '密码错误' });
       }
 
       // 生成唯一的sessionId 防止多次登录 Generate a unique session ID for this login
@@ -39,9 +39,9 @@ class LoginSV {
       const refreshTokenExpiresAt = UtilsJwt.generateExpiresAt();
 
       return { accessToken, account: Account, refreshToken, refreshTokenExpiresAt, sessionId };
-    } catch (error) {
-      console.error('LoginSV login error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('LoginSV login error:', e);
+      throw e;
     }
   }
 
@@ -49,18 +49,18 @@ class LoginSV {
     try {
       const decoded = UtilsJwt.verifyRefreshToken(refresh_current);
       if (!decoded) {
-        throw new Error('无效的刷新令牌');
+        throw ({ code: 401, message: '无效的刷新令牌' });
       }
 
       const Account = await AccountModel.findOne({ _id: decoded._id, isActive: true })
         .select('+currentSessionId')
 
       if (!Account) {
-        throw new Error('用户不存在或已禁用');
+        throw ({ code: 400, message: '用户不存在或已禁用' });
       }
 
       if (Account.currentSessionId !== decoded.sessionId) {
-        throw new Error('会话已过期，请重新登录');
+        throw ({ code: 400, message: '会话已过期，请重新登录' });
       }
 
       // Generate new session ID to maintain current session
@@ -73,9 +73,9 @@ class LoginSV {
       const refreshTokenExpiresAt = UtilsJwt.generateExpiresAt();
 
       return { accessToken, account: Account, refreshToken, refreshTokenExpiresAt, sessionId };
-    } catch (error) {
+    } catch (e) {
       console.error('LoginSV refreshToken error:', error);
-      throw error;
+      throw e;
     }
   }
 
@@ -97,9 +97,9 @@ class LoginSV {
       }, { new: true });
 
       return true;
-    } catch (error) {
-      console.error('LoginSV logout error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('LoginSV logout error:', e);
+      throw e;
     }
   }
 
@@ -126,9 +126,9 @@ class LoginSV {
       }, { new: true });
 
       return true;
-    } catch (error) {
-      console.error('LoginSV forceLogoutAllDevices error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('LoginSV forceLogoutAllDevices error:', e);
+      throw e;
     }
   }
 

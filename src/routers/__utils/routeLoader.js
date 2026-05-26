@@ -49,7 +49,7 @@ function loadRouteFile(routePath, router, dir, basePrefix) {
     const moduleRouter = require(routePath);
 
     if (!moduleRouter || !moduleRouter.stack) {
-      throw new Error(`${routePath} 不是有效的路由模块`);
+      throw ({ code: 400, message: `${routePath} 不是有效的路由模块` });
     }
 
     // 尝试加载对应的描述配置文件 (例如: index.routes.desc.js)

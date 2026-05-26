@@ -11,7 +11,7 @@ const checkPermission = (permissionType) => {
 
       let hasPermission = false;
 
-      switch(permissionType) {
+      switch (permissionType) {
         case 'read':
           // 读取权限：只有管理员可以读取其他账户信息
           hasPermission = payload.isAdmin === true;
@@ -33,22 +33,15 @@ const checkPermission = (permissionType) => {
       }
 
       if (!hasPermission) {
-        const permissionMessages = {
-          read: "需要读取权限",
-          create: "需要创建权限",
-          edit: "需要编辑权限",
-          manage: "需要管理权限"
-        };
-
         return res.status(403).json(
-          ApiResponse.forbiddenError(permissionMessages[permissionType] || "无权限访问")
+          ApiResponse.error({ code: 403, message: "您无权访问" })
         );
       }
 
       next();
-    } catch (error) {
-      console.error('Permission check error:', error);
-      return res.status(500).json(ApiResponse.error("权限检查服务器错误"));
+    } catch (e) {
+      console.error('Account Permission check error:', e);
+      return res.json(ApiResponse.error(e));
     }
   };
 };

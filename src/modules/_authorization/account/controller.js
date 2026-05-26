@@ -1,5 +1,5 @@
 const AccountSV = require('./service');
-const ApiResponse = require('@utils/responsed');
+const ApiResponse = require('@utils/response');
 const asyncHandler = require('@utils/asyncHandler');
 
 class AccountCT {

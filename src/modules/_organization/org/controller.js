@@ -1,5 +1,5 @@
 const OrgSV = require('./service');
-const ApiResponse = require('@utils/responsed');
+const ApiResponse = require('@utils/response');
 const asyncHandler = require('@utils/asyncHandler');
 
 class OrgCT {
@@ -44,7 +44,7 @@ class OrgCT {
       const doc = req.validData;
       delete doc.id
 
-      const { item } = await OrgSV.edit(req.payload, req.params.id, req.validData);
+      const { item } = await OrgSV.edit(req.payload, id, doc);
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT edit error: ", e)

@@ -14,9 +14,9 @@ class AccountSV {
     try {
       const { items, total, permFilter } = await AccountDAO.list(payload, filter, options);
       return { items, total, permFilter };
-    } catch (error) {
-      console.error('AccountSV list error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('AccountSV list error:', e);
+      throw e;
     }
   }
 
@@ -29,16 +29,16 @@ class AccountSV {
    */
   async detail(payload, _id, options) {
     try {
-      const item = await AccountDAO.detail(payload, _id, options);
+      const { item } = await AccountDAO.detail(payload, _id, options);
 
       if (!item) {
-        throw new Error("此数据已不存在");
+        throw ({ code: 404, message: "此数据已不存在" });
       }
 
       return { item };
-    } catch (error) {
-      console.error('AccountSV detail error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('AccountSV detail error:', e);
+      throw e;
     }
   }
 
@@ -56,9 +56,9 @@ class AccountSV {
 
       return { item };
     }
-    catch (error) {
-      console.error('AccountSV add error:', error.message);
-      throw error;
+    catch (e) {
+      console.error('AccountSV add error:', e);
+      throw e;
     }
   }
 
@@ -74,9 +74,9 @@ class AccountSV {
       deleteImmutableFront(doc, AccountDOC);
       const { item } = await AccountDAO.edit(payload, _id, doc);
       return { item };
-    } catch (error) {
-      console.error('AccountSV edit error:', error.message);
-      throw error;
+    } catch (e) {
+      console.error('AccountSV edit error:', e);
+      throw e;
     }
   }
 

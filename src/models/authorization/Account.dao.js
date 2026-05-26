@@ -21,7 +21,7 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
     try {
-        const item = await DAO.detail(AccountModel, _id, options);
+        const { item } = await DAO.detail(AccountModel, _id, options);
 
         if (!item) {
             throw ({ code: 404, message: "此 账户 数据已不存在" });
@@ -68,7 +68,7 @@ const add = async (payload, doc) => {
             throw ({ code: 400, message: '手机号或账号已被占用' });
         }
 
-        const item = DAO.add(AccountModel, doc);
+        const { item } = await DAO.add(AccountModel, doc);
         delete item.passwordHash;
         delete item.currentSessionId
 
@@ -103,7 +103,7 @@ const edit = async (payload = {}, _id, doc) => {
             throw new e('手机号或账号已被占用');
         }
 
-        const item = await DAO.edit(AccountModel, _id, doc);
+        const { item } = await DAO.edit(AccountModel, _id, doc);
         delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
         return { item };
