@@ -4,13 +4,15 @@ const RouteCollector = require("@utils/routeCollector");
 
 /**
  * 递归加载路由文件
+ * 自动扫描指定目录下的路由文件并注册到 Express 路由器
+ *
  * @param {string} dir - 要加载的目录路径
  * @param {object} router - Express路由实例
  * @param {string} basePrefix - 基础路由前缀
  */
 function loadRoutesRecursively(dir, router, basePrefix = '') {
   try {
-    // 检查当前目录是否以 双下滑下 （__） 开头，如果是则跳过整个目录
+    // 检查当前目录是否以双下划线开头，如果是则跳过整个目录
     const currentDir = path.basename(dir);
     if (currentDir.startsWith('__')) {
       return;
@@ -19,7 +21,7 @@ function loadRoutesRecursively(dir, router, basePrefix = '') {
     // 读取 dir 目录下的内容
     const items = fs.readdirSync(dir, { withFileTypes: true });
 
-    // 找出非文件夹(即文件)子内容 而且如果结尾为router.js的文件 则处理该路由文件
+    // 找出非文件夹(即文件)子内容而且如果结尾为router.js的文件则处理该路由文件
     items
       .filter(item => !item.isDirectory() && item.name.endsWith('.routes.js'))
       .forEach(file => {
@@ -27,7 +29,7 @@ function loadRoutesRecursively(dir, router, basePrefix = '') {
         loadRouteFile(routePath, router, dir, basePrefix);
       });
 
-    // 递归处理子目录， 如果目录名不以 __ 开头 则继续递归加载子目录下
+    // 递归处理子目录，如果目录名不以 __ 开头则继续递归加载子目录下
     items
       .filter(item => item.isDirectory() && !item.name.startsWith('__'))
       .forEach(dirent => {
@@ -43,6 +45,12 @@ function loadRoutesRecursively(dir, router, basePrefix = '') {
 
 /**
  * 加载单个路由文件
+ * 加载指定的路由文件并将其注册到路由器
+ *
+ * @param {string} routePath - 路由文件路径
+ * @param {object} router - Express路由实例
+ * @param {string} dir - 目录路径
+ * @param {string} basePrefix - 基础路由前缀
  */
 function loadRouteFile(routePath, router, dir, basePrefix) {
   try {
@@ -87,6 +95,7 @@ function loadRouteFile(routePath, router, dir, basePrefix) {
     // 获取不包含下划线文件夹的路由前缀
     const routePrefix = getRoutePath(dir);
     const finalPrefix = routePrefix ? basePrefix + '/' + routePrefix : basePrefix;
+
     // 收集路由信息
     moduleRouter.stack.forEach(layer => {
       if (layer.route) {
@@ -111,6 +120,10 @@ function loadRouteFile(routePath, router, dir, basePrefix) {
 
 /**
  * 处理路由路径，跳过带下划线的文件夹
+ * 从目录路径中提取有效的路由路径部分
+ *
+ * @param {string} dir - 目录路径
+ * @returns {string} 提取后的路由路径
  */
 function getRoutePath(dir) {
   const modulesDir = path.join(process.cwd(), 'src/modules');
@@ -125,6 +138,10 @@ function getRoutePath(dir) {
 
 /**
  * 获取从src开始的相对路径
+ * 用于日志输出显示路由文件位置
+ *
+ * @param {string} fullPath - 完整文件路径
+ * @returns {string} 从src开始的相对路径
  */
 function getRelativePathFromSrc(fullPath) {
   const srcIndex = fullPath.indexOf('src');

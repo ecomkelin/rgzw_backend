@@ -17,7 +17,7 @@ const list = async (payload = {}, filter, options) => {
     const { items, total } = await DAO.list(StudentModel, filter, options);
     return { items, total };
   } catch (e) {
-    console.error('StudentDao list e:', e.message);
+    console.error('StudentDao list error:', e);
     throw e;
   }
 };
@@ -45,7 +45,7 @@ const detail = async (payload = {}, _id, options) => {
 
     return { item };
   } catch (e) {
-    console.error('StudentDao detail e:', e.message);
+    console.error('StudentDao detail error:', e);
     throw e;
   }
 };
@@ -60,7 +60,7 @@ const add = async (payload, doc) => {
     const { item } = await DAO.add(StudentModel, doc);
     return { item };
   } catch (e) {
-    console.error('StudentDao create e:', e.message);
+    console.error('StudentDao create error:', e);
     throw e;
   }
 };
@@ -95,7 +95,7 @@ const edit = async (payload = {}, _id, doc) => {
     return { item };
 
   } catch (e) {
-    console.error('StudentSV update e:', e.message);
+    console.error('StudentSV update error:', e);
     throw e;
   }
 };

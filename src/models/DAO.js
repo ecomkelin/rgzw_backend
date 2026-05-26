@@ -38,7 +38,7 @@ const list = async (Model, filter = {}, options = {}) => {
 
         return { items, total };
     } catch (e) {
-        console.error('DAO list e:', e.message);
+        console.error('DAO list error:', e);
         throw e;
     }
 };
@@ -52,7 +52,7 @@ const detail = async (Model, _id, options = {}) => {
 
         return { item };
     } catch (e) {
-        console.error('DAO detail e:', e.message);
+        console.error('DAO detail error:', e);
         throw e;
     }
 };
@@ -63,7 +63,7 @@ const add = async (Model, doc) => {
         await item.save();
         return { item };
     } catch (e) {
-        console.error('DAO add e:', e.message);
+        console.error('DAO add error:', e);
         throw e;
     }
 };
@@ -78,7 +78,7 @@ const edit = async (Model, _id, doc) => {
 
         return { item };
     } catch (e) {
-        console.error('DAO edit e:', e.message);
+        console.error('DAO edit error:', e);
         throw e;
     }
 };
@@ -93,7 +93,7 @@ const remove = async (Model, _id) => {
 
         return { item };
     } catch (e) {
-        console.error('DAO remove e:', e.message);
+        console.error('DAO remove error:', e);
         throw e;
     }
 };
@@ -104,7 +104,7 @@ const addMany = async (Model, docs) => {
         const items = await Model.insertMany(docs);
         return { items };
     } catch (e) {
-        console.error('DAO addMany e:', e.message);
+        console.error('DAO addMany error:', e);
         throw e;
     }
 };
@@ -114,7 +114,7 @@ const editMany = async (Model, filter, data) => {
         const result = await Model.updateMany(filter, data);
         return { result };
     } catch (e) {
-        console.error('DAO editMany e:', e.message);
+        console.error('DAO editMany error:', e);
         throw e;
     }
 };
@@ -124,7 +124,7 @@ const removeMany = async (Model, filter) => {
         const result = await Model.deleteMany(filter);
         return { result };
     } catch (e) {
-        console.error('DAO removeMany e:', e.message);
+        console.error('DAO removeMany error:', e);
         throw e;
     }
 };

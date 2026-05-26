@@ -9,18 +9,22 @@ const { validateEnvironmentVariables, DEFAULT_REQUIRED_VARS } = require('./utils
 require('dotenv').config();
 
 // 注册模块别名 @models 指向 src/models
-if (require.main === module) {
-  require('module-alias/register');
-}
+// 在任何情况下都注册，包括测试环境
+require('module-alias/register');
 
 // 验证必需的环境变量
 validateEnvironmentVariables(DEFAULT_REQUIRED_VARS);
 
-require('./demo.js')(); // 引入测试代码
+// 注意：下面的 demo.js() 似乎是测试代码，如果不需要可以移除
+try {
+  require('./demo.js')(); // 引入测试代码
+} catch (e) {
+  console.warn('警告：demo.js 执行失败', e);
+}
 
 const app = express();
 
-// 中间件
+// 中间件配置
 app.use(cookieParser());
 app.use(cors({
   // 核心：生产环境精准限制，非生产环境放行所有
@@ -77,4 +81,4 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // 导出 app 用于测试
-module.exports = { app, server }; 
+module.exports = { app, server };

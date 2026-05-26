@@ -11,7 +11,7 @@ const list = async (payload = {}, filter, options) => {
     const { items, total } = await DAO.list(UserModel, filter, options);
     return { items, total };
   } catch (e) {
-    console.error('UserDao list e:', e.message);
+    console.error('UserDao list error:', e);
     throw e;
   }
 };
@@ -31,7 +31,7 @@ const detail = async (payload = {}, _id, options) => {
 
     return { item };
   } catch (e) {
-    console.error('UserDao detail e:', e.message);
+    console.error('UserDao detail error:', e);
     throw e;
   }
 };
@@ -46,7 +46,7 @@ const add = async (payload, doc) => {
     const { item } = await DAO.add(UserModel, doc);
     return { item };
   } catch (e) {
-    console.error('UserDao add e:', e.message);
+    console.error('UserDao add error:', e);
     throw e;
   }
 };
@@ -81,7 +81,7 @@ const update = async (payload = {}, _id, doc) => {
     return { item };
 
   } catch (e) {
-    console.error('UserSV update e:', e.message);
+    console.error('UserSV update error:', e);
     throw e;
   }
 };

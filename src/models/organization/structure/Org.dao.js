@@ -11,7 +11,7 @@ const list = async (payload = {}, filter, options) => {
     const { items, total } = await DAO.list(OrgModel, filter, options);
     return { items, total };
   } catch (e) {
-    console.error('OrgDao list e:', e.message);
+    console.error('OrgDao list error:', e);
     throw e;
   }
 };
@@ -31,7 +31,7 @@ const detail = async (payload = {}, _id, options) => {
 
     return { item };
   } catch (e) {
-    console.error('OrgDao detail e:', e.message);
+    console.error('OrgDao detail error:', e);
     throw e;
   }
 };
@@ -46,7 +46,7 @@ const create = async (payload, doc) => {
     const { item } = await DAO.add(OrgModel, doc);
     return { item };
   } catch (e) {
-    console.error('OrgDao create e:', e.message);
+    console.error('OrgDao create error:', e);
     throw e;
   }
 };
@@ -81,7 +81,7 @@ const update = async (payload = {}, _id, doc) => {
     return { item };
 
   } catch (e) {
-    console.error('OrgSV update e:', e.message);
+    console.error('OrgSV update error:', e);
     throw e;
   }
 };

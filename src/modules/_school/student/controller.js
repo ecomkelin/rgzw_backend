@@ -78,8 +78,8 @@ class StudentCT {
       const data = await StudentSV.selfDetail(req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (e) {
-      console.error("StudentCT selfDetail error: ", e.message)
-      return res.status(500).json(ApiResponse.error(e))
+      console.error("StudentCT selfDetail error: ", e);
+      return res.status(500).json(ApiResponse.error(e));
     }
   });
   */

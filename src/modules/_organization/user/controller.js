@@ -3,7 +3,16 @@ const UserSV = require('./service');
 const ApiResponse = require('@utils/response');
 const asyncHandler = require('@utils/asyncHandler');
 
+/**
+ * 用户控制器类
+ * 处理用户相关HTTP请求
+ */
 class UserCT {
+  /**
+   * 获取用户列表
+   * @param {Object} req - HTTP请求对象
+   * @param {Object} res - HTTP响应对象
+   */
   list = asyncHandler(async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
@@ -11,11 +20,16 @@ class UserCT {
 
       return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
     } catch (e) {
-      console.error("UserCT list error: ", e)
-      return res.json(ApiResponse.error(e))
+      console.error("UserCT list error: ", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 
+  /**
+   * 获取用户详情
+   * @param {Object} req - HTTP请求对象
+   * @param {Object} res - HTTP响应对象
+   */
   detail = asyncHandler(async (req, res) => {
     try {
       const { id, options } = req.validData || {};
@@ -23,17 +37,23 @@ class UserCT {
 
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
-      console.error("UserCT detail error: ", e)
-      return res.json(ApiResponse.error(e))
+      console.error("UserCT detail error: ", e);
+      return res.json(ApiResponse.error(e));
     }
   });
 
+  /**
+   * 创建用户（同时创建账户）
+   * @param {Object} req - HTTP请求对象
+   * @param {Object} res - HTTP响应对象
+   */
   add = asyncHandler(async (req, res) => {
     try {
       const payload = req.payload;
       const doc_User = req.validData?.user;
 
-      const data = {}
+      const data = {};
+
       // 如果没有提供Account，但提供了account信息，则先创建Account
       if (!doc_User.Account) {
         if (!req.validData.account) {
@@ -53,31 +73,41 @@ class UserCT {
       return res.status(200).json(ApiResponse.success({ data }));
     } catch (e) {
       console.error("UserCT create error: ", e);
-      return res.status(500).json(ApiResponse.error(e))
+      return res.status(500).json(ApiResponse.error(e));
     }
   });
 
+  /**
+   * 更新用户信息
+   * @param {Object} req - HTTP请求对象
+   * @param {Object} res - HTTP响应对象
+   */
   edit = asyncHandler(async (req, res) => {
     try {
       const id = req.validData?.id;
       const doc = req.validData;
-      delete doc.id
+      delete doc.id;
 
       const { item } = await UserSV.edit(req.payload, id, doc);
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
-      console.error("UserCT edit error: ", e)
-      return res.status(500).json(ApiResponse.error(e))
+      console.error("UserCT edit error: ", e);
+      return res.status(500).json(ApiResponse.error(e));
     }
   });
 
+  /**
+   * 更新个人信息
+   * @param {Object} req - HTTP请求对象
+   * @param {Object} res - HTTP响应对象
+   */
   selfEdit = asyncHandler(async (req, res) => {
     try {
       const data = await UserSV.selfUpdate(req.body, req.payload);
       return res.status(200).json(ApiResponse.success(data));
     } catch (e) {
-      console.error("UserCT selfUpdate error: ", e)
-      return res.status(500).json(ApiResponse.error(e))
+      console.error("UserCT selfUpdate error: ", e);
+      return res.status(500).json(ApiResponse.error(e));
     }
   });
 }

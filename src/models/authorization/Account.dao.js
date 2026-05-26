@@ -14,7 +14,7 @@ const list = async (payload = {}, filter, options) => {
         const { items, total } = await DAO.list(AccountModel, permFilter, options);
         return { items, total, permFilter };
     } catch (e) {
-        console.error('AccountDao list e:', e.message);
+        console.error('AccountDao list error:', e);
         throw e;
     }
 };
@@ -34,7 +34,7 @@ const detail = async (payload = {}, _id, options) => {
 
         return { item };
     } catch (e) {
-        console.error('AccountDao detail e:', e.message);
+        console.error('AccountDao detail error:', e);
         throw e;
     }
 };
@@ -74,7 +74,7 @@ const add = async (payload, doc) => {
 
         return { item };
     } catch (e) {
-        console.error('AccountDao create e:', e.message);
+        console.error('AccountDao create error:', e);
         throw e;
     }
 };
@@ -109,7 +109,7 @@ const edit = async (payload = {}, _id, doc) => {
         return { item };
 
     } catch (e) {
-        console.error('AccountSV edit e:', e.message);
+        console.error('AccountSV edit error:', e);
         throw e;
     }
 };

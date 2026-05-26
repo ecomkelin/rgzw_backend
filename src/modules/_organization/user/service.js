@@ -1,14 +1,18 @@
 const { UserDAO, UserDOC } = require('@models/organization/structure/User.dao');
 const { deleteImmutableFront } = require('@/utils/fieldAttributes');
 
+/**
+ * 用户服务类
+ * 处理与用户相关的业务逻辑
+ */
 class UserSV {
   /**
-     * 
-     * @param {*} payload 
-     * @param {*} filter find(filter)的过滤条件，允许根据账户的基本信息进行过滤，例如：isActive、isAdmin、gender、accountType等字段，以及关联的Nation/Province/City/Area等字段
-     * @param {*} options { limit=100, skip=0, sort={}, populate=[{path: ''}] }
-     * @returns 
-     */
+   * 获取用户列表
+   * @param {Object} payload - 用户身份信息
+   * @param {Object} filter - 过滤条件，默认为空对象
+   * @param {Object} options - 查询选项 { limit=100, skip=0, sort={}, populate=[{path: ''}] }
+   * @returns {Object} 包含 items(用户列表), total(总数), permFilter(权限过滤器) 的对象
+   */
   async list(payload, filter = {}, options) {
     try {
       const { items, total, permFilter } = await UserDAO.list(payload, filter, options);
@@ -20,11 +24,11 @@ class UserSV {
   }
 
   /**
-   * 获取账户详情
-   * @param {*} payload 
-   * @param {*} _id 
-   * @param {*} options : { populate: [{ path: '' }] } 里面只有 一个参数 populate
-   * @returns 
+   * 获取用户详情
+   * @param {Object} payload - 用户身份信息
+   * @param {String} _id - 用户ID
+   * @param {Object} options - 选项 { populate: [{ path: '' }] } 只有一个参数 populate
+   * @returns {Object} 包含 item(用户详情) 的对象
    */
   async detail(payload, _id, options) {
     try {
@@ -42,13 +46,14 @@ class UserSV {
   }
 
   /**
-   * 
-   * @param {*} doc 
-   * @param {*} payload 
-   * @returns 
+   * 创建用户
+   * @param {Object} payload - 用户身份信息
+   * @param {Object} doc - 用户数据
+   * @returns {Object} 包含 item(新创建的用户) 的对象
    */
   async add(payload, doc) {
     try {
+      // 删除不允许从前端修改的字段
       deleteImmutableFront(doc, UserDOC);
 
       const { item } = await UserDAO.add(payload, doc);
@@ -62,15 +67,17 @@ class UserSV {
   }
 
   /**
-   * 
-   * @param {*} payload 
-   * @param {*} _id 
-   * @param {*} doc 
-   * @returns 
+   * 更新用户信息
+   * @param {Object} payload - 用户身份信息
+   * @param {String} _id - 用户ID
+   * @param {Object} doc - 要更新的数据
+   * @returns {Object} 包含 item(更新后的用户) 的对象
    */
   async edit(payload, _id, doc) {
     try {
+      // 删除不允许从前端修改的字段
       deleteImmutableFront(doc, UserDOC);
+
       const { item } = await UserDAO.edit(payload, _id, doc);
       return { item };
     } catch (e) {
@@ -80,4 +87,4 @@ class UserSV {
   }
 }
 
-module.exports = new UserSV(); 
+module.exports = new UserSV();

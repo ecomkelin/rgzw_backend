@@ -21,7 +21,7 @@ const UserDOC = {
     sort: { type: Number, default: 0 }, // 排序字段，越大越靠前
 
     createdBy: { type: ObjectId, ref: 'Account', immutable: true },
-    updatedBy: { type: ObjectId, ref: 'Account', deleteImmutableFront: true },
+    updatedBy: { type: ObjectId, ref: 'Account', immutableFront: true },
 };
 const docSchema = new Schema(UserDOC, { timestamps: true });
 docSchema.index({ Account: 1, Org: 1 }, { unique: true });

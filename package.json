@@ -13,14 +13,14 @@
     "@config": "src/config"
   },
   "scripts": {
-    "pm2": "cross-env NODE_ENV=production pm2 start config/ecosystem.config.js --only school_manage_plat",
+    "pm2": "cross-env NODE_ENV=production pm2 start ./config/ecosystem.config.js --only rgzw_plat",
     "pm2:restart": "cross-env NODE_ENV=production pm2 restart school_manage_plat",
     "pm2:stop": "cross-env NODE_ENV=production pm2 stop school_manage_plat",
     "dev": "cross-env NODE_ENV=dev nodemon src/main.js",
-    "test": "cross-env NODE_ENV=test jest --config config/jest.config.js --detectOpenHandles --forceExit --maxWorkers=1",
+    "test": "cross-env NODE_ENV=test jest --config tests/jest.config.js --detectOpenHandles --forceExit --maxWorkers=1",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:e2e": "cross-env NODE_ENV=test jest --config config/jest.e2e.config.js --detectOpenHandles --forceExit",
+    "test:coverage": "jest --config tests/jest.config.js --coverage",
+    "test:e2e": "cross-env NODE_ENV=test jest --config tests/jest.e2e.config.js --detectOpenHandles --forceExit",
     "test:all": "npm run test && npm run test:e2e",
     "db:seeds": "node scripts/db/index.js",
     "db:seeds:test": "cross-env NODE_ENV=test node scripts/db/index.js",
