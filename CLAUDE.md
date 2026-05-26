@@ -128,3 +128,26 @@ _module_name/
 - 位于 `scripts/db/seeds/`
 - 支持账户和其他基本数据的初始化
 - 使用 `pnpm db:seeds` 运行
+
+## 项目文档结构
+
+项目文档分为以下几个部分：
+
+### 根目录文档
+- `README.md` - 项目概述和快速入门
+- `CLAUDE.md` - Claude Code 开发指导
+- `version.md` - 版本历史记录
+
+### 文档目录 (doc/)
+- `ARCHITECTURE.md` - 项目架构详细说明
+- `DEVELOPMENT_STANDARD.md` - 开发规范和标准
+- 其他技术文档
+
+### 测试文档 (tests/docs/)
+- `TESTING_GUIDE.md` - 测试指南
+- `TESTING_SOLUTIONS.md` - 测试问题解决方案
+- `TESTING_SUMMARY.md` - 测试总结
+- `TESTING.md` - 测试说明
+
+### 测试报告 (tests/report/)
+- `report_x_x_x.md` - 版本测试报告

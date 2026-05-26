@@ -1,57 +1,58 @@
-# rgzw 项目文档
+# 科技培训学校管理系统
 
-## 项目概述
-这是一个基于 Express 和 MongoDB 的后端项目，包含完整的用户认证、权限管理、模型定义等功能。
+基于 Node.js/Express 的科技培训学校管理系统，采用四层架构设计（路由 → 控制器 → 服务 → DAO）。
 
-## 环境配置
+## 项目结构
+
+- `src/` - 主要源代码
+  - `models/` - 数据库模型和数据访问对象 (DAO)
+  - `modules/` - 功能模块 (认证、组织、学校等)
+  - `routers/` - Express 路由系统
+  - `controllers/` - 请求处理逻辑
+  - `services/` - 业务逻辑处理
+  - `middlewares/` - 中间件函数
+  - `utils/` - 实用函数
+
+## 主要特性
+
+- **JWT 认证系统** - 基于访问令牌和刷新令牌的安全认证
+- **四层架构** - 清晰的职责分离
+- **模块化路由** - 自动化路由加载系统
+- **权限控制** - 基于角色的访问控制
+- **数据安全** - 字段级别安全控制，NoSQL注入防护
+
+## 快速开始
+
 ```bash
-# 复制环境变量模板
-cp .env.example .env
-
 # 安装依赖
 pnpm install
 
 # 启动开发服务器
-pnpm run dev
+pnpm dev
+
+# 运行测试
+pnpm test
+
+# 生成测试覆盖率报告
+pnpm test:coverage
 ```
 
-## 目录结构
-```
-src/
-├── models/           # 数据模型定义
-├── modules/          # 功能模块
-├── middlewares/      # 中间件
-├── utils/            # 工具函数
-└── routers/          # 路由
-```
+## 详细文档
 
-## 项目约定
+- [项目架构](./doc/ARCHITECTURE.md)
+- [开发规范](./CLAUDE.md)
+- [版本历史](./version.md)
+- [测试指南](./tests/docs/TESTING_GUIDE.md)
+- [测试解决方案](./tests/docs/TESTING_SOLUTIONS.md)
 
-### 模型规范
-- 模型文件使用 `.model.js` 后缀
-- 枚举值通过 `modelEnums` 统一访问
-- 模型中定义的枚举可通过 `Model.modelEnums` 访问
+## 项目规范
 
-### 路由约定
-- 路由文件使用 `.routes.js` 后缀
-- 自动扫描 `modules` 目录下的路由文件
-- `__` 开头的目录会被忽略, 不会扫描
-- `_` 开头的目录, 路由加载的时候 会忽略目录名称
+- **编程语言**: JavaScript (ES6+)
+- **框架**: Node.js + Express
+- **数据库**: MongoDB + Mongoose
+- **测试**: Jest + Supertest
+- **包管理**: pnpm
 
-### 验证器规范
-- 验证器放在各模块的 `utils/validator.js` 文件中
-- 使用预定义的验证规则：`createVD`, `updateVD`, `listVD` 等
+## 贡献
 
-## 开发规范
-详细开发规范请参见 [CODING_STANDARD.md](./CODING_STANDARD.md)
-
-## 数据库脚本
-- `npm run db:seeds` - 初始化数据库种子数据
-- `npm run db:indexes` - 创建数据库索引
-
-## 测试脚本
-- `npm run test` - 运行单元测试
-- `npm run test:coverage` - 生成覆盖率报告
-
-## 部署
-- `npm run pm2` - 使用 PM2 部署到生产环境
+请参阅 [CLAUDE.md](./CLAUDE.md) 文件了解项目开发规范和编码约定。
