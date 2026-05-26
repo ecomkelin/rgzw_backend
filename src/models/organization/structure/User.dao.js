@@ -4,8 +4,14 @@ const DAO = require('@models/DAO');
 const list = async (payload = {}, filter, options) => {
   try {
     // 验证权限
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您没有权限操作User" });
+    }
     if (!payload.isAdmin) {
-      throw ({ code: 403, message: "只有超级管理员才能查看公司列表" });
+      filter.Org = payload.currentUser?.Org;
+      if (payload.currentUser?.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "只有超级管理员才能查看用户列表" });
+      }
     }
 
     const { items, total } = await DAO.list(UserModel, filter, options);
@@ -18,15 +24,24 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
   try {
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "你没有权限访问用户" })
+    }
+
     const { item } = await DAO.detail(UserModel, _id, options);
 
     if (!item) {
-      throw ({ code: 404, message: "此 公司 数据已不存在" });
+      throw ({ code: 404, message: "此 用户 数据已不存在" });
     }
 
-    // 验证权限 - 管理员可以查看任何公司，普通用户只能查看自己的公司
-    if (!payload.isAdmin && item._id.toString() !== payload.currentUser?.User.toString()) {
-      throw ({ code: 403, message: "没有权限访问此公司" });
+    // 验证权限 - 管理员可以查看任何用户，普通用户只能查看自己的用户
+    if (!payload.isAdmin) {
+      if (payload.currentUser?.Org?.toString() !== item.Org.toString()) {
+        throw ({ code: 403, message: "你没有权限访问此用户" })
+      }
+      if (payload.currentUser?.roleTemp !== 'manager' && payload.currentUser?._id?.toString() !== item._id.toString()) {
+        throw ({ code: 403, message: "没有权限访问此用户" });
+      }
     }
 
     return { item };
@@ -38,9 +53,19 @@ const detail = async (payload = {}, _id, options) => {
 
 const add = async (payload, doc) => {
   try {
-    // 只有管理员可以创建公司
+    // 只有管理员可以创建用户
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "你没有权限添加用户" })
+    }
     if (!payload.isAdmin) {
-      throw ({ code: 403, message: "只有超级管理员才能创建公司" });
+      doc.Org = payload.currentUser.Org
+      if (payload.currentUser.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "只有超级管理员才能创建用户" });
+      }
+    } else {
+      if (!doc.Org) {
+        doc.Org = payload.currentUser.Org
+      }
     }
 
     const { item } = await DAO.add(UserModel, doc);
@@ -53,15 +78,26 @@ const add = async (payload, doc) => {
 
 const update = async (payload = {}, _id, doc) => {
   try {
-    // 验证目标公司是否存在
-    const targetUser = await UserModel.findById(_id);
-    if (!targetUser) {
-      throw new e('公司不存在');
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "你没有权限访问用户" })
     }
 
-    // 只有管理员可以修改任何公司，普通用户只能修改自己的公司
-    if (!payload.isAdmin && targetUser._id.toString() !== payload._id.toString()) {
-      throw ({ code: 403, message: "没有权限修改此公司" });
+    // 验证目标用户是否存在
+    const targetUser = await UserModel.findById(_id);
+    if (!targetUser) {
+      throw new e('用户不存在');
+    }
+
+    // 只有管理员可以修改任何用户，普通用户只能修改自己的用户
+    if (!payload.isAdmin) {
+      if (payload.currentUser.Org.toString() !== targetUser.Org.toString()) {
+        throw ({ code: 403, message: "没有权限修改此用户" });
+      }
+      if (payload.currentUser.roleTemp !== 'manager') {
+        if (payload.currentUser._id.toString() !== targetUser._id.toString()) {
+          throw ({ code: 403, message: "没有权限修改此用户" });
+        }
+      }
     }
 
     // 处理密码
@@ -85,6 +121,9 @@ const update = async (payload = {}, _id, doc) => {
     throw e;
   }
 };
+
+// User 不能被删除 remove 只需要在 把 isActive 修改为 false
+
 
 module.exports = {
   UserDAO: {

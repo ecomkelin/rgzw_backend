@@ -41,6 +41,7 @@ class StudentCT {
         }
 
         const doc_Account = req.validData.account;
+        doc_Account.accountType = 'Student';
         const { item: itemAccount } = await AccountSV.add(payload, doc_Account);
         data.itemAccount = itemAccount;
 

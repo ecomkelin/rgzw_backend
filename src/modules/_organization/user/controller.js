@@ -61,6 +61,8 @@ class UserCT {
         }
 
         const doc_Account = req.validData.account;
+        doc_Account.accountType = 'User';
+
         const { item: itemAccount } = await AccountSV.add(payload, doc_Account);
         data.itemAccount = itemAccount;
 

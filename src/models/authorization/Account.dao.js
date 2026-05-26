@@ -4,6 +4,9 @@ const DAO = require('@models/DAO');
 const list = async (payload = {}, filter, options) => {
     try {
         // 验证权限
+        if (payload.accountType !== 'User') {
+            throw ({ code: 403, message: "您无权查看账户列表" });
+        }
         if (!payload.isAdmin) {
             throw ({ code: 403, message: "只有管理员才能查看账户列表" });
         }
@@ -48,6 +51,9 @@ const detail = async (payload = {}, _id, options) => {
 const add = async (payload, doc) => {
     try {
         // 只有管理员可以创建账户
+        if (payload.accountType !== 'User') {
+            throw ({ code: 403, message: "您无权添加账户" });
+        }
         if (!payload.isAdmin && payload.currentUser?.roleTemp !== 'manager') {
             throw ({ code: 403, message: "只有管理员才能创建账户" });
         }
@@ -113,6 +119,8 @@ const edit = async (payload = {}, _id, doc) => {
         throw e;
     }
 };
+
+// account 不能被删除 remove 只需要在 把 isActive 修改为 false
 
 
 module.exports = {

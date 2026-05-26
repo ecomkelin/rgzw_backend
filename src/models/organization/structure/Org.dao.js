@@ -4,6 +4,9 @@ const DAO = require('@models/DAO');
 const list = async (payload = {}, filter, options) => {
   try {
     // 验证权限
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您无权查看公司列表" });
+    }
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "只有超级管理员才能查看公司列表" });
     }
@@ -25,8 +28,10 @@ const detail = async (payload = {}, _id, options) => {
     }
 
     // 验证权限 - 管理员可以查看任何公司，普通用户只能查看自己的公司
-    if (!payload.isAdmin && item._id.toString() !== payload.currentUser?.Org.toString()) {
-      throw ({ code: 403, message: "没有权限访问此公司" });
+    if (!payload.isAdmin) {
+      if (payload.currentUser?.Org.toString() !== item._id.toString() || payload.currentStudent?.Org.toString() !== item._id.toString()) {
+        throw ({ code: 403, message: "没有权限访问此公司" });
+      }
     }
 
     return { item };
@@ -36,9 +41,12 @@ const detail = async (payload = {}, _id, options) => {
   }
 };
 
-const create = async (payload, doc) => {
+const add = async (payload, doc) => {
   try {
     // 只有管理员可以创建公司
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您无权创建公司" });
+    }
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "只有超级管理员才能创建公司" });
     }
@@ -46,52 +54,49 @@ const create = async (payload, doc) => {
     const { item } = await DAO.add(OrgModel, doc);
     return { item };
   } catch (e) {
-    console.error('OrgDao create error:', e);
+    console.error('OrgDao add error:', e);
     throw e;
   }
 };
 
-const update = async (payload = {}, _id, doc) => {
+const edit = async (payload = {}, _id, doc) => {
   try {
+    // 只有管理员可以修改公司
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您无权修改公司" });
+    }
+    if (!payload.isAdmin) {
+      throw ({ code: 403, message: "没有权限修改公司" });
+    }
+
     // 验证目标公司是否存在
     const targetOrg = await OrgModel.findById(_id);
     if (!targetOrg) {
       throw new e('公司不存在');
     }
 
-    // 只有管理员可以修改任何公司，普通用户只能修改自己的公司
-    if (!payload.isAdmin && targetOrg._id.toString() !== payload._id.toString()) {
-      throw ({ code: 403, message: "没有权限修改此公司" });
-    }
-
-    // 处理密码
-    if (doc.password) {
-      doc.passwordHash = doc.password;
-      delete doc.password;
-    }
-
-    const existing = await OrgModel.findOne({ $or: [{ phone: doc.phone }, { code: doc.code }], _id: { $ne: _id } });
+    const existing = await OrgModel.findOne({ $or: [{ unionCode: doc.unionCode }, { name: doc.name }], _id: { $ne: _id } });
     if (existing) {
-      throw new e('手机号或账号已被占用');
+      throw new e('统一社会编号或公司名称已被存在');
     }
 
     const { item } = await DAO.edit(OrgModel, _id, doc);
-    delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
     return { item };
-
   } catch (e) {
-    console.error('OrgSV update error:', e);
+    console.error('OrgSV edit error:', e);
     throw e;
   }
 };
+
+// org 不能被删除 remove 只需要在 把 isActive 修改为 false
 
 module.exports = {
   OrgDAO: {
     list,
     detail,
-    create,
-    update,
+    add,
+    edit,
   },
   OrgModel, OrgDOC, OrgEnums,
 }

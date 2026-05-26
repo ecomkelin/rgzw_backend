@@ -4,14 +4,14 @@ const DAO = require('@models/DAO');
 const list = async (payload = {}, filter, options) => {
   try {
     // 验证权限
-    if (payload.accountType === 'Student') {
+    if (payload.accountType !== 'User') {
       throw ({ code: 403, message: "您无权查看学生列表" });
-    } else if (payload.accountType === 'User') {
-      if (!payload.isAdmin) {
-        filter.Org = payload.currentUser.Org;
+    }
+    if (!payload.isAdmin) {
+      filter.Org = payload.currentUser.Org;
+      if (payload.currentUser?.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "您无权查看学生列表" });
       }
-    } else {
-      throw ({ code: 403, message: "您的身份有误" })
     }
 
     const { items, total } = await DAO.list(StudentModel, filter, options);
@@ -32,7 +32,9 @@ const detail = async (payload = {}, _id, options) => {
 
     // 验证权限 - 管理员可以查看任何学生，普通用户只能查看自己的学生
     if (payload.accountType === 'Student') {
-      item._id.toString() !== payload.currentStudent?.Student.toString()
+      if (item._id.toString() !== payload.currentStudent?.Student.toString()) {
+        throw ({ code: 403, message: "您无权查看此学生" })
+      }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
         if (item.Org !== payload.currentUser?.Org) {
@@ -52,9 +54,15 @@ const detail = async (payload = {}, _id, options) => {
 
 const add = async (payload, doc) => {
   try {
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您无权添加学生" });
+    }
     // 只有管理员可以创建学生
     if (!payload.isAdmin) {
-      throw ({ code: 403, message: "只有超级管理员才能创建学生" });
+      doc.Org = payload.currentUser.Org;
+      if (payload.currentUser?.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "只有超级管理员才能创建学生" });
+      }
     }
 
     const { item } = await DAO.add(StudentModel, doc);
@@ -74,8 +82,21 @@ const edit = async (payload = {}, _id, doc) => {
     }
 
     // 只有管理员可以修改任何学生，普通用户只能修改自己的学生
-    if (!payload.isAdmin && targetStudent._id.toString() !== payload._id.toString()) {
-      throw ({ code: 403, message: "没有权限修改此学生" });
+    if (payload.accountType === 'User') {
+      if (payload.currentStudent?._id?.toString() !== targetStudent._id.toString()) {
+        throw ({ code: 403, message: "没有权限修改此学生" });
+      }
+    } else if (payload.accountType === 'Student') {
+      if (!payload.isAdmin) {
+        if (payload.currentUser?.Org.toString() !== targetStudent.Org.toString()) {
+          throw ({ code: 403, message: "没有权限修改此学生" });
+        }
+        if (payload.currentUser.roleTemp !== 'manager') {
+          throw ({ code: 403, message: "没有权限修改学生信息" });
+        }
+      }
+    } else {
+      throw ({ code: 403, message: "您的身份出现了错误" });
     }
 
     // 处理密码
@@ -99,6 +120,8 @@ const edit = async (payload = {}, _id, doc) => {
     throw e;
   }
 };
+
+// Student 不能被删除 remove 只需要在 把 isActive 修改为 false
 
 module.exports = {
   StudentDAO: {
