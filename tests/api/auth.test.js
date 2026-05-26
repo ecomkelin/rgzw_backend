@@ -7,17 +7,19 @@ const {
   startMongoServer,
   stopMongoServer,
   clearDatabase,
-  loginAndGetTokens
+  initializeTestData
 } = require('../test.utils');
 
 describe('Authentication API', () => {
+  let testData;
+
   beforeAll(async () => {
     await startMongoServer();
   });
 
   beforeEach(async () => {
     await clearDatabase();
-    // 这里可以创建初始测试数据
+    testData = await initializeTestData(); // 初始化测试数据
   });
 
   afterEach(async () => {
@@ -30,10 +32,9 @@ describe('Authentication API', () => {
 
   describe('POST /api/auth/login', () => {
     test('应该成功登录并返回令牌', async () => {
-      // 创建一个测试账户用于登录
       const testCredentials = {
-        code: 'admin',
-        password: '12345678' // 假设这是默认密码
+        code: 'ADMIN',  // 使用大写以匹配数据库中的值
+        password: 'admin123'
       };
 
       const response = await request(app)
@@ -49,7 +50,7 @@ describe('Authentication API', () => {
 
     test('应该在凭证错误时返回400', async () => {
       const invalidCredentials = {
-        code: 'nonexistent',
+        code: 'NONEXISTENT',
         password: 'wrongpassword'
       };
 
@@ -57,7 +58,7 @@ describe('Authentication API', () => {
         .post('/api/auth/login')
         .send(invalidCredentials);
 
-      expect(response.status).toBe(200); // 通常这类应用在验证失败时也会返回200，但success为false
+      expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('success', false);
       expect(response.body).toHaveProperty('code');
     });
@@ -68,29 +69,30 @@ describe('Authentication API', () => {
         .send({}); // 空请求体
 
       // 验证参数验证失败
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
     });
   });
 
   describe('GET /api/auth/refresh-token', () => {
     test('应该能够刷新访问令牌', async () => {
-      // 首先登录获取refreshToken（通过Cookie）
-      const testCredentials = {
-        code: 'admin',
-        password: '12345678'
-      };
-
-      // 注意：由于refresh-token端点依赖于Cookie中的refreshToken，
-      // 这里可能需要模拟登录过程，实际测试可能需要调整
+      // 登录以设置cookie
       const loginResponse = await request(app)
         .post('/api/auth/login')
-        .send(testCredentials);
+        .send({
+          code: 'ADMIN',
+          password: 'admin123'
+        })
+        .expect(200);
 
-      // 通常refreshToken存储在Cookie中，我们需要处理Cookie
+      // 从登录响应中提取cookies
+      const cookies = loginResponse.headers['set-cookie'];
+      expect(cookies).toBeDefined();
+
+      // 使用cookies来刷新令牌
       const response = await request(app)
         .get('/api/auth/refresh-token')
-        .set('Cookie', loginResponse.headers['set-cookie']); // 从登录响应获取Cookie
+        .set('Cookie', cookies);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('code', 200);
@@ -100,17 +102,17 @@ describe('Authentication API', () => {
   describe('GET /api/auth/logout', () => {
     test('应该成功登出', async () => {
       // 首先登录获取令牌
-      const testCredentials = {
-        code: 'admin',
-        password: '12345678'
-      };
-
       const loginResponse = await request(app)
         .post('/api/auth/login')
-        .send(testCredentials);
+        .send({
+          code: 'ADMIN',
+          password: 'admin123'
+        })
+        .expect(200);
 
       const accessToken = loginResponse.body.data.accessToken;
 
+      // 现在使用Bearer token进行登出请求
       const response = await request(app)
         .get('/api/auth/logout')
         .set('Authorization', `Bearer ${accessToken}`);

@@ -10,6 +10,9 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../src/main').app;
 
+// 导入测试数据创建函数
+const { createDefaultUser, cleanupTestData } = require('./testSetup');
+
 let mongoServer;
 
 /**
@@ -43,6 +46,17 @@ const clearDatabase = async () => {
 };
 
 /**
+ * 初始化测试数据
+ */
+const initializeTestData = async () => {
+  // 清理现有测试数据
+  await cleanupTestData();
+
+  // 创建默认用户
+  return await createDefaultUser();
+};
+
+/**
  * 登录获取认证令牌
  * @param {Object} credentials - 登录凭据 {code, password}
  * @returns {Promise<Object>} 包含认证信息的对象
@@ -53,9 +67,10 @@ const loginAndGetTokens = async (credentials) => {
     .send(credentials)
     .expect(200);
 
-  // 从响应头中提取认证信息
+  // 从响应体中提取认证信息
   return {
     accessToken: response.body.data.accessToken,
+    refreshToken: response.body.data.refreshToken,
     account: response.body.data.account
   };
 };
@@ -66,5 +81,6 @@ module.exports = {
   startMongoServer,
   stopMongoServer,
   clearDatabase,
+  initializeTestData,
   loginAndGetTokens
 };
