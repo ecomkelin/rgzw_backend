@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AccountSV = require('../../_authorization/account/service');
 const UserSV = require('./service');
 const ApiResponse = require('@utils/response');
@@ -49,6 +50,10 @@ class UserCT {
    */
   add = asyncHandler(async (req, res) => {
     try {
+      // 启动事务
+      const session = await mongoose.startSession();
+      session.startTransaction(); // 开启事务
+
       const payload = req.payload;
       const doc_User = req.validData?.user;
 
@@ -63,14 +68,19 @@ class UserCT {
         const doc_Account = req.validData.account;
         doc_Account.accountType = 'User';
 
-        const { item: itemAccount } = await AccountSV.add(payload, doc_Account);
+        const { item: itemAccount } = await AccountSV.add(payload, doc_Account, { session });
         data.itemAccount = itemAccount;
 
         doc_User.Account = itemAccount._id;
       }
 
-      const { item: itemUser } = await UserSV.add(payload, doc_User);
+      const { item: itemUser } = await UserSV.add(payload, doc_User, { session });
       data.itemUser = itemUser;
+
+      // 全部成功 → 提交事务
+      await session.commitTransaction();
+      session.endSession();
+
 
       return res.status(200).json(ApiResponse.success({ data }));
     } catch (e) {

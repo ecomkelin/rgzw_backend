@@ -41,7 +41,14 @@ const detail = async (payload = {}, _id, options) => {
   }
 };
 
-const add = async (payload, doc) => {
+/**
+ * 
+ * @param {*} payload 
+ * @param {*} doc 
+ * @param {*} options: {session} 事务 
+ * @returns 
+ */
+const add = async (payload, doc, options) => {
   try {
     // 只有管理员可以创建公司
     if (payload.accountType !== 'User') {
@@ -51,7 +58,7 @@ const add = async (payload, doc) => {
       throw ({ code: 403, message: "只有超级管理员才能创建公司" });
     }
 
-    const { item } = await DAO.add(OrgModel, doc);
+    const { item } = await DAO.add(OrgModel, doc, options);
     return { item };
   } catch (e) {
     console.error('OrgDao add error:', e);

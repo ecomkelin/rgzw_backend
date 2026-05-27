@@ -45,9 +45,10 @@ class OrgSV {
    * 
    * @param {*} doc 
    * @param {*} payload 
+   * @param {*} options: {session} 事务 
    * @returns 
    */
-  async add(payload, doc) {
+  async add(payload, doc, options) {
     try {
       deleteImmutableFront(doc, OrgDOC);
 

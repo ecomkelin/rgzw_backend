@@ -57,10 +57,19 @@ const detail = async (Model, _id, options = {}) => {
     }
 };
 
-const add = async (Model, doc) => {
+/**
+ * 
+ * @param {*} Model 
+ * @param {*} doc 
+ * @param {*} options: {session} 事务 
+ * @returns 
+ */
+const add = async (Model, doc, { session }) => {
     try {
+        const options = session ? { session } : undefined;
+
         const item = new Model(doc);
-        await item.save();
+        await item.save(options);
         return { item };
     } catch (e) {
         console.error('DAO add error:', e);

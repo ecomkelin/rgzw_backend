@@ -15,7 +15,7 @@ const StudentDOC = {
     phone: { type: String },
 
     // 证件上的信息
-    identity: { type: String },       // 身份证号
+    identityNo: { type: String },       // 身份证号
     name: { type: String },       // 真实姓名
     birthday: { type: Date },     // 出生日期
     gender: { type: String, enum: ['Male', 'Female'], default: 'Male' },
@@ -53,7 +53,7 @@ const StudentDOC = {
 };
 const docSchema = new Schema(StudentDOC, { timestamps: true });
 
-docSchema.index({ identity: 1 });
+docSchema.index({ identityNo: 1 }, { unique: true, partialFilterExpression: { identityNo: { $exists: true, $ne: null } } });
 
 StudentModel = mongoose.model('Student', docSchema);
 

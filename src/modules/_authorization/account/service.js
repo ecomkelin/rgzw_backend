@@ -46,14 +46,13 @@ class AccountSV {
    * 
    * @param {*} doc 
    * @param {*} payload 
+   * @param {*} options: {session} 事务 
    * @returns 
    */
-  async add(payload, doc) {
+  async add(payload, doc, options) {
     try {
       deleteImmutableFront(doc, AccountDOC);
-
-      const { item } = await AccountDAO.add(payload, doc);
-
+      const { item } = await AccountDAO.add(payload, doc, options);
       return { item };
     }
     catch (e) {

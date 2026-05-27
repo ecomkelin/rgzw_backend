@@ -46,9 +46,10 @@ const detail = async (payload = {}, _id, options) => {
  * 
  * @param {*} payload 
  * @param {*} doc { code, password, ...} 其中 password 是明文密码，DAO层会处理成 passwordHash 存储
+ * @param {*} options: {session} 事务 
  * @returns 
  */
-const add = async (payload, doc) => {
+const add = async (payload, doc, options) => {
     try {
         // 只有管理员可以创建账户
         if (payload.accountType !== 'User') {
@@ -75,7 +76,7 @@ const add = async (payload, doc) => {
             throw ({ code: 400, message: '手机号或账号已被占用' });
         }
 
-        const { item } = await DAO.add(AccountModel, doc);
+        const { item } = await DAO.add(AccountModel, doc, options);
         delete item.passwordHash;
         delete item.currentSessionId
 

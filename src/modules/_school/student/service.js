@@ -45,13 +45,14 @@ class StudentSV {
    * 
    * @param {*} doc 
    * @param {*} payload 
+   * @param {*} options: {session} 事务 
    * @returns 
    */
-  async add(payload, doc) {
+  async add(payload, doc, options) {
     try {
       deleteImmutableFront(doc, StudentDOC);
 
-      const { item } = await StudentDAO.add(payload, doc);
+      const { item } = await StudentDAO.add(payload, doc, options);
 
       return { item };
     }

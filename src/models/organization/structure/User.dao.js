@@ -51,7 +51,14 @@ const detail = async (payload = {}, _id, options) => {
   }
 };
 
-const add = async (payload, doc) => {
+/**
+ * 
+ * @param {*} payload 
+ * @param {*} doc 
+ * @param {*} options: {session} 事务 
+ * @returns 
+ */
+const add = async (payload, doc, options) => {
   try {
     // 只有管理员可以创建用户
     if (payload.accountType !== 'User') {
@@ -68,7 +75,7 @@ const add = async (payload, doc) => {
       }
     }
 
-    const { item } = await DAO.add(UserModel, doc);
+    const { item } = await DAO.add(UserModel, doc, options);
     return { item };
   } catch (e) {
     console.error('UserDao add error:', e);

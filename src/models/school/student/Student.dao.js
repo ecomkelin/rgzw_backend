@@ -52,7 +52,14 @@ const detail = async (payload = {}, _id, options) => {
   }
 };
 
-const add = async (payload, doc) => {
+/**
+ * 
+ * @param {*} payload 
+ * @param {*} doc 
+ * @param {*} options: {session} 事务 
+ * @returns 
+ */
+const add = async (payload, doc, options) => {
   try {
     if (payload.accountType !== 'User') {
       throw ({ code: 403, message: "您无权添加学生" });
@@ -65,7 +72,7 @@ const add = async (payload, doc) => {
       }
     }
 
-    const { item } = await DAO.add(StudentModel, doc);
+    const { item } = await DAO.add(StudentModel, doc, options);
     return { item };
   } catch (e) {
     console.error('StudentDao create error:', e);

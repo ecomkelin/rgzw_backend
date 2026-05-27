@@ -49,14 +49,14 @@ class UserSV {
    * 创建用户
    * @param {Object} payload - 用户身份信息
    * @param {Object} doc - 用户数据
-   * @returns {Object} 包含 item(新创建的用户) 的对象
+   * @param {*} options: {session} 事务 
    */
-  async add(payload, doc) {
+  async add(payload, doc, options) {
     try {
       // 删除不允许从前端修改的字段
       deleteImmutableFront(doc, UserDOC);
 
-      const { item } = await UserDAO.add(payload, doc);
+      const { item } = await UserDAO.add(payload, doc, options);
 
       return { item };
     }
