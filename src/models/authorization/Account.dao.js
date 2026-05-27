@@ -91,7 +91,7 @@ const edit = async (payload = {}, _id, doc) => {
         // 验证目标账户是否存在
         const targetAccount = await AccountModel.findById(_id);
         if (!targetAccount) {
-            throw new e('账户不存在');
+            throw ({ code: 11000, message: '账户不存在' });
         }
 
         // 只有管理员可以修改任何账户，普通用户只能修改自己的账户
@@ -107,7 +107,7 @@ const edit = async (payload = {}, _id, doc) => {
 
         const existing = await AccountModel.findOne({ $or: [{ phone: doc.phone }, { code: doc.code }], _id: { $ne: _id } });
         if (existing) {
-            throw new e('手机号或账号已被占用');
+            throw ({ message: 11000, code: '手机号或账号已被占用' });
         }
 
         const { item } = await DAO.edit(AccountModel, _id, doc);

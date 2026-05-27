@@ -78,7 +78,7 @@ const edit = async (payload = {}, _id, doc) => {
     // 验证目标学生是否存在
     const targetStudent = await StudentModel.findById(_id);
     if (!targetStudent) {
-      throw new e('学生不存在');
+      throw ({ code: 404, message: '学生不存在' });
     }
 
     // 只有管理员可以修改任何学生，普通用户只能修改自己的学生
@@ -107,7 +107,7 @@ const edit = async (payload = {}, _id, doc) => {
 
     const existing = await StudentModel.findOne({ $or: [{ phone: doc.phone }, { code: doc.code }], _id: { $ne: _id } });
     if (existing) {
-      throw new e('手机号或账号已被占用');
+      throw ({ code: 11000, message: '手机号或账号已被占用' });
     }
 
     const { item } = await DAO.edit(StudentModel, _id, doc);

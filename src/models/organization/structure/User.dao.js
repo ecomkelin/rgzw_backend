@@ -76,7 +76,7 @@ const add = async (payload, doc) => {
   }
 };
 
-const update = async (payload = {}, _id, doc) => {
+const edit = async (payload = {}, _id, doc) => {
   try {
     if (payload.accountType !== 'User') {
       throw ({ code: 403, message: "你没有权限访问用户" })
@@ -85,7 +85,7 @@ const update = async (payload = {}, _id, doc) => {
     // 验证目标用户是否存在
     const targetUser = await UserModel.findById(_id);
     if (!targetUser) {
-      throw new e('用户不存在');
+      throw ({ code: 404, message: '用户不存在' });
     }
 
     // 只有管理员可以修改任何用户，普通用户只能修改自己的用户
@@ -106,18 +106,13 @@ const update = async (payload = {}, _id, doc) => {
       delete doc.password;
     }
 
-    const existing = await UserModel.findOne({ $or: [{ phone: doc.phone }, { code: doc.code }], _id: { $ne: _id } });
-    if (existing) {
-      throw new e('手机号或账号已被占用');
-    }
-
     const { item } = await DAO.edit(UserModel, _id, doc);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
     return { item };
 
   } catch (e) {
-    console.error('UserSV update error:', e);
+    console.error('UserDAO edit error:', e);
     throw e;
   }
 };
@@ -130,7 +125,7 @@ module.exports = {
     list,
     detail,
     add,
-    update,
+    edit,
   },
   UserModel, UserDOC, UserEnums,
 }

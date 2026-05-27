@@ -6,11 +6,11 @@ exports.addVD = [
   commonBodyRules.optionalNumber('sort', null, { min: 0 }),
   commonBodyRules.validateString('unionCode', { minLength: 2, maxLength: 30 }), // 增加最大长度
   commonBodyRules.validateString('name', { minLength: 2, maxLength: 100 }), // 增加最大长度
-  commonBodyRules.validateString('nickname', { minLength: 1, maxLength: 50 }), // 允许更短的昵称
-  commonBodyRules.optionalString('phone', { minLength: 7, maxLength: 20 }), // 调整电话长度范围
-  commonBodyRules.optionalString('email', { minLength: 5, maxLength: 100 }), // 调整邮箱长度范围
-  commonBodyRules.optionalString('website', { minLength: 5, maxLength: 200 }), // 调整网站长度范围
-  commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }), // 增加地址长度
+  commonBodyRules.validateString('nickname', { maxLength: 50 }), // 允许更短的昵称
+  commonBodyRules.optionalString('phone', { maxLength: 20 }), // 调整电话长度范围
+  commonBodyRules.optionalString('email', { maxLength: 100 }), // 调整邮箱长度范围
+  commonBodyRules.optionalString('website', { maxLength: 200 }), // 调整网站长度范围
+  commonBodyRules.optionalString('address', { maxLength: 200 }), // 增加地址长度
   commonBodyRules.optionalBoolean('isMain'), // 添加对isMain字段的验证
   commonBodyRules.optionalObjectId('Nation'),
   commonBodyRules.optionalObjectId('Province'), // 使用正确的省份字段名
@@ -21,6 +21,7 @@ exports.addVD = [
 ];
 
 exports.editVD = [
+  commonParamRules.validateObjectId('id'),
   // Body 参数：可选规则（注意：id参数验证不在这里，而是在路由层面）
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalNumber('sort', null, { min: 0 }),

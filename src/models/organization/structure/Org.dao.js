@@ -72,12 +72,12 @@ const edit = async (payload = {}, _id, doc) => {
     // 验证目标公司是否存在
     const targetOrg = await OrgModel.findById(_id);
     if (!targetOrg) {
-      throw new e('公司不存在');
+      throw ({ code: 11000, message: '公司不存在' });
     }
 
     const existing = await OrgModel.findOne({ $or: [{ unionCode: doc.unionCode }, { name: doc.name }], _id: { $ne: _id } });
     if (existing) {
-      throw new e('统一社会编号或公司名称已被存在');
+      throw ({ code: 11000, message: '统一社会编号或公司名称已被存在' });
     }
 
     const { item } = await DAO.edit(OrgModel, _id, doc);
