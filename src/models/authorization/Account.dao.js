@@ -53,7 +53,7 @@ const add = async (payload, doc, options) => {
     try {
         // 只有管理员可以创建账户
         if (payload.accountType !== 'User') {
-            throw ({ code: 403, message: "您无权添加账户 1111111" });
+            throw ({ code: 403, message: "您无权添加账户" });
         }
         if (!payload.isAdmin) {
             doc.isAdmin = false
@@ -119,6 +119,7 @@ const edit = async (payload = {}, _id, doc, options) => {
             throw ({ message: 11000, code: '手机号或账号已被占用' });
         }
 
+        targetAccount.set(doc);
         const { item } = await DAO.edit(targetAccount, options);
         delete item.passwordHash; // 确保返回时不包含密码哈希字段
 

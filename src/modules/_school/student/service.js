@@ -73,6 +73,7 @@ class StudentSV {
   async edit(payload, _id, doc, options) {
     try {
       deleteImmutableFront(doc, StudentDOC);
+
       const { item } = await StudentDAO.edit(payload, _id, doc, options);
       return { item };
     } catch (e) {

@@ -121,6 +121,7 @@ const edit = async (payload = {}, _id, doc, options) => {
       delete doc.password;
     }
 
+    targetUser.set(doc);
     const { item } = await DAO.edit(targetUser, options);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 

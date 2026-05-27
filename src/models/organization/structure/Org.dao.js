@@ -95,7 +95,8 @@ const edit = async (payload = {}, _id, doc, options) => {
       throw ({ code: 11000, message: '统一社会编号或公司名称已被存在' });
     }
 
-    const { item } = await DAO.edit(targetOrg, options);
+    targetOrg.set(doc);
+    const { item } = await DAO.edit(targetOrg, _id, doc);
 
     return { item };
   } catch (e) {

@@ -117,6 +117,7 @@ const edit = async (payload = {}, _id, doc, options) => {
     //   throw ({ code: 11000, message: '手机号或账号已被占用' });
     // }
 
+    targetStudent.set(doc);
     const { item } = await DAO.edit(targetStudent, options);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 

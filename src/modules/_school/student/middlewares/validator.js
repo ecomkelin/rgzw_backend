@@ -74,10 +74,11 @@ exports.editVD = [
 
 
 exports.listVD = [
-  commonBodyRules.optionalString('regExp', { minLength: 0, maxLength: 50 }),
-  commonBodyRules.optionalBoolean('isActive'),
-  commonBodyRules.optionalObjectId('Org'),
-  commonBodyRules.optionalObjectId('Account'),
+  commonBodyRules.optionalObject('filter'),
+  commonBodyRules.optionalString('filter.regExp', { minLength: 0, maxLength: 50 }),
+  commonBodyRules.optionalBoolean('filter.isActive'),
+  commonBodyRules.optionalObjectId('filter.Org'),
+  commonBodyRules.optionalObjectId('filter.Account'),
 
   ...listOptionsValidator, // 分页, 排序
   validatorErrorHandle
