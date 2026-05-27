@@ -78,7 +78,7 @@ const add = async (Model, doc, options = {}) => {
     }
 };
 
-const edit = async (targetItem, options) => {
+const edit = async (targetItem, options = {}) => {
     try {
         const { session } = options;
         const dbSession = session ? { session } : {}
