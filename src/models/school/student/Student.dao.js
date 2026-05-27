@@ -66,11 +66,11 @@ const add = async (payload, doc, options) => {
     }
     // 只有管理员可以创建学生
     if (!payload.isAdmin) {
-      doc.Org = payload.currentUser.Org;
       if (payload.currentUser?.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有超级管理员才能创建学生" });
+        throw ({ code: 403, message: "只有管理员才能创建学生" });
       }
     }
+    doc.Org = payload.currentUser.Org;
 
     const { item } = await DAO.add(StudentModel, doc, options);
     return { item };
@@ -90,11 +90,11 @@ const edit = async (payload = {}, _id, doc, options) => {
 
     // 只有管理员可以修改任何学生，普通用户只能修改自己的学生
     if (!payload.isAdmin) {
-      if (payload.accountType === 'User') {
+      if (payload.accountType === 'Student') {
         if (payload.currentStudent?._id?.toString() !== targetStudent._id.toString()) {
           throw ({ code: 403, message: "没有权限修改此学生" });
         }
-      } else if (payload.accountType === 'Student') {
+      } else if (payload.accountType === 'User') {
         if (payload.currentUser?.Org.toString() !== targetStudent.Org.toString()) {
           throw ({ code: 403, message: "没有权限修改此学生" });
         }
@@ -112,10 +112,6 @@ const edit = async (payload = {}, _id, doc, options) => {
       delete doc.password;
     }
 
-    // const existing = await StudentModel.findOne({ $or: [{ identityID: doc.identityID }], _id: { $ne: _id } });
-    // if (existing) {
-    //   throw ({ code: 11000, message: '手机号或账号已被占用' });
-    // }
 
     targetStudent.set(doc);
     const { item } = await DAO.edit(targetStudent, options);

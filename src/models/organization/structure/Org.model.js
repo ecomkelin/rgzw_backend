@@ -32,9 +32,9 @@ const OrgDOC = {
 const docSchema = new Schema(OrgDOC, { timestamps: true });
 
 // 为经常查询的字段创建索引
-docSchema.index({ name: 1 }, { unique: true });
 docSchema.index({ unionCode: 1 }, { unique: true });
-docSchema.index({ isActive: 1 });
+docSchema.index({ name: 1 }, { unique: true });
+docSchema.index({ nickname: 1 }, { unique: true });
 
 // 添加中间件，在保存前检查isMain字段的唯一性
 docSchema.pre('save', async function (next) {

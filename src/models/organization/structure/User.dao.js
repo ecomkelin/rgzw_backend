@@ -67,12 +67,17 @@ const add = async (payload, doc, options) => {
     if (!payload.isAdmin) {
       doc.Org = payload.currentUser.Org
       if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有超级管理员才能创建用户" });
+        throw ({ code: 403, message: "只有管理员才能创建用户" });
       }
     } else {
       if (!doc.Org) {
         doc.Org = payload.currentUser.Org
       }
+    }
+
+    const existing = await UserModel.findOne({ Account: doc.Account, Org: doc.Org });
+    if (existing) {
+      throw ({ code: 400, message: '同一个账号 不能有同一个公司的其他用户' });
     }
 
     const { item } = await DAO.add(UserModel, doc, options);
@@ -119,6 +124,11 @@ const edit = async (payload = {}, _id, doc, options) => {
     if (doc.password) {
       doc.passwordHash = doc.password;
       delete doc.password;
+    }
+
+    const existing = await UserModel.findOne({ _id: { $ne: _id }, Account: doc.Account, Org: doc.Org });
+    if (existing) {
+      throw ({ code: 400, message: '同一个账号 不能有同一个公司的其他用户' });
     }
 
     targetUser.set(doc);

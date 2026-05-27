@@ -4,9 +4,6 @@ const DAO = require('@models/DAO');
 const list = async (payload = {}, filter, options) => {
     try {
         // 验证权限
-        if (payload.accountType !== 'User') {
-            throw ({ code: 403, message: "您无权查看账户列表" });
-        }
         if (!payload.isAdmin) {
             throw ({ code: 403, message: "只有管理员才能查看账户列表" });
         }
@@ -24,15 +21,16 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
     try {
-        const { item } = await DAO.detail(AccountModel, _id, options);
-
-        if (!item) {
-            throw ({ code: 404, message: "此 账户 数据已不存在" });
+        // 验证权限 - 管理员可以查看任何账户，普通用户只能查看自己的账户
+        if (!payload.isAdmin) {
+            if (payload._id.toString() !== _id.toString()) {
+                throw ({ code: 403, message: "没有权限访问此账户" });
+            }
         }
 
-        // 验证权限 - 管理员可以查看任何账户，普通用户只能查看自己的账户
-        if (!payload.isAdmin && item._id.toString() !== payload._id.toString()) {
-            throw ({ code: 403, message: "没有权限访问此账户" });
+        const { item } = await DAO.detail(AccountModel, _id, options);
+        if (!item) {
+            throw ({ code: 404, message: "此 账户 数据已不存在" });
         }
 
         return { item };
@@ -52,16 +50,15 @@ const detail = async (payload = {}, _id, options) => {
 const add = async (payload, doc, options) => {
     try {
         // 只有管理员可以创建账户
-        if (payload.accountType !== 'User') {
-            throw ({ code: 403, message: "您无权添加账户" });
-        }
         if (!payload.isAdmin) {
+            if (payload.accountType !== 'User') {
+                throw ({ code: 403, message: "您无权添加账户" });
+            }
             doc.isAdmin = false
             if (payload.currentUser?.roleTemp !== 'manager') {
                 throw ({ code: 403, message: "只有管理员才能创建账户" });
             }
         }
-
 
         // 处理密码
         if (doc.password) {
@@ -69,11 +66,15 @@ const add = async (payload, doc, options) => {
             delete doc.password;
         }
 
+        if (!doc.nickname) doc.nickname = doc.name;
         doc.createdBy = payload.currentUser?._id;
 
-        const existing = await AccountModel.findOne({ $or: [{ code: doc.code }, { phone: doc.phone }] });
+        const existFilter = [{ code: doc.code }];
+        if (doc.phone) existFilter.push({ phone: doc.phone });
+        if (doc.identityNo) existFilter.push({ identityNo: doc.identityNo });
+        const existing = await AccountModel.findOne({ $or: existFilter });
         if (existing) {
-            throw ({ code: 400, message: '手机号或账号已被占用' });
+            throw ({ code: 400, message: '账号或手机号或身份证号已被占用' });
         }
 
         const { item } = await DAO.add(AccountModel, doc, options);
@@ -97,15 +98,16 @@ const add = async (payload, doc, options) => {
  */
 const edit = async (payload = {}, _id, doc, options) => {
     try {
+        // 只有管理员可以修改任何账户，普通用户只能修改自己的账户
+        if (!payload.isAdmin) {
+            if (payload._id.toString() !== _id.toString()) {
+                throw ({ code: 403, message: "没有权限修改此账户" });
+            }
+        }
         // 验证目标账户是否存在
         const targetAccount = await AccountModel.findById(_id);
         if (!targetAccount) {
             throw ({ code: 11000, message: '账户不存在' });
-        }
-
-        // 只有管理员可以修改任何账户，普通用户只能修改自己的账户
-        if (!payload.isAdmin && targetAccount._id.toString() !== payload._id.toString()) {
-            throw ({ code: 403, message: "没有权限修改此账户" });
         }
 
         // 处理密码
@@ -114,7 +116,10 @@ const edit = async (payload = {}, _id, doc, options) => {
             delete doc.password;
         }
 
-        const existing = await AccountModel.findOne({ $or: [{ phone: doc.phone }, { code: doc.code }], _id: { $ne: _id } });
+        const existFilter = [{ code: doc.code }];
+        if (doc.phone) existFilter.push({ phone: doc.phone });
+        if (doc.identityNo) existFilter.push({ identityNo: doc.identityNo });
+        const existing = await AccountModel.findOne({ _id: { $ne: _id }, $or: existFilter });
         if (existing) {
             throw ({ message: 11000, code: '手机号或账号已被占用' });
         }

@@ -18,13 +18,14 @@ const UserDOC = {
 
     avatar: { type: String }, // 头像URL
     isActive: { type: Boolean, default: true }, // 是否启用
-    sort: { type: Number, default: 0 }, // 排序字段，越大越靠前
 
+    sort: { type: Number, default: 0 }, // 排序字段，越大越靠前
     createdBy: { type: ObjectId, ref: 'Account', immutable: true },
     updatedBy: { type: ObjectId, ref: 'Account', immutableFront: true },
 };
 const docSchema = new Schema(UserDOC, { timestamps: true });
-docSchema.index({ Account: 1, Org: 1 }, { unique: true });
+
+docSchema.index({ Account: 1, Org: 1 }, { unique: true }); // 一个公司的员工只能有一个账号
 
 const UserModel = mongoose.model('User', docSchema);
 
