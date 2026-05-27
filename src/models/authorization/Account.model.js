@@ -24,7 +24,7 @@ const AccountDOC = {
 
   // 证件信息
   name: { type: String, required: true },// 用户真实姓名
-  identityNo: { type: String, required: true }, // 证件号码 身份证号/护照号
+  identityNo: { type: String }, // 证件号码 身份证号/护照号
   gender: { type: String, enum: AccountEnums.genderEnums, default: 'male' },
   birthday: { type: Date }, // 出生日期
   address: { type: String }, // 户籍地址
@@ -79,7 +79,7 @@ docSchema.methods.comparePassword = async function (candidatePassword) {
 
 docSchema.index({ code: 1 }, { unique: true });
 docSchema.index({ phone: 1 }, { unique: true, partialFilterExpression: { phone: { $exists: true, $ne: null } } });
-docSchema.index({ identityNo: 1 }, { unique: true });
+docSchema.index({ identityNo: 1 }, { unique: true, partialFilterExpression: { identityNo: { $exists: true, $ne: null } } });
 
 const AccountModel = mongoose.model('Account', docSchema);
 

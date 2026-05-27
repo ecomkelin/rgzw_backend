@@ -16,7 +16,7 @@ const checkPermission = (permissionType) => {
           // 读取权限：只有管理员可以读取其他账户信息
           hasPermission = payload.isAdmin === true;
           break;
-        case 'create':
+        case 'add':
           // 创建权限：只有管理员可以创建账户
           hasPermission = payload.isAdmin === true;
           break;
@@ -47,6 +47,6 @@ const checkPermission = (permissionType) => {
 };
 
 exports.readPermission = checkPermission('read');
-exports.createPermission = checkPermission('create');
+exports.addPermission = checkPermission('add');
 exports.editPermission = checkPermission('edit');
 exports.managePermission = checkPermission('manage');

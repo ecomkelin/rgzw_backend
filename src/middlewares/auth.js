@@ -37,7 +37,7 @@ exports.authenticate = async (req, res, next) => {
       if (process.env.NODE_ENV === 'production') {
         return res.status(401).json({ message: "会话已失效或已在其他设备登录，请重新登录" });
       } else {
-        console.warn(`会话ID不匹配，账户 ${Account._id}。期望 ${Account.currentSessionId}，获得 ${decoded.sessionId}`);
+        console.warn(`会话ID不匹配，账户 ${Account.code}。期望 ${Account.currentSessionId}，获得 ${decoded.sessionId}`);
       }
     }
 

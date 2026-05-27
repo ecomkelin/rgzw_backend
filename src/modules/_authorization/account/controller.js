@@ -27,6 +27,19 @@ class AccountCT {
     }
   });
 
+  add = asyncHandler(async (req, res) => {
+    try {
+      const doc = req.validData;
+      delete doc.id
+
+      const { item } = await AccountSV.add(req.payload, req.validData);
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
+    } catch (e) {
+      console.error("AccountCT add error: ", e);
+      return res.json(ApiResponse.error(e));
+    }
+  });
+
   edit = asyncHandler(async (req, res) => {
     try {
       const id = req.validData?.id;

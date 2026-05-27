@@ -32,7 +32,7 @@ exports.addVD = [
   commonBodyRules.subObjValString('account.code', { minLength: 4, maxLength: 16 }),
   commonBodyRules.subObjValString('account.password', { minLength: 8, maxLength: 16 }),
   commonBodyRules.subObjValString('account.name', { minLength: 2, maxLength: 50 }),
-  commonBodyRules.subObjValString('account.identityNo', { minLength: 15, maxLength: 18 }),
+  commonBodyRules.optionalString('account.identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalEnum('account.gender', AccountEnums.genderEnums),
   commonBodyRules.optionalString('account.phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('account.address', { minLength: 5, maxLength: 200 }),

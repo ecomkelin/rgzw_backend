@@ -1,6 +1,28 @@
 const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator, detailOptionsValidator } = require('@utils/validatorHandle');
 const { AccountEnums } = require('@models/authorization/Account.dao');
 
+
+exports.addVD = [
+  // Body 参数：可选规则
+  commonBodyRules.validateString('code', { minLength: 4, maxLength: 16 }),
+  commonBodyRules.validateString('password', { minLength: 8, maxLength: 16 }),
+  commonBodyRules.validateString('name', { minLength: 2, maxLength: 50 }),
+  commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
+  commonBodyRules.optionalBoolean('isActive'),
+  commonBodyRules.optionalNumber('sort'),
+  commonBodyRules.optionalString('name', { minLength: 2, maxLength: 50 }),
+  commonBodyRules.optionalString('phone', { minLength: 10, maxLength: 15 }),
+  commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
+  commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
+  commonBodyRules.optionalEnum('gender', AccountEnums.genderEnums),
+  commonBodyRules.optionalObjectId('Nation'),
+  commonBodyRules.optionalObjectId('Province'), // 修正字段名
+  commonBodyRules.optionalObjectId('City'),
+  commonBodyRules.optionalObjectId('Area'),
+
+  validatorErrorHandle
+];
+
 exports.editVD = [
   // 路径参数：必填 ObjectId
   commonParamRules.validateObjectId('id'),

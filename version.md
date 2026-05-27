@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v2.6.0
+- 添加了 Account 的 增加接口, 并且修改了 identityID 为非必需和非空唯一
+
 ## v2.5.0
 - 编辑了 aipDesc.md 接口文档
 - 优化了 account.seed.js 文件
