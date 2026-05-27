@@ -31,9 +31,13 @@ class StudentCT {
 
   add = asyncHandler(async (req, res) => {
     try {
-      // 启动事务
-      const session = await mongoose.startSession();
-      session.startTransaction(); // 开启事务
+      let session = null;
+
+      if (process.env.ACID === 'true') {
+        // 启动事务
+        session = await mongoose.startSession();
+        session.startTransaction(); // 开启事务
+      }
 
       const payload = req.payload;
       const doc_Student = req.validData?.student;
@@ -56,9 +60,11 @@ class StudentCT {
       const { item: itemStudent } = await StudentSV.add(payload, doc_Student, { session });
       data.itemStudent = itemStudent;
 
-      // 全部成功 → 提交事务
-      await session.commitTransaction();
-      session.endSession();
+      if (process.env.ACID === 'true') {
+        // 全部成功 → 提交事务
+        await session.commitTransaction();
+        session.endSession();
+      }
 
       return res.status(200).json(ApiResponse.success({ data }));
     } catch (e) {

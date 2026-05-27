@@ -64,12 +64,13 @@ const detail = async (Model, _id, options = {}) => {
  * @param {*} options: {session} 事务 
  * @returns 
  */
-const add = async (Model, doc, { session }) => {
+const add = async (Model, doc, options = {}) => {
     try {
-        const options = session ? { session } : undefined;
+        const { session } = options;
+        const dbSession = session ? { session } : {}
 
         const item = new Model(doc);
-        await item.save(options);
+        await item.save(dbSession);
         return { item };
     } catch (e) {
         console.error('DAO add error:', e);
@@ -77,11 +78,12 @@ const add = async (Model, doc, { session }) => {
     }
 };
 
-const edit = async (targetItem, { session }) => {
+const edit = async (targetItem, options) => {
     try {
-        const options = session ? { session } : undefined;
+        const { session } = options;
+        const dbSession = session ? { session } : {}
 
-        const item = await targetItem.save(options);
+        const item = await targetItem.save(dbSession);
         return { item };
     } catch (e) {
         console.error('DAO edit error:', e);

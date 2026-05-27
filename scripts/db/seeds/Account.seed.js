@@ -1,6 +1,7 @@
 const { AccountModel, AccountDAO } = require('@models/authorization/Account.dao');
 const { OrgModel } = require('@models/organization/structure/Org.dao');
 const { UserModel } = require('@models/organization/structure/User.dao');
+const { StudentModel } = require('@models/school/student/Student.dao');
 
 const orgSeeds = [
   {
@@ -83,6 +84,7 @@ async function initializeAccounts() {
     await AccountModel.deleteMany({});
     await OrgModel.deleteMany({});
     await UserModel.deleteMany({});
+    await StudentModel.deleteMany({});
 
     // 创建组织
     const orgDocs = await OrgModel.insertMany(orgSeeds);
