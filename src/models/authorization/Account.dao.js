@@ -52,14 +52,15 @@ const add = async (payload, doc) => {
     try {
         // 只有管理员可以创建账户
         if (payload.accountType !== 'User') {
-            throw ({ code: 403, message: "您无权添加账户" });
+            throw ({ code: 403, message: "您无权添加账户 1111111" });
         }
-        if (!payload.isAdmin && payload.currentUser?.roleTemp !== 'manager') {
-            throw ({ code: 403, message: "只有管理员才能创建账户" });
+        if (!payload.isAdmin) {
+            doc.isAdmin = false
+            if (payload.currentUser?.roleTemp !== 'manager') {
+                throw ({ code: 403, message: "只有管理员才能创建账户" });
+            }
         }
 
-        // 确保新创建的账户不是管理员
-        doc.isAdmin = false;
 
         // 处理密码
         if (doc.password) {

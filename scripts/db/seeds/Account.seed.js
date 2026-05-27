@@ -1,5 +1,4 @@
-const argon2 = require('argon2');
-const { AccountModel } = require('@models/authorization/Account.dao');
+const { AccountModel, AccountDAO } = require('@models/authorization/Account.dao');
 const { OrgModel } = require('@models/organization/structure/Org.dao');
 const { UserModel } = require('@models/organization/structure/User.dao');
 
@@ -90,12 +89,18 @@ async function initializeAccounts() {
     console.info(`已创建组织: ${orgDocs.map(o => o.name).join(', ')}`);
 
     // 创建账户
-    const accountDocs = await AccountModel.insertMany(rawAccountSeeds);
-    console.info(`已创建账户: ${accountDocs.map(a => a.code).join(', ')}`);
+    const seedPayload = {
+      accountType: "User",
+      isAdmin: true
+    }
+    for (const rawAccountSeed of rawAccountSeeds) {
+      const { item } = await AccountDAO.add(seedPayload, rawAccountSeed);
+      console.info(`已创建账户: ${item.code}`);
+    }
 
     // 创建用户
     const userDocs = await UserModel.insertMany(userSeeds);
-    console.info(`已创建用户档案: ${userDocs.map(u => u.nickname).join(', ')}`);
+    console.info(`已创建用户档案: ${userDocs.map(u => u.nickname).join(', ')} `);
 
     // 批量插入数据
     console.info('用户数据初始化成功');
