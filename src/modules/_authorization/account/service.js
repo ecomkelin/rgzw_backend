@@ -66,12 +66,13 @@ class AccountSV {
    * @param {*} payload 
    * @param {*} _id 
    * @param {*} doc 
+   * @param {*} options: {session} 事务 
    * @returns 
    */
-  async edit(payload, _id, doc) {
+  async edit(payload, _id, doc, options) {
     try {
       deleteImmutableFront(doc, AccountDOC);
-      const { item } = await AccountDAO.edit(payload, _id, doc);
+      const { item } = await AccountDAO.edit(payload, _id, doc, options);
       return { item };
     } catch (e) {
       console.error('AccountSV edit error:', e);

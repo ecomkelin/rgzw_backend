@@ -80,7 +80,7 @@ const add = async (payload, doc, options) => {
   }
 };
 
-const edit = async (payload = {}, _id, doc) => {
+const edit = async (payload = {}, _id, doc, options) => {
   try {
     // 验证目标学生是否存在
     const targetStudent = await StudentModel.findById(_id);
@@ -117,7 +117,7 @@ const edit = async (payload = {}, _id, doc) => {
       throw ({ code: 11000, message: '手机号或账号已被占用' });
     }
 
-    const { item } = await DAO.edit(StudentModel, _id, doc);
+    const { item } = await DAO.edit(targetStudent, options);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
     return { item };

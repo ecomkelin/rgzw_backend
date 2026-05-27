@@ -66,7 +66,15 @@ const add = async (payload, doc, options) => {
   }
 };
 
-const edit = async (payload = {}, _id, doc) => {
+/**
+ * 
+ * @param {*} payload 
+ * @param {*} _id 
+ * @param {*} doc 
+ * @param {*} options: {session} 事务 
+ * @returns 
+ */
+const edit = async (payload = {}, _id, doc, options) => {
   try {
     // 只有管理员可以修改公司
     if (payload.accountType !== 'User') {
@@ -87,7 +95,7 @@ const edit = async (payload = {}, _id, doc) => {
       throw ({ code: 11000, message: '统一社会编号或公司名称已被存在' });
     }
 
-    const { item } = await DAO.edit(OrgModel, _id, doc);
+    const { item } = await DAO.edit(targetOrg, options);
 
     return { item };
   } catch (e) {

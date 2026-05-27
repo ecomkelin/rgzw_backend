@@ -52,7 +52,7 @@ class OrgSV {
     try {
       deleteImmutableFront(doc, OrgDOC);
 
-      const { item } = await OrgDAO.add(payload, doc);
+      const { item } = await OrgDAO.add(payload, doc, options);
 
       return { item };
     }

@@ -67,12 +67,13 @@ class StudentSV {
    * @param {*} payload 
    * @param {*} _id 
    * @param {*} doc 
+   * @param {*} options - {session} 事务  
    * @returns 
    */
-  async edit(payload, _id, doc) {
+  async edit(payload, _id, doc, options) {
     try {
       deleteImmutableFront(doc, StudentDOC);
-      const { item } = await StudentDAO.edit(payload, _id, doc);
+      const { item } = await StudentDAO.edit(payload, _id, doc, options);
       return { item };
     } catch (e) {
       console.error('StudentSV edit error:', e);

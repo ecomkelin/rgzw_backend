@@ -49,7 +49,7 @@ class UserSV {
    * 创建用户
    * @param {Object} payload - 用户身份信息
    * @param {Object} doc - 用户数据
-   * @param {*} options: {session} 事务 
+   * @param {Object} options - {session} 事务 
    */
   async add(payload, doc, options) {
     try {
@@ -71,14 +71,15 @@ class UserSV {
    * @param {Object} payload - 用户身份信息
    * @param {String} _id - 用户ID
    * @param {Object} doc - 要更新的数据
+   * @param {Object} options - {session} 事务 
    * @returns {Object} 包含 item(更新后的用户) 的对象
    */
-  async edit(payload, _id, doc) {
+  async edit(payload, _id, doc, options) {
     try {
       // 删除不允许从前端修改的字段
       deleteImmutableFront(doc, UserDOC);
 
-      const { item } = await UserDAO.edit(payload, _id, doc);
+      const { item } = await UserDAO.edit(payload, _id, doc, options);
       return { item };
     } catch (e) {
       console.error('UserSV edit error:', e);

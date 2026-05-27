@@ -77,14 +77,11 @@ const add = async (Model, doc, { session }) => {
     }
 };
 
-const edit = async (Model, _id, doc) => {
+const edit = async (targetItem, { session }) => {
     try {
-        const item = await Model.findByIdAndUpdate(_id, doc, { new: true });
+        const options = session ? { session } : undefined;
 
-        if (!item) {
-            throw ({ code: 404, message: "此数据已不存在" });
-        }
-
+        const item = await targetItem.save(options);
         return { item };
     } catch (e) {
         console.error('DAO edit error:', e);

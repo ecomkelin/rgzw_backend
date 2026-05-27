@@ -87,7 +87,15 @@ const add = async (payload, doc, options) => {
     }
 };
 
-const edit = async (payload = {}, _id, doc) => {
+/**
+ * 
+ * @param {*} payload 
+ * @param {*} _id 
+ * @param {*} doc 
+ * @param {*} options: {session} 事务 
+ * @returns 
+ */
+const edit = async (payload = {}, _id, doc, options) => {
     try {
         // 验证目标账户是否存在
         const targetAccount = await AccountModel.findById(_id);
@@ -111,7 +119,7 @@ const edit = async (payload = {}, _id, doc) => {
             throw ({ message: 11000, code: '手机号或账号已被占用' });
         }
 
-        const { item } = await DAO.edit(AccountModel, _id, doc);
+        const { item } = await DAO.edit(targetAccount, options);
         delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
         return { item };

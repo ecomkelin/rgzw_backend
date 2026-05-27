@@ -83,7 +83,15 @@ const add = async (payload, doc, options) => {
   }
 };
 
-const edit = async (payload = {}, _id, doc) => {
+/**
+ * 
+ * @param {*} payload 
+ * @param {*} _id 
+ * @param {*} doc 
+ * @param {*} options: {session} 事务 
+ * @returns 
+ */
+const edit = async (payload = {}, _id, doc, options) => {
   try {
     if (payload.accountType !== 'User') {
       throw ({ code: 403, message: "你没有权限访问用户" })
@@ -113,7 +121,7 @@ const edit = async (payload = {}, _id, doc) => {
       delete doc.password;
     }
 
-    const { item } = await DAO.edit(UserModel, _id, doc);
+    const { item } = await DAO.edit(targetUser, options);
     delete item.passwordHash; // 确保返回时不包含密码哈希字段
 
     return { item };
