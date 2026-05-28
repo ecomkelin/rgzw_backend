@@ -12,17 +12,17 @@ const StudentEnums = {};
 const StudentDOC = {
     // 对应的账号ID，一个账号可以对应多个身份（Student），但一个身份只能对应一个账号
     Account: { type: ObjectId, ref: 'Account', required: true, immutable: true },
-    phone: { type: String },
-
+    name: { type: String, required: true },       // 真实姓名
+    
     // 证件上的信息
     identityNo: { type: String },       // 身份证号
-    name: { type: String },       // 真实姓名
     birthday: { type: Date },     // 出生日期
     gender: { type: String, enum: ['Male', 'Female'], default: 'Male' },
     address: { type: String },   // 证件地址
-
+    
     // 现居 地址信息
     currentAddress: { type: String },
+    phone: { type: String },
     Nation: { type: ObjectId, ref: 'Nation' },  // 从 province 冗余过来的
     Provence: { type: ObjectId, ref: 'Province' }, // 从 City 冗余过来的
     City: { type: ObjectId, ref: 'City' },  // 从 Area 冗余过来的

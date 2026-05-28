@@ -14,8 +14,6 @@ exports.addVD = [
   commonBodyRules.optionalString('student.address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('student.currentAddress', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('student.school', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.optionalString('student.displayName', { minLength: 2, maxLength: 50 }),
-  commonBodyRules.optionalString('student.avatar', { minLength: 4, maxLength: 200 }),
   commonBodyRules.optionalEnum('student.sourceType', ['地推', '传单', '活动', '介绍', '听说', '路过', '抖音', '朋友圈', '其他']),
   commonBodyRules.optionalString('student.description', { maxLength: 500 }),
 
@@ -47,8 +45,6 @@ exports.editVD = [
   commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('currentAddress', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('school', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.optionalString('displayName', { minLength: 2, maxLength: 50 }),
-  commonBodyRules.optionalString('avatar', { minLength: 4, maxLength: 200 }),
   commonBodyRules.optionalEnum('sourceType', ['地推', '传单', '活动', '介绍', '听说', '路过', '抖音', '朋友圈', '其他']),
   commonBodyRules.optionalString('description', { maxLength: 500 }),
   commonBodyRules.optionalObjectId('Nation'),

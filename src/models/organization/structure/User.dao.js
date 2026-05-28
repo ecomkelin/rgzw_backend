@@ -1,5 +1,6 @@
-const { UserModel, UserEnums, UserDOC } = require('./User.model');
 const DAO = require('@models/DAO');
+const { UserModel, UserEnums, UserDOC } = require('./User.model');
+const { AccountModel } = require('@models/authorization/Account.dao');
 
 const list = async (payload = {}, filter, options) => {
   try {
@@ -73,6 +74,17 @@ const add = async (payload, doc, options) => {
       if (!doc.Org) {
         doc.Org = payload.currentUser.Org
       }
+    }
+
+    if (!doc.Account) {
+      throw ({ code: 400, message: "用户必须加入 账号信息" });
+    }
+    const Account = await AccountModel.findById(doc.Account);
+    if (!Account) {
+      throw ({ code: 404, message: "没有此账号" });
+    }
+    if (!Account.isActive || Account.accountType !== 'User') {
+      throw ({ code: 400, message: "账号被禁用 或者 账号类型不是 User" });
     }
 
     const existing = await UserModel.findOne({ Account: doc.Account, Org: doc.Org });

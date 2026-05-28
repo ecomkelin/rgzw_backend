@@ -1,5 +1,6 @@
-const { StudentModel, StudentEnums, StudentDOC } = require('./Student.model');
 const DAO = require('@models/DAO');
+const { StudentModel, StudentEnums, StudentDOC } = require('./Student.model');
+const { AccountModel } = require('@models/authorization/Account.dao');
 
 const list = async (payload = {}, filter, options) => {
   try {
@@ -70,8 +71,24 @@ const add = async (payload, doc, options) => {
         throw ({ code: 403, message: "只有管理员才能创建学生" });
       }
     }
+
     doc.Org = payload.currentUser.Org;
     if (!doc.displayName) doc.displayName = doc.name;
+    if (!doc.Nation) delete doc.Nation;
+    if (!doc.Provence) delete doc.Provence;
+    if (!doc.City) delete doc.City;
+    if (!doc.Area) delete doc.Area;
+
+    if (!doc.Account) {
+      throw ({ code: 400, message: "学生必须加入 账号信息" });
+    }
+    const Account = await AccountModel.findById(doc.Account);
+    if (!Account) {
+      throw ({ code: 404, message: "没有此账号" });
+    }
+    if (!Account.isActive || Account.accountType !== 'Student') {
+      throw ({ code: 400, message: "账号被禁用 或者 账号类型不是 Student" });
+    }
 
     const { item } = await DAO.add(StudentModel, doc, options);
     return { item };
@@ -112,6 +129,11 @@ const edit = async (payload = {}, _id, doc, options) => {
       doc.passwordHash = doc.password;
       delete doc.password;
     }
+    if (!doc.displayName) doc.displayName = doc.name;
+    if (!doc.Nation) delete doc.Nation;
+    if (!doc.Provence) delete doc.Provence;
+    if (!doc.City) delete doc.City;
+    if (!doc.Area) delete doc.Area;
 
 
     targetStudent.set(doc);

@@ -66,8 +66,12 @@ const add = async (payload, doc, options) => {
             delete doc.password;
         }
 
-        if (!doc.nickname) doc.nickname = doc.name;
         doc.createdBy = payload.currentUser?._id;
+        if (!doc.nickname) doc.nickname = doc.name;
+        if (!doc.Nation) delete doc.Nation;
+        if (!doc.Provence) delete doc.Provence;
+        if (!doc.City) delete doc.City;
+        if (!doc.Area) delete doc.Area;
 
         const existFilter = [{ code: doc.code }];
         if (doc.phone) existFilter.push({ phone: doc.phone });
@@ -115,6 +119,11 @@ const edit = async (payload = {}, _id, doc, options) => {
             doc.passwordHash = doc.password;
             delete doc.password;
         }
+        if (!doc.displayName) doc.displayName = doc.name;
+        if (!doc.Nation) delete doc.Nation;
+        if (!doc.Provence) delete doc.Provence;
+        if (!doc.City) delete doc.City;
+        if (!doc.Area) delete doc.Area;
 
         const existFilter = [{ code: doc.code }];
         if (doc.phone) existFilter.push({ phone: doc.phone });
