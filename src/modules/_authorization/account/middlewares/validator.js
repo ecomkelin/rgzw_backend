@@ -15,6 +15,7 @@ exports.addVD = [
   commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalEnum('gender', AccountEnums.genderEnums),
+  commonBodyRules.optionalEnum('accountType', AccountEnums.accountTypeEnums),
 
   validatorErrorHandle
 ];
