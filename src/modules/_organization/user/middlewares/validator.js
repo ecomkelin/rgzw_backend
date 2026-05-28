@@ -31,7 +31,6 @@ exports.editVD = [
   commonBodyRules.optionalNumber('sort'),
   commonBodyRules.optionalEnum('roleTemp', UserEnums.roleSimpEnums),
   commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 26 }),
-  commonBodyRules.optionalString('avatar', { minLength: 4, maxLength: 50 }),
 
   validatorErrorHandle
 ];
@@ -59,6 +58,7 @@ exports.detailVD = [
 exports.selfEditVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 26 }),
+  commonBodyRules.optionalString('avatar', { minLength: 2, maxLength: 26 }),
 
   validatorErrorHandle
 ];

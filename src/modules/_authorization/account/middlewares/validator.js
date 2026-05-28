@@ -15,10 +15,6 @@ exports.addVD = [
   commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalEnum('gender', AccountEnums.genderEnums),
-  commonBodyRules.optionalObjectId('Nation'),
-  commonBodyRules.optionalObjectId('Province'), // 修正字段名
-  commonBodyRules.optionalObjectId('City'),
-  commonBodyRules.optionalObjectId('Area'),
 
   validatorErrorHandle
 ];
@@ -35,10 +31,10 @@ exports.editVD = [
   commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalEnum('gender', AccountEnums.genderEnums),
-  commonBodyRules.optionalObjectId('Nation'),
-  commonBodyRules.optionalObjectId('Province'), // 修正字段名
-  commonBodyRules.optionalObjectId('City'),
-  commonBodyRules.optionalObjectId('Area'),
+  // commonBodyRules.optionalObjectId('Nation'),
+  // commonBodyRules.optionalObjectId('Province'), // 修正字段名
+  // commonBodyRules.optionalObjectId('City'),
+  // commonBodyRules.optionalObjectId('Area'),
 
   validatorErrorHandle
 ];

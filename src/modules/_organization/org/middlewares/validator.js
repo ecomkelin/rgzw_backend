@@ -12,10 +12,6 @@ exports.addVD = [
   commonBodyRules.optionalString('website', { maxLength: 200 }), // 调整网站长度范围
   commonBodyRules.optionalString('address', { maxLength: 200 }), // 增加地址长度
   commonBodyRules.optionalBoolean('isMain'), // 添加对isMain字段的验证
-  commonBodyRules.optionalObjectId('Nation'),
-  commonBodyRules.optionalObjectId('Province'), // 使用正确的省份字段名
-  commonBodyRules.optionalObjectId('City'),
-  commonBodyRules.optionalObjectId('Area'),
 
   validatorErrorHandle
 ];
@@ -33,10 +29,10 @@ exports.editVD = [
   commonBodyRules.optionalString('website', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalBoolean('isMain'),
-  commonBodyRules.optionalObjectId('Nation'),
-  commonBodyRules.optionalObjectId('Province'), // 使用正确的省份字段名
-  commonBodyRules.optionalObjectId('City'),
-  commonBodyRules.optionalObjectId('Area'),
+  // commonBodyRules.optionalObjectId('Nation'),
+  // commonBodyRules.optionalObjectId('Province'), // 使用正确的省份字段名
+  // commonBodyRules.optionalObjectId('City'),
+  // commonBodyRules.optionalObjectId('Area'),
 
   validatorErrorHandle
 ];

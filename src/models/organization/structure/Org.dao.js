@@ -63,10 +63,8 @@ const add = async (payload, doc, options) => {
     if (!doc.nickname) doc.nickname = doc.name;
     doc.createdBy = payload.currentUser?._id;
 
-    const existFilter = [{ unionCode: doc.unionCode }];
-    if (doc.name) existFilter.push({ name: doc.name });
-    if (doc.nickname) existFilter.push({ nickname: doc.nickname });
-    const existing = await AccountModel.findOne({ $or: existFilter });
+    const existFilter = [{ unionCode: doc.unionCode }, { name: doc.name }, { nickname: doc.nickname }];
+    const existing = await OrgModel.findOne({ $or: existFilter });
     if (existing) {
       throw ({ code: 400, message: '统一账号或公司名称或公司简称已被占用' });
     }
