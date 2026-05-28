@@ -29,10 +29,7 @@ const StudentDOC = {
     Area: { type: ObjectId, ref: 'Area' },
 
     // 工作/上学 信息
-    company: { type: String },
-    position: { type: String },
     school: { type: String },
-    profession: { type: String },
 
     // 展示信息
     displayName: { type: String },
@@ -40,7 +37,6 @@ const StudentDOC = {
 
     // 用户来源类型
     sourceType: { type: String, enum: ['地推', '传单', '活动', '介绍', '听说', '路过', '抖音', '朋友圈', '其他'], default: '其他' },
-    description: { type: String },
 
     // 其他信息
     isActive: { type: Boolean, default: true },

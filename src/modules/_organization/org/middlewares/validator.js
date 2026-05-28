@@ -2,11 +2,11 @@ const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsVali
 
 exports.addVD = [
   // Body 参数：可选规则
-  commonBodyRules.optionalBoolean('isActive'),
-  commonBodyRules.optionalNumber('sort', null, { min: 0 }),
   commonBodyRules.validateString('unionCode', { minLength: 2, maxLength: 30 }), // 增加最大长度
   commonBodyRules.validateString('name', { minLength: 2, maxLength: 100 }), // 增加最大长度
-  commonBodyRules.validateString('nickname', { maxLength: 50 }), // 允许更短的昵称
+  commonBodyRules.optionalBoolean('isActive'),
+  commonBodyRules.optionalNumber('sort', null, { min: 0 }),
+  commonBodyRules.optionalString('nickname', { maxLength: 50 }), // 允许更短的昵称
   commonBodyRules.optionalString('phone', { maxLength: 20 }), // 调整电话长度范围
   commonBodyRules.optionalString('email', { maxLength: 100 }), // 调整邮箱长度范围
   commonBodyRules.optionalString('website', { maxLength: 200 }), // 调整网站长度范围

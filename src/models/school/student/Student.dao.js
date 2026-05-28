@@ -71,6 +71,7 @@ const add = async (payload, doc, options) => {
       }
     }
     doc.Org = payload.currentUser.Org;
+    if (!doc.displayName) doc.displayName = doc.name;
 
     const { item } = await DAO.add(StudentModel, doc, options);
     return { item };

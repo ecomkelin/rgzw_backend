@@ -5,11 +5,8 @@ const { UserEnums } = require('@models/organization/structure/User.dao');
 exports.addVD = [
   // Body 参数：可选规则
   commonBodyRules.validateObject('user'),
-  commonBodyRules.optionalBoolean('user.isActive'),
-  commonBodyRules.optionalNumber('user.sort'),
-  commonBodyRules.optionalString('user.avatar', { minLength: 4, maxLength: 50 }),
+  commonBodyRules.validateBoolean('user.isActive'),
   commonBodyRules.validateEnum('user.roleTemp', UserEnums.roleSimpEnums),
-  commonBodyRules.validateString('user.nickname', { minLength: 2, maxLength: 26 }),
 
   commonBodyRules.optionalObjectId('user.Org'),
   commonBodyRules.optionalObjectId('user.Account'),
@@ -18,14 +15,10 @@ exports.addVD = [
   commonBodyRules.subObjValString('account.code', { minLength: 4, maxLength: 16 }),
   commonBodyRules.subObjValString('account.password', { minLength: 8, maxLength: 16 }),
   commonBodyRules.subObjValString('account.name', { minLength: 2, maxLength: 50 }),
-  commonBodyRules.optionalString('account.identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalEnum('account.gender', AccountEnums.genderEnums),
   commonBodyRules.optionalString('account.phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('account.address', { minLength: 5, maxLength: 200 }),
-  commonBodyRules.optionalObjectId('account.Nation'),
-  commonBodyRules.optionalObjectId('account.Province'), // 修正字段名
-  commonBodyRules.optionalObjectId('account.City'),
-  commonBodyRules.optionalObjectId('account.Area'),
+  commonBodyRules.optionalString('account.identityNo', { minLength: 15, maxLength: 18 }),
 
   validatorErrorHandle
 ];
