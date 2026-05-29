@@ -1,3 +1,6 @@
+/**
+ * 某个学校公司Org的教室
+ */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;

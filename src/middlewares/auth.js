@@ -1,7 +1,7 @@
 const { verifyAccessToken } = require("@utils/JwtUtil");
 const { AccountModel } = require("@models/authorization/Account.dao");
-const ApiPermission = require("@models/authorization/roleApi/ApiPermission.model");
-const UserApiPermission = require("@models/authorization/roleApi/UserApiPermission.model");
+const ApiPermission = require("@/models/authorization/__roleApi/ApiPermission.model");
+const UserApiPermission = require("@/models/authorization/__roleApi/UserApiPermission.model");
 const { OrgModel } = require("@models/organization/structure/Org.dao"); // 添加对机构服务的引用
 const { UserModel } = require("@models/organization/structure/User.dao");
 const { StudentModel } = require("@/models/school/student/Student.dao");

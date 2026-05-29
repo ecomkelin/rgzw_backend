@@ -1,3 +1,7 @@
+/**
+ * 每堂课 老师对学生的 课评
+ *  * 每当Lesson的状态 变为 ongoing 进行时 则为每个学生生成一个课评记录
+ */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;

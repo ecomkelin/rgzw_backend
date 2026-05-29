@@ -1,4 +1,10 @@
-// models/user.js (用户)
+/**
+ * 公司用户
+ * 用户的身份
+ * 现在的权限认证 先用 roleTemp 替代完整的权限系统
+ * 后期再加
+ * 现在roleTemp 只有 manager 和 teacher
+ */
 const mongoose = require("mongoose");
 const { deleteImmutableFront } = require("@/utils/fieldAttributes");
 const Schema = mongoose.Schema;

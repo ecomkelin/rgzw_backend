@@ -1,5 +1,6 @@
 /**
  * 科目 学校开设哪些科目
+ * 科目的类型 先写简单的 分类 后面再写完整
  */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;

@@ -1,4 +1,17 @@
-const StudentPackageDOC = {
+/**
+ * 学生购买课包订单， 支付完成后 生成此数据库
+ * 这个数据库跟学生的消课有关
+ * 每当 LessonAttendance 完成后 usedLesson+1， remainingLesson-1
+ */
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
+
+const StudentPackEnums = {
+  statusEnums: ['active', 'frozen', 'exhausted', 'refunded']
+};
+
+const StudentPackDOC = {
   // ==================== 归属 ====================
   Account: { type: ObjectId, ref: 'Account', required: true },  // 家长
   Student: { type: ObjectId, ref: 'Student', required: true },  // 学生（必填，课时仅限该生使用）
@@ -25,6 +38,10 @@ const StudentPackageDOC = {
   updatedBy: { type: ObjectId, ref: 'User' }
 };
 
-const studentPackageSchema = new Schema(StudentPackageDOC, { timestamps: true });
-studentPackageSchema.index({ Student: 1, status: 1 });
-studentPackageSchema.index({ Account: 1 });
+const studentPackSchema = new Schema(StudentPackDOC, { timestamps: true });
+studentPackSchema.index({ Student: 1, status: 1 });
+studentPackSchema.index({ Account: 1 });
+
+
+const StudentPackModel = mongoose.model('StudentPack', enrollmentSchema);
+module.exports = { StudentPackModel, StudentPackEnums, StudentPackDOC };

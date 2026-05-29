@@ -1,6 +1,7 @@
 /**
  *  学生考勤， 即 学生每上一节课
  *  我用的是 LessonAttendance
+ * 每当Lesson的状态 变为 ongoing 进行时 则为每个学生生成一个考勤记录
  */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
@@ -17,7 +18,7 @@ const LessonAttendanceEnums = {
 
 const LessonAttendanceDOC = {
     // ==================== 关联 ====================
-    Session: { type: ObjectId, ref: 'CourseSession', required: true },   // 哪一次课
+    Lesson: { type: ObjectId, ref: 'Lesson', required: true },   // 哪一次课
     Student: { type: ObjectId, ref: 'Student', required: true },         // 哪个学生
     StudentCourse: { type: ObjectId, ref: 'StudentCourse' },                   // 报名记录（可选冗余）
 

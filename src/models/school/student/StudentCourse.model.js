@@ -1,6 +1,7 @@
 /** 学生报名了某一个课程
  * 人工智能 让我用 Enrollment 命名
  * 我没有用 因为 这样是学生跟课程的关联 更好找
+ * 员工可以指定 让学生使用哪个课包
  */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;

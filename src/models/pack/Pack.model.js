@@ -1,3 +1,9 @@
+/**
+ * 公司需要发布课包 让学生购买
+ * 课包有自己名称价钱
+ * 主要是 哪些课程 可以为这个课包消课。 
+ * 现在可以先让 公司员工选择就可以
+ */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;

@@ -1,3 +1,14 @@
+/**
+ * 登陆账号
+ * 两类 User 和 Student 都用Account 登陆
+ *    公司用户User 和 Student 两个数据库中 都有Account 
+ *    同一个公司Org的用户不能使用同一个账户， 一个账户下可以有任意多Student 无关公司Org
+ *    作为User账户的话 这里存储用户的身份证信息， 作为Student账户的话 这里存家长信息
+ *    Student账户下 还有身份证信息， 那才是存储学生的。 身份证信息 不是必填项
+ * Account.isAdmin 为是否是 超级管理员， 只有User的账户 可以有isAdmin: true
+ * Account.isActive 是否激活 作为是否可以登陆 使用的标识
+ * Account.currentUser / currentStudent 时登陆这个账户时 用的是哪个身份
+ */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;

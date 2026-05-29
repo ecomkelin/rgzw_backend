@@ -1,12 +1,17 @@
+/**
+ * 学生每堂课的作品记录集
+ * 每当Lesson的状态 变为 ongoing 进行时 则为每个学生生成一个作品记录集
+ */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
 const LessonWorkDOC = {
     // ==================== 关联 ====================
-    Session: { type: ObjectId, ref: 'CourseSession', required: true },
-    Student: { type: ObjectId, ref: 'Student', required: true },
+    Subject: { type: ObjectId, ref: 'Subject' },                    // 冗余科目，方便查询
     Course: { type: ObjectId, ref: 'Course' },                      // 冗余课程，方便查询
+    Lesson: { type: ObjectId, ref: 'Lesson', required: true },
+    Student: { type: ObjectId, ref: 'Student', required: true },
 
     // ==================== 作品信息 ====================
     title: { type: String, required: true },                        // 作品名称
@@ -26,7 +31,7 @@ const LessonWorkDOC = {
 const workSchema = new Schema(LessonWorkDOC, { timestamps: true });
 
 // 索引
-workSchema.index({ Session: 1, Student: 1 });                     // 按课次+学生查作品
+workSchema.index({ Lesson: 1, Student: 1 });                     // 按课次+学生查作品
 workSchema.index({ Student: 1, createdAt: -1 });                  // 学生作品时间线
 workSchema.index({ isPublic: 1, createdAt: -1 });                 // 公开作品广场
 workSchema.index({ Course: 1 });                                  // 按课程聚合作品

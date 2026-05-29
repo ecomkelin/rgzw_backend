@@ -1,3 +1,8 @@
+/**
+ * 上的每一节课
+ * StudentCourse 生成后 自动生成16个Lesson数据库
+ * 老师的考勤 暂时在这里
+ */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;

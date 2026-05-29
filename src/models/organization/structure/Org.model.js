@@ -1,4 +1,7 @@
-// models/org.js (公司/机构)
+/**
+ * 公司/机构/学校
+ * 作为隔离层 以公司为基本单位
+ */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
