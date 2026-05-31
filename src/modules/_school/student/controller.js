@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 const AccountSV = require('../../_authorization/account/service');
 const StudentSV = require('./service');
 const ApiResponse = require('@utils/response');
-const asyncHandler = require('@utils/asyncHandler');
 
 class StudentCT {
-  list = asyncHandler(async (req, res) => {
+  list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
       const { total, items, permFilter } = await StudentSV.list(req.payload, filter, options);
@@ -15,9 +14,9 @@ class StudentCT {
       console.error("StudentCT list error: ", e)
       return res.json(ApiResponse.error(e))
     }
-  });
+  };
 
-  detail = asyncHandler(async (req, res) => {
+  detail = async (req, res) => {
     try {
       const { id, options } = req.validData || {};
       const { item } = await StudentSV.detail(req.payload, id, options);
@@ -27,9 +26,9 @@ class StudentCT {
       console.error("StudentCT detail error: ", e)
       return res.json(ApiResponse.error(e))
     }
-  });
+  };
 
-  add = asyncHandler(async (req, res) => {
+  add = async (req, res) => {
     try {
       let session = null;
 
@@ -71,9 +70,9 @@ class StudentCT {
       console.error("StudentCT create error: ", e);
       return res.status(500).json(ApiResponse.error(e))
     }
-  });
+  };
 
-  edit = asyncHandler(async (req, res) => {
+  edit = async (req, res) => {
     try {
       const id = req.validData?.id;
       const doc = req.validData;
@@ -85,11 +84,11 @@ class StudentCT {
       console.error("StudentCT edit error: ", e)
       return res.status(500).json(ApiResponse.error(e))
     }
-  });
+  };
 
   // 注释：学生账号查看自己的信息（暂不启用）
   /*
-  selfDetail = asyncHandler(async (req, res) => {
+  selfDetail = async (req, res) => {
     try {
       const data = await StudentSV.selfDetail(req.payload);
       return res.status(200).json(ApiResponse.success(data));
@@ -97,12 +96,12 @@ class StudentCT {
       console.error("StudentCT selfDetail error: ", e);
       return res.status(500).json(ApiResponse.error(e));
     }
-  });
+  };
   */
 
   // 注释：学生账号修改自己的信息（暂不启用）
   /*
-  selfUpdate = asyncHandler(async (req, res) => {
+  selfUpdate = async (req, res) => {
     try {
       const data = await StudentSV.selfUpdate(req.body, req.payload);
       return res.status(200).json(ApiResponse.success(data));
@@ -110,7 +109,7 @@ class StudentCT {
       console.error("StudentCT selfUpdate error: ", e)
       return res.status(500).json(ApiResponse.error(e))
     }
-  });
+  };
   */
 }
 

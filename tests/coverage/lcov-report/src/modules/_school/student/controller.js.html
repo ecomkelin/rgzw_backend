@@ -338,7 +338,7 @@ class StudentCT {
 &nbsp;
   // 注释：学生账号查看自己的信息（暂不启用）
   /*
-  selfDetail = asyncHandler(async (req, res) =&gt; {
+  selfDetail = async (req, res) =&gt; {
     try {
       const data = await StudentSV.selfDetail(req.payload);
       return res.status(200).json(ApiResponse.success(data));
@@ -351,7 +351,7 @@ class StudentCT {
 &nbsp;
   // 注释：学生账号修改自己的信息（暂不启用）
   /*
-  selfUpdate = asyncHandler(async (req, res) =&gt; {
+  selfUpdate = async (req, res) =&gt; {
     try {
       const data = await StudentSV.selfUpdate(req.body, req.payload);
       return res.status(200).json(ApiResponse.success(data));

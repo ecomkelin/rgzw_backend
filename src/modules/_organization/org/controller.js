@@ -1,9 +1,8 @@
 const OrgSV = require('./service');
 const ApiResponse = require('@utils/response');
-const asyncHandler = require('@utils/asyncHandler');
 
 class OrgCT {
-  list = asyncHandler(async (req, res) => {
+  list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
       const { total, items, permFilter } = await OrgSV.list(req.payload, filter, options);
@@ -13,9 +12,9 @@ class OrgCT {
       console.error("OrgCT list error: ", e)
       return res.json(ApiResponse.error(e))
     }
-  });
+  };
 
-  detail = asyncHandler(async (req, res) => {
+  detail = async (req, res) => {
     try {
       const { id, options } = req.validData || {};
       const { item } = await OrgSV.detail(req.payload, id, options);
@@ -25,9 +24,9 @@ class OrgCT {
       console.error("OrgCT detail error: ", e)
       return res.json(ApiResponse.error(e))
     }
-  });
+  };
 
-  add = asyncHandler(async (req, res) => {
+  add = async (req, res) => {
     try {
       const doc = req.validData;
       const { item } = await OrgSV.add(req.payload, doc);
@@ -36,9 +35,9 @@ class OrgCT {
       console.error("OrgCT add error: ", e)
       return res.status(500).json(ApiResponse.error(e))
     }
-  });
+  };
 
-  edit = asyncHandler(async (req, res) => {
+  edit = async (req, res) => {
     try {
       const id = req.validData?.id;
       const doc = req.validData;
@@ -50,9 +49,9 @@ class OrgCT {
       console.error("OrgCT edit error: ", e)
       return res.status(500).json(ApiResponse.error(e))
     }
-  });
+  };
 
-  selfDetail = asyncHandler(async (req, res) => {
+  selfDetail = async (req, res) => {
     try {
       const id = req.payload?.currentUser?.Org;
       const { options = [] } = req.validData || {};
@@ -63,7 +62,7 @@ class OrgCT {
       console.error("OrgCT selfDetail error: ", e)
       return res.status(500).json(ApiResponse.error(e))
     }
-  });
+  };
 }
 
 module.exports = new OrgCT();

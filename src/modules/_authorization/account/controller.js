@@ -1,9 +1,8 @@
 const AccountSV = require('./service');
 const ApiResponse = require('@utils/response');
-const asyncHandler = require('@utils/asyncHandler');
 
 class AccountCT {
-  list = asyncHandler(async (req, res) => {
+  list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
       const { total, items, permFilter } = await AccountSV.list(req.payload, filter, options);
@@ -13,9 +12,9 @@ class AccountCT {
       console.error("AccountCT list error: ", e);
       return res.json(ApiResponse.error(e));
     }
-  });
+  }
 
-  detail = asyncHandler(async (req, res) => {
+  detail = async (req, res) => {
     try {
       const { id, options } = req.validData || {};
       const { item } = await AccountSV.detail(req.payload, id, options);
@@ -25,9 +24,9 @@ class AccountCT {
       console.error("AccountCT detail error: ", e);
       return res.json(ApiResponse.error(e));
     }
-  });
+  };
 
-  add = asyncHandler(async (req, res) => {
+  add = async (req, res) => {
     try {
       const doc = req.validData;
       delete doc.id
@@ -38,9 +37,9 @@ class AccountCT {
       console.error("AccountCT add error: ", e);
       return res.json(ApiResponse.error(e));
     }
-  });
+  };
 
-  edit = asyncHandler(async (req, res) => {
+  edit = async (req, res) => {
     try {
       const id = req.validData?.id;
       const doc = req.validData;
@@ -52,9 +51,9 @@ class AccountCT {
       console.error("AccountCT edit error: ", e);
       return res.json(ApiResponse.error(e));
     }
-  });
+  };
 
-  selfDetail = asyncHandler(async (req, res) => {
+  selfDetail = async (req, res) => {
     try {
       const id = req.payload._id;
       const { options = [] } = req.validData || {};
@@ -65,9 +64,9 @@ class AccountCT {
       console.error("AccountCT selfDetail error: ", e);
       return res.json(ApiResponse.error(e));
     }
-  });
+  };
 
-  selfEdit = asyncHandler(async (req, res) => {
+  selfEdit = async (req, res) => {
     try {
       const id = req.payload?._id;
       const doc = req.validData
@@ -78,7 +77,7 @@ class AccountCT {
       console.error("AccountCT selfUpdate error: ", e);
       return res.json(ApiResponse.error(e));
     }
-  });
+  };
 
 }
 

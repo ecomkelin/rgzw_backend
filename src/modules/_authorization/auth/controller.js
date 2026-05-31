@@ -1,6 +1,5 @@
 const AuthSV = require('./service');
 const ApiResponse = require('@utils/response');
-const asyncHandler = require('@utils/asyncHandler');
 
 class LoginCT {
   authorizationRes(res, { account, accessToken, refreshToken, refreshTokenExpiresAt }) {
@@ -21,7 +20,7 @@ class LoginCT {
     }));
   }
   // 用户登录
-  login = asyncHandler(async (req, res) => {
+  login = async (req, res) => {
     try {
       const { code, password } = req.validData || {};
       const authResRtData = await AuthSV.login(code, password);
@@ -31,10 +30,10 @@ class LoginCT {
       console.error("LoginCT login error:", e);
       return res.json(ApiResponse.error(e));
     }
-  });
+  };
 
   // 刷新访问令牌
-  refreshToken = asyncHandler(async (req, res, next) => {
+  refreshToken = async (req, res, next) => {
     try {
       // 1. 从 Cookie 中获取 refreshToken
       let refreshToken = req.cookies.refreshToken;
@@ -49,10 +48,10 @@ class LoginCT {
       console.error("LoginCT refreshToken error:", e);
       return res.json(ApiResponse.error(e))
     }
-  });
+  };
 
   // 登出
-  logout = asyncHandler(async (req, res) => {
+  logout = async (req, res) => {
     try {
       const result = await AuthSV.logout(req.payload);
       if (!result) {
@@ -63,7 +62,7 @@ class LoginCT {
       console.error('LoginCT logout error:', e);
       return res.json(ApiResponse.error(e))
     }
-  });
+  };
 
 }
 

@@ -224,7 +224,7 @@ class LoginCT {
     }));
   }
   // 用户登录
-  login = asyncHandler(async (req, res) =&gt; {
+  login = async (req, res) =&gt; {
     try {
       const { code, password } = req.validData || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
       const authResRtData = await AuthSV.login(code, password);
@@ -237,7 +237,7 @@ class LoginCT {
   });
 &nbsp;
   // 刷新访问令牌
-  refreshToken = asyncHandler(async (req, res, next) =&gt; {
+  refreshToken = async (req, res, next) =&gt; {
     try {
       // 1. 从 Cookie 中获取 refreshToken
       let refreshToken = req.cookies.refreshToken;
@@ -255,7 +255,7 @@ class LoginCT {
   });
 &nbsp;
   // 登出
-  logout = asyncHandler(async (req, res) =&gt; {
+  logout = async (req, res) =&gt; {
     try {
       const result = await AuthSV.logout(req.payload);
       <span class="missing-if-branch" title="if path not taken" >I</span>if (!result) {

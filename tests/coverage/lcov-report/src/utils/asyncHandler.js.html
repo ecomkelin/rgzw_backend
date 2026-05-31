@@ -160,7 +160,7 @@
  * @returns {Function} 包装后的路由处理函数，能够自动捕获异步错误
  *
  * 使用方法：在路由处理函数上包装此函数，即可自动处理异步错误
- * 示例：someRoute = asyncHandler(async (req, res) =&gt; { ... })
+ * 示例：someRoute = async (req, res) =&gt; { ... })
  */
 const asyncHandler = (fn) =&gt; (req, res, next) =&gt; {
   // 将异步函数包装在 Promise 中，并将错误传递给 Express 错误处理中间件
