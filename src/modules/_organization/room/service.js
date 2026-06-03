@@ -1,4 +1,4 @@
-const { RoomDAO, RoomDOC } = require('@models/organization/physical/_Room.dao');
+const { RoomDAO, RoomDOC } = require('@/models/organization/physical/Room.dao');
 const { deleteImmutableFront } = require('@/utils/fieldAttributes');
 
 /**
