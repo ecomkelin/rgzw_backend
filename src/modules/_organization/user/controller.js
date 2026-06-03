@@ -120,10 +120,16 @@ class UserCT {
    */
   selfEdit = async (req, res) => {
     try {
-      const data = await UserSV.selfUpdate(req.body, req.payload);
+      const payload = req.payload;
+      if (!payload || !payload.accountType !== 'User' || !payload.currentUserId) {
+        throw ({ code: 400, message: "无效的用户信息" });
+      }
+      const id = payload.currentUserId;
+      const doc = req.validData;
+      const data = await UserSV.edit(payload, id, doc);
       return res.status(200).json(ApiResponse.success(data));
     } catch (e) {
-      console.error("UserCT selfUpdate error: ", e);
+      console.error("UserCT selfEdit error: ", e);
       return res.status(500).json(ApiResponse.error(e));
     }
   };

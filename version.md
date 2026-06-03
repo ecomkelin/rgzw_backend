@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v6.0.2
+- [bugger]修改 UserCT selfEdit 
+
 ## v6.0.1
 - 增加了 DOCS: API 文档
 
