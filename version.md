@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v7.2.2
+- course 的 validator edit 有问题 已经解决
+
 ## v7.2.1
 - 删除了 course 状态锁死字段， 暂时管理员修改
 - 加入了大量的 immutable 大部分不让修改
