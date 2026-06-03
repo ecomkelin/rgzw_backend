@@ -1,5 +1,9 @@
 # 版本更新日志
 
+## v7.1.0
+- 新增了 subject 科目模块
+- 其他信息调整
+
 ## v7.0.2
 - 更新 _Room.dao.js 到 Room.dao.js
 

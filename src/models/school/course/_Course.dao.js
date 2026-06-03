@@ -1,8 +1,8 @@
 const DAO = require('@models/DAO');
 const { CourseModel, CourseEnums, CourseDOC } = require('./Course.model');
-const { SubjectModel } = require('./Subject.dao');
-const { UserModel } = require('@models/organization/structure/User.dao');
-const { RoomModel } = require('@models/organization/physical/Room.dao');
+const { SubjectModel } = require('./Subject.model');
+const { UserModel } = require('@models/organization/structure/User.model');
+const { RoomModel } = require('@models/organization/physical/Room.model');
 
 const list = async (payload = {}, filter, options) => {
   try {
@@ -63,7 +63,7 @@ const detail = async (payload = {}, _id, options) => {
         // 老师只能查看自己相关的课程
         if (payload.currentUser.roleTemp !== 'manager') {
           if (item.mainTeacher.toString() !== payload.currentUser._id.toString() &&
-              item.assistantTeacher.toString() !== payload.currentUser._id.toString()) {
+            item.assistantTeacher.toString() !== payload.currentUser._id.toString()) {
             throw ({ code: 403, message: "您无权查看此课程" });
           }
         }
@@ -106,6 +106,11 @@ const add = async (payload, doc, options) => {
     const subject = await SubjectModel.findById(doc.Subject);
     if (!subject) {
       throw ({ code: 404, message: "指定的科目不存在" });
+    }
+
+    const room = await RoomModel.findById(doc.Room);
+    if (!room) {
+      throw ({ code: 404, message: "指定的教室不存在" });
     }
 
     if (!doc.mainTeacher) {

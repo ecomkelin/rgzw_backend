@@ -21,7 +21,6 @@ const SubjectDOC = {
     // Packs: [{ type: ObjectId, ref: 'Pack' }], 
 
     name: { type: String, required: true }, // 这里叫 python 初级
-    title: { type: String },    // 比如同样的课程 不同老师教 可能标题不一样 精品初级 python
 
     /** 课程信息 */
     price: { type: Number }, // 课程 每堂课价格，原价 单位：分
@@ -29,10 +28,8 @@ const SubjectDOC = {
     default_lesson_count: { type: Number }, // 标准课时 16
     // 教学大纲
     syllabus: [{
-        order: Number,
         title: String,
         description: String,
-        duration_minutes: Number
     }],
     // 适合人群
     // target_audience: [{ type: String }],
@@ -47,6 +44,7 @@ const SubjectDOC = {
 
     // 精彩视频(查看 相关课程数组的 course.hlVideoUrl)
 
+    sort: { type: Number, default: 0 }, // 排序，数值越大越靠前
     isActive: { type: Boolean, default: true },
     isShow: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },// 创建时间
@@ -60,5 +58,7 @@ docSchema.index({ name: 1, Org: 1 }, { unique: true })
 const SubjectModel = mongoose.model('Subject', docSchema);
 
 module.exports = {
-    SubjectModel
+    SubjectModel,
+    SubjectEnums,
+    SubjectDOC
 }

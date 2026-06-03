@@ -1,5 +1,5 @@
 const DAO = require('@models/DAO');
-const { SubjectModel } = require('./Subject.model');
+const { SubjectModel, SubjectDOC, SubjectEnums } = require('./Subject.model');
 
 const list = async (payload = {}, filter, options) => {
   try {
@@ -130,5 +130,7 @@ module.exports = {
     add,
     edit,
   },
-  SubjectModel
+  SubjectModel,
+  SubjectDOC,
+  SubjectEnums
 }

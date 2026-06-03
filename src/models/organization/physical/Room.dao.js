@@ -1,5 +1,6 @@
 const DAO = require('@models/DAO');
 const { RoomModel, RoomEnums, RoomDOC } = require('./Room.model');
+const { CourseModel } = require('../../school/course/Course.model');
 
 const list = async (payload = {}, filter, options) => {
   try {
@@ -146,8 +147,11 @@ const remove = async (payload = {}, _id, options) => {
       }
     }
 
-    // Room 不能被删除 remove 只需要在 把 isActive 修改为 false
-    targetRoom.isActive = false;
+    const existRelatedCourse = await CourseModel.findOne({ Room: _id, isActive: true });
+    if (existRelatedCourse) {
+      throw ({ code: 400, message: "无法删除教室，请先移除相关课程的教室关联" });
+    }
+
     const { item } = await DAO.remove(RoomModel, _id);
     return { item };
   } catch (e) {

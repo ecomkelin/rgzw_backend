@@ -15,7 +15,7 @@ router.post('/add', authenticate, userAuthorize(), createPermission, addVD, Room
 // 修改数据
 router.post('/edit/:id', authenticate, userAuthorize(), editPermission, editVD, RoomCT.edit);
 
-// 删除数据
-router.post('/remove/:id', authenticate, userAuthorize(), managePermission, removeVD, RoomCT.remove);
+// 删除数据()
+// router.post('/remove/:id', authenticate, userAuthorize(), managePermission, removeVD, RoomCT.remove);
 
-module.exports = router; 
+module.exports = router;

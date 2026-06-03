@@ -7,7 +7,7 @@ const checkPermission = (permissionType) => {
       const payload = req.payload;
 
       // 记录权限检查
-      console.info(`Checking ${permissionType} permission for room:`, payload._id);
+      console.info(`Checking ${permissionType} permission for Room:`, payload._id);
 
       let hasPermission = false;
 

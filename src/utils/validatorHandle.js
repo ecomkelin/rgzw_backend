@@ -32,11 +32,11 @@ exports.validatorErrorHandle = (req, res, next) => {
 // ====================== 1. Body 参数通用规则（请求体） ======================
 exports.commonBodyRules = {
     // 数组验证
-    validateArray: (field, options = { maxLength: 10000, msg }) =>
+    validateArray: (field, options = { maxLength: 10000, msg: '' }) =>
         body(field)
             .notEmpty().withMessage(`${field} 不能为空`)
             .isArray({ max: options.maxLength }).withMessage(options.msg || `${field} 必须是数组，且长度不能超过 ${options.maxLength}`),
-    optionalArray: (field, options = { maxLength: 10000, msg }) =>
+    optionalArray: (field, options = { maxLength: 10000, msg: '' }) =>
         body(field)
             .optional()
             .isArray({ max: options.maxLength }).withMessage(options.msg || `${field} 必须是数组，且长度不能超过 ${options.maxLength}`),

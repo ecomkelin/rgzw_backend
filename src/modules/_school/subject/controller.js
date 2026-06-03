@@ -1,11 +1,11 @@
-const RoomSV = require('./service');
+const SubjectSV = require('./service');
 const ApiResponse = require('@utils/response');
 
 /**
  * 控制器类
  * 处理相关HTTP请求
  */
-class RoomCT {
+class SubjectCT {
   /**
    * 获取列表信息
    * @param {Object} req - HTTP请求对象
@@ -14,11 +14,11 @@ class RoomCT {
   list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
-      const { total, items, permFilter } = await RoomSV.list(req.payload, filter, options);
+      const { total, items, permFilter } = await SubjectSV.list(req.payload, filter, options);
 
       return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
     } catch (e) {
-      console.error("RoomCT list error: ", e);
+      console.error("SubjectCT list error: ", e);
       return res.json(ApiResponse.error(e));
     }
   };
@@ -31,11 +31,11 @@ class RoomCT {
   detail = async (req, res) => {
     try {
       const { id, options } = req.validData || {};
-      const { item } = await RoomSV.detail(req.payload, id, options);
+      const { item } = await SubjectSV.detail(req.payload, id, options);
 
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
-      console.error("RoomCT detail error: ", e);
+      console.error("SubjectCT detail error: ", e);
       return res.json(ApiResponse.error(e));
     }
   };
@@ -47,11 +47,11 @@ class RoomCT {
    */
   add = async (req, res) => {
     try {
-      const { item } = await RoomSV.add(req.payload, req.validData);
+      const { item } = await SubjectSV.add(req.payload, req.validData);
 
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
-      console.error("RoomCT add error: ", e);
+      console.error("SubjectCT add error: ", e);
       return res.status(500).json(ApiResponse.error(e));
     }
   };
@@ -67,10 +67,10 @@ class RoomCT {
       const doc = req.validData;
       delete doc.id;
 
-      const { item } = await RoomSV.edit(req.payload, id, doc);
+      const { item } = await SubjectSV.edit(req.payload, id, doc);
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
-      console.error("RoomCT edit error: ", e);
+      console.error("SubjectCT edit error: ", e);
       return res.status(500).json(ApiResponse.error(e));
     }
   };
@@ -83,13 +83,13 @@ class RoomCT {
   remove = async (req, res) => {
     try {
       const id = req.validData?.id;
-      const { item } = await RoomSV.remove(req.payload, id);
+      const { item } = await SubjectSV.remove(req.payload, id);
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
-      console.error("RoomCT remove error: ", e);
+      console.error("SubjectCT remove error: ", e);
       return res.status(500).json(ApiResponse.error(e));
     }
   };
 }
 
-module.exports = new RoomCT();
+module.exports = new SubjectCT();

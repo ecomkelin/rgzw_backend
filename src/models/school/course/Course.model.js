@@ -38,7 +38,7 @@ const CourseDOC = {
     customDates: [Date],
 
     // 默认教室（如有变动放在 Session 里）
-    defaultClassroom: { type: ObjectId, ref: 'Classroom' },
+    defaultRoom: { type: ObjectId, ref: 'Room' },
 
     // ==================== 容量与价格 ====================
     maxStudents: { type: Number, default: 8 },

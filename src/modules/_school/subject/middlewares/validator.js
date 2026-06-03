@@ -1,13 +1,17 @@
 const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator, detailOptionsValidator } = require('@utils/validatorHandle');
-const { RoomEnums } = require('@models/organization/physical/Room.dao');
+const { SubjectEnums } = require('@models/school/course/_Subject.dao');
 
 exports.addVD = [
+  commonBodyRules.validateEnum('category', SubjectEnums.categoryEnums),
   commonBodyRules.validateString('name', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.validateNumber('capacity', { min: 0 }),
-  commonBodyRules.optionalString('location', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.optionalString('description', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.validateEnum('status', RoomEnums.statusEnums),
+  commonBodyRules.validateNumber('price', { min: 0 }),
+  commonBodyRules.validateNumber('duration_minutes', { min: 0 }),
+  commonBodyRules.validateNumber('default_lesson_count', { min: 0 }),
+  commonBodyRules.optionalArray('syllabus'),
+  commonBodyRules.validateString('syllabus.*.title', { minLength: 1, maxLength: 100 }),
+  commonBodyRules.validateString('syllabus.*.description', { minLength: 1, maxLength: 500 }),
   commonBodyRules.validateBoolean('isActive'),
+  commonBodyRules.validateBoolean('isShow'),
   commonBodyRules.optionalNumber('sort'),
 
   commonBodyRules.optionalObjectId('Org'),
@@ -19,12 +23,16 @@ exports.editVD = [
   // 路径参数：必填 ObjectId
   commonParamRules.validateObjectId('id'),
   // Body 参数：可选规则
+  commonBodyRules.optionalEnum('category', SubjectEnums.categoryEnums),
   commonBodyRules.optionalString('name', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.optionalNumber('capacity', { min: 0 }),
-  commonBodyRules.optionalString('location', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.optionalString('description', { minLength: 2, maxLength: 100 }),
-  commonBodyRules.optionalEnum('status', RoomEnums.statusEnums),
+  commonBodyRules.optionalNumber('price', { min: 0 }),
+  commonBodyRules.optionalNumber('duration_minutes', { min: 0 }),
+  commonBodyRules.optionalNumber('default_lesson_count', { min: 0 }),
+  commonBodyRules.optionalArray('syllabus'),
+  commonBodyRules.optionalString('syllabus.*.title', { minLength: 1, maxLength: 100 }),
+  commonBodyRules.optionalString('syllabus.*.description', { minLength: 1, maxLength: 500 }),
   commonBodyRules.optionalBoolean('isActive'),
+  commonBodyRules.optionalBoolean('isShow'),
   commonBodyRules.optionalNumber('sort'),
 
   validatorErrorHandle
@@ -35,8 +43,9 @@ exports.listVD = [
   commonBodyRules.optionalObject('filter'),
   commonBodyRules.optionalString('filter.regExp', { minLength: 0, maxLength: 50 }), // 搜索关键词，模糊匹配 name 字段
   commonBodyRules.optionalBoolean('filter.isActive'),
+  commonBodyRules.optionalBoolean('filter.isShow'),
   commonBodyRules.optionalObjectId('filter.Org'),
-  commonBodyRules.optionalEnum('filter.status', RoomEnums.statusEnums),
+  commonBodyRules.optionalEnum('filter.category', SubjectEnums.categoryEnums),
 
 
   ...listOptionsValidator, // 分页, 排序
