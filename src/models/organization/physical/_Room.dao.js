@@ -65,15 +65,22 @@ const add = async (payload, doc, options) => {
     if (payload.accountType !== 'User') {
       throw ({ code: 403, message: "您无权添加教室" });
     }
+    if (!payload.currentUser || !payload.currentUser.Org) {
+      throw ({ code: 403, message: "您的账户信息有误，无法添加教室" });
+    }
 
     // 只有管理员可以创建教室
     if (!payload.isAdmin) {
+      doc.Org = payload.currentUser.Org;  // 普通用户只能创建属于自己的机构的教室
       if (payload.currentUser?.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建教室" });
       }
+    } else {
+      if (!doc.Org) {
+        doc.Org = payload.currentUser.Org;
+      }
     }
 
-    doc.Org = payload.currentUser.Org;
     doc.createdBy = payload.currentUser._id;
 
     const { item } = await DAO.add(RoomModel, doc, options);
@@ -117,6 +124,38 @@ const edit = async (payload = {}, _id, doc, options) => {
   }
 };
 
+const remove = async (payload = {}, _id, options) => {
+  try {
+    // 验证目标教室是否存在
+    const targetRoom = await RoomModel.findById(_id);
+    if (!targetRoom) {
+      throw ({ code: 404, message: '教室不存在' });
+    }
+
+    // 验证权限
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您无权删除教室" });
+    }
+
+    if (!payload.isAdmin) {
+      if (payload.currentUser?.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "只有管理员才能删除教室" });
+      }
+      if (targetRoom.Org.toString() !== payload.currentUser?.Org.toString()) {
+        throw ({ code: 403, message: "您无权删除此教室" });
+      }
+    }
+
+    // Room 不能被删除 remove 只需要在 把 isActive 修改为 false
+    targetRoom.isActive = false;
+    const { item } = await DAO.remove(RoomModel, _id);
+    return { item };
+  } catch (e) {
+    console.error('RoomDao delete error:', e);
+    throw e;
+  }
+}
+
 // Room 不能被删除 remove 只需要在 把 isActive 修改为 false
 
 module.exports = {
@@ -125,6 +164,7 @@ module.exports = {
     detail,
     add,
     edit,
+    remove
   },
   RoomModel, RoomDOC, RoomEnums,
 }

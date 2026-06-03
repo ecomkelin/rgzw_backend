@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v7.0.0
+- 增加了 教室模块
+
 ## v6.0.2
 - [bugger]修改 UserCT selfEdit 
 

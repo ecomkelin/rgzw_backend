@@ -37,7 +37,7 @@ exports.authenticate = async (req, res, next) => {
       if (process.env.NODE_ENV === 'production') {
         return res.status(401).json({ message: "会话已失效或已在其他设备登录，请重新登录" });
       } else {
-        console.warn(`会话ID不匹配，账户 ${Account.code}。期望 ${Account.currentSessionId}，获得 ${decoded.sessionId}`);
+        console.warn(`会话ID不匹配, 账户 ${Account.code}。期望 ${Account.currentSessionId}，获得 ${decoded.sessionId}`);
       }
     }
 
@@ -52,7 +52,6 @@ exports.authenticate = async (req, res, next) => {
     } else {
       return res.status(401).json({ message: "账号类型无效" });
     }
-
     next();
   } catch (error) {
     console.error('认证服务器错误详情:', {
@@ -124,7 +123,6 @@ exports.userAuthorize = (apiPermission) => async (req, res, next) => {
       _id: User._id,
       Org: User.Org,
     };
-
     // 如果是管理员，直接通过
     if (payload.isAdmin) {
       req.payload = payload; // 确保更新后的payload被传递到后续中间件

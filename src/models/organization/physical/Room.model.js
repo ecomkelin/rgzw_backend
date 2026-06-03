@@ -24,8 +24,10 @@ const RoomDOC = {
   },
   isActive: { type: Boolean, default: true },
 
+  sort: { type: Number, default: 0 },           // 排序字段，数值越大越靠前
+
   // ==================== 归属与审计 ====================
-  Org: { type: ObjectId, ref: 'Org', required: true },
+  Org: { type: ObjectId, ref: 'Org', immutable: true, required: true },
   createdBy: { type: ObjectId, ref: 'User', immutable: true },
   updatedBy: { type: ObjectId, ref: 'User' }
 };
