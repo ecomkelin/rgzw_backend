@@ -217,59 +217,27 @@ const filterUpdatableFields = (status, doc) => {
 
 const edit = async (payload = {}, _id, doc, options) => {
   try {
+    // 验证权限
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您无权修改课程" });
+    }
+
     // 验证目标课程是否存在
     const targetCourse = await CourseModel.findById(_id);
     if (!targetCourse) {
       throw ({ code: 404, message: '课程不存在' });
     }
 
-    // 验证权限
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权修改课程" });
-    }
-
+    // 只有超级管理员可以修改所有课程
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
-        // 普通老师只能修改自己主讲的课程
-        if (targetCourse.mainTeacher.toString() !== payload.currentUser._id.toString()) {
-          throw ({ code: 403, message: "您只能修改自己主讲的课程" });
-        }
-      }
-      if (targetCourse.Org.toString() !== payload.currentUser?.Org.toString()) {
-        throw ({ code: 403, message: "您无权修改此课程" });
-      }
+      throw ({ code: 403, message: "您无权修改此课程" });
     }
 
     // 根据状态约束过滤可修改的字段
-    const allowedDoc = filterUpdatableFields(targetCourse.status, doc);
-
     // 检查是否尝试修改被锁定的字段
-    const requestedFields = Object.keys(doc);
-    const allowedFields = Object.keys(allowedDoc);
-    const blockedFields = requestedFields.filter(f => !allowedFields.includes(f) && f !== 'status');
-
-    if (blockedFields.length > 0) {
-      // 根据状态返回具体的错误消息
-      let message = '';
-      switch (targetCourse.status) {
-        case 'enrolling':
-        case 'ongoing':
-          message = `课程处于"${targetCourse.status === 'enrolling' ? '招生中' : '进行中'}"状态，以下字段不可修改: ${blockedFields.join(', ')}。只能修改课程状态和内容包装字段(features, description, posterUrl, videoUrl, highlightVideoUrl等)`;
-          break;
-        case 'finished':
-          message = `课程已结束(finished), 只能修改状态字段`;
-          break;
-        case 'cancelled':
-          message = `课程已取消(cancelled), 只能修改状态字段`;
-          break;
-        default:
-          message = `以下字段在当前状态下不可修改: ${blockedFields.join(', ')}`;
-      }
-      throw ({ code: 400, message });
-    }
 
     // 检查状态流转限制：如果课程有学生报名(StudentCourse记录), 则不能将状态修改为cancelled
-    if (allowedDoc.status === 'cancelled' && targetCourse.status !== 'cancelled') {
+    if (doc.status === 'cancelled' && targetCourse.status !== 'cancelled') {
       const enrolledCount = await StudentCourseModel.countDocuments({
         Course: _id,
         status: { $in: ['active', 'finished'] } // 统计还在学或已完成的学生
@@ -283,11 +251,8 @@ const edit = async (payload = {}, _id, doc, options) => {
       }
     }
 
-    // 设置更新者
-    allowedDoc.updatedBy = payload.currentUser?._id || payload._id;
-
     // 更新课程信息
-    targetCourse.set(allowedDoc);
+    targetCourse.set(doc);
     const { item } = await DAO.edit(targetCourse, options);
 
     return { item };
