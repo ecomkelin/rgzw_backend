@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v7.1.1
+- 更新 _Subject.dao.js 到 Subject.dao.js
+
 ## v7.1.0
 - 新增了 subject 科目模块
 - 其他信息调整

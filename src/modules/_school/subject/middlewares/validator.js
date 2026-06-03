@@ -1,5 +1,5 @@
 const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator, detailOptionsValidator } = require('@utils/validatorHandle');
-const { SubjectEnums } = require('@models/school/course/_Subject.dao');
+const { SubjectEnums } = require('@/models/school/course/Subject.dao');
 
 exports.addVD = [
   commonBodyRules.validateEnum('category', SubjectEnums.categoryEnums),

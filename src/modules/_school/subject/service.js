@@ -1,5 +1,5 @@
 const { CourseModel } = require('@/models/school/course/_Course.dao');
-const { SubjectDAO, SubjectDOC } = require('@/models/school/course/_Subject.dao');
+const { SubjectDAO, SubjectDOC } = require('@/models/school/course/Subject.dao');
 const { deleteImmutableFront } = require('@/utils/fieldAttributes');
 
 /**
