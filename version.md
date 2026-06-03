@@ -1,5 +1,9 @@
 # 版本更新日志
 
+## v7.2.0
+- 新增了 course 课程模块
+- 其他信息调整
+
 ## v7.1.1
 - 更新 _Subject.dao.js 到 Subject.dao.js
 

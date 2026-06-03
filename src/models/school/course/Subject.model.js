@@ -24,8 +24,8 @@ const SubjectDOC = {
 
     /** 课程信息 */
     price: { type: Number }, // 课程 每堂课价格，原价 单位：分
-    duration_minutes: { type: Number }, // 课程时长，单位：分钟
-    default_lesson_count: { type: Number }, // 标准课时 16
+    duration_minutes: { type: Number, default: 90 }, // 课程时长，单位：分钟
+    default_lesson_count: { type: Number, default: 16 }, // 标准课时 16
     // 教学大纲
     syllabus: [{
         title: String,

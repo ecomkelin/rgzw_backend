@@ -1,4 +1,5 @@
 const DAO = require('@models/DAO');
+const { CourseModel } = require('./Course.model');
 const { SubjectModel, SubjectDOC, SubjectEnums } = require('./Subject.model');
 
 const list = async (payload = {}, filter, options) => {
@@ -121,7 +122,43 @@ const edit = async (payload = {}, _id, doc, options) => {
   }
 };
 
-// Subject 不能被删除 remove 只需要在 把 isActive 修改为 false
+// 删除
+const remove = async (payload = {}, _id, options) => {
+  try {
+    // 验证目标科目是否存在
+    const targetSubject = await SubjectModel.findById(_id);
+    if (!targetSubject) {
+      throw ({ code: 404, message: '科目不存在' });
+    }
+
+    // 验证权限
+    if (payload.accountType !== 'User') {
+      throw ({ code: 403, message: "您无权删除科目" });
+    }
+
+    if (!payload.isAdmin) {
+      if (payload.currentUser?.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "只有管理员才能删除科目" });
+      }
+      if (targetSubject.Org.toString() !== payload.currentUser?.Org.toString()) {
+        throw ({ code: 403, message: "您无权删除此科目" });
+      }
+    }
+
+    // 验证是否有课程关联
+    const existRelatedCourse = await CourseModel.findOne({ subject: _id });
+    if (existRelatedCourse) {
+      throw ({ code: 400, message: "无法删除，此数据有相关课程关联" });
+    }
+
+    const { item } = await DAO.remove(SubjectModel, _id, options);
+    return { item };
+
+  } catch (e) {
+    console.error('SubjectDao delete error:', e);
+    throw e;
+  }
+}
 
 module.exports = {
   SubjectDAO: {
@@ -129,6 +166,7 @@ module.exports = {
     detail,
     add,
     edit,
+    remove
   },
   SubjectModel,
   SubjectDOC,

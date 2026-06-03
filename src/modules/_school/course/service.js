@@ -1,12 +1,11 @@
-const { CourseModel } = require('@/models/school/course/Course.dao');
-const { SubjectDAO, SubjectDOC } = require('@/models/school/course/Subject.dao');
+const { CourseDAO, CourseDOC } = require('@/models/school/course/Course.dao');
 const { deleteImmutableFront } = require('@/utils/fieldAttributes');
 
 /**
  * 数据服务类
  * 处理与数据相关的业务逻辑
  */
-class SubjectSV {
+class CourseSV {
   /**
    * 获取数据列表
    * @param {Object} payload - 账户身份信息
@@ -16,10 +15,10 @@ class SubjectSV {
    */
   async list(payload, filter = {}, options) {
     try {
-      const { items, total, permFilter } = await SubjectDAO.list(payload, filter, options);
+      const { items, total, permFilter } = await CourseDAO.list(payload, filter, options);
       return { items, total, permFilter };
     } catch (e) {
-      console.error('SubjectSV list error:', e);
+      console.error('CourseSV list error:', e);
       throw e;
     }
   }
@@ -33,7 +32,7 @@ class SubjectSV {
    */
   async detail(payload, _id, options) {
     try {
-      const { item } = await SubjectDAO.detail(payload, _id, options);
+      const { item } = await CourseDAO.detail(payload, _id, options);
 
       if (!item) {
         throw ({ code: 404, message: "此数据已不存在" });
@@ -41,7 +40,7 @@ class SubjectSV {
 
       return { item };
     } catch (e) {
-      console.error('SubjectSV detail error:', e);
+      console.error('CourseSV detail error:', e);
       throw e;
     }
   }
@@ -55,14 +54,14 @@ class SubjectSV {
   async add(payload, doc, options) {
     try {
       // 删除不允许从前端修改的字段
-      deleteImmutableFront(doc, SubjectDOC);
+      deleteImmutableFront(doc, CourseDOC);
 
-      const { item } = await SubjectDAO.add(payload, doc, options);
+      const { item } = await CourseDAO.add(payload, doc, options);
 
       return { item };
     }
     catch (e) {
-      console.error('SubjectSV add error:', e);
+      console.error('CourseSV add error:', e);
       throw e;
     }
   }
@@ -78,12 +77,12 @@ class SubjectSV {
   async edit(payload, _id, doc, options) {
     try {
       // 删除不允许从前端修改的字段
-      deleteImmutableFront(doc, SubjectDOC);
+      deleteImmutableFront(doc, CourseDOC);
 
-      const { item } = await SubjectDAO.edit(payload, _id, doc, options);
+      const { item } = await CourseDAO.edit(payload, _id, doc, options);
       return { item };
     } catch (e) {
-      console.error('SubjectSV edit error:', e);
+      console.error('CourseSV edit error:', e);
       throw e;
     }
   }
@@ -97,18 +96,13 @@ class SubjectSV {
    */
   async remove(payload, _id, options) {
     try {
-      const existRelatedCourse = await CourseModel.exists({ subject: _id });
-      if (existRelatedCourse) {
-        throw ({ code: 400, message: "无法删除，此数据有相关课程关联" });
-      }
-
-      const { item } = await SubjectDAO.remove(payload, _id, options);
+      const { item } = await CourseDAO.remove(payload, _id, options);
       return { item };
     } catch (e) {
-      console.error('SubjectSV remove error:', e);
+      console.error('CourseSV remove error:', e);
       throw e;
     }
   }
 }
 
-module.exports = new SubjectSV();
+module.exports = new CourseSV();
