@@ -23,10 +23,16 @@ const checkPermission = (permissionType) => {
         case 'add':
           // 创建权限：超级管理员可以创建任意公司用户，经理只能创建自己公司的用户
           hasPermission = payload.isAdmin === true;
+          if (!hasPermission && payload.currentUser?.roleTemp === 'manager') {
+            hasPermission = true;
+          }
           break;
         case 'edit':
           // 编辑权限：超级管理员可以编辑所有用户，经理只能编辑自己公司的用户
           hasPermission = payload.isAdmin === true;
+          if (!hasPermission && payload.currentUser?.roleTemp === 'manager') {
+            hasPermission = true;
+          }
           break;
         case 'manage':
           // 管理权限（激活/禁用等特殊操作）：仅管理员可以

@@ -11,7 +11,7 @@ exports.addVD = [
   commonBodyRules.validateNumber('totalSessions', { min: 0 }),
   commonBodyRules.validateEnum('frequency', CourseEnums.frequencyEnums),
   commonBodyRules.optionalArray('scheduleRules'),
-  commonBodyRules.validateNumber('scheduleRules.*.dayOfWeek'),
+  commonBodyRules.validateNumber('scheduleRules.*.dayOfWeek', '', { min: 0, max: 6 }),
   commonBodyRules.validateString('scheduleRules.*.startTime'),
   commonBodyRules.validateString('scheduleRules.*.endTime'),
   commonBodyRules.validateObjectId('defaultRoom'),
@@ -65,9 +65,8 @@ exports.listVD = [
   commonBodyRules.optionalObject('filter'),
   commonBodyRules.optionalString('filter.regExp', { minLength: 0, maxLength: 50 }), // 搜索关键词，模糊匹配 name 字段
   commonBodyRules.optionalBoolean('filter.isActive'),
-  commonBodyRules.optionalBoolean('filter.status'), // 课程状态
+  commonBodyRules.optionalEnum('filter.status', CourseEnums.statusEnums), // 课程状态
   commonBodyRules.optionalObjectId('filter.Org'),
-  commonBodyRules.optionalEnum('filter.status', CourseEnums.statusEnums),
   commonBodyRules.optionalEnum('filter.frequency', CourseEnums.frequencyEnums),
 
 
@@ -83,7 +82,7 @@ exports.detailVD = [
   validatorErrorHandle
 ];
 
-exports.removeVD = [
-  commonParamRules.validateObjectId('id'),
-  validatorErrorHandle
-];
+// exports.removeVD = [
+//   commonParamRules.validateObjectId('id'),
+//   validatorErrorHandle
+// ];

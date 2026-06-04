@@ -15,15 +15,14 @@ const list = async (payload = {}, filter, options) => {
       filter.status = { $in: ['enrolling', 'ongoing'] }; // 只能查看正在招生或进行中的课程
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
-      if (!payload.isAdmin) {
-        if (payload.currentUser.roleTemp !== 'manager') {
-          // 老师只能查看自己教授的课程
-          filter.$or = [
-            { mainTeacher: payload.currentUser._id },
-            { assistantTeacher: payload.currentUser._id }
-          ];
-        }
+      if (payload.isAdmin) {
+        // 管理员: 全部课程
+      } else if (payload.currentUser?.roleTemp === 'manager') {
+        // 经理: 仅本机构
         filter.Org = payload.currentUser.Org;
+      } else {
+        // 其他 User 角色(老师/普通员工) 无权查看课程列表
+        throw ({ code: 403, message: "您无权查看课程列表" });
       }
     } else {
       throw ({ code: 403, message: "您的身份有误" });
@@ -68,15 +67,12 @@ const detail = async (payload = {}, _id, options) => {
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
       if (!payload.isAdmin) {
+        // 非管理员必须是 manager 才能查看课程
+        if (payload.currentUser?.roleTemp !== 'manager') {
+          throw ({ code: 403, message: "您无权查看此课程" });
+        }
         if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此课程" })
-        }
-        // 老师只能查看自己相关的课程
-        if (payload.currentUser.roleTemp !== 'manager') {
-          if (item.mainTeacher.toString() !== payload.currentUser._id.toString() &&
-            item.assistantTeacher.toString() !== payload.currentUser._id.toString()) {
-            throw ({ code: 403, message: "您无权查看此课程" });
-          }
         }
       }
     } else {
@@ -117,7 +113,7 @@ const add = async (payload, doc, options) => {
       throw ({ code: 404, message: "指定的科目不存在" });
     }
 
-    const room = await RoomModel.findById(doc.Room);
+    const room = await RoomModel.findById(doc.defaultRoom);
     if (!room) {
       throw ({ code: 404, message: "指定的教室不存在" });
     }
@@ -142,82 +138,6 @@ const add = async (payload, doc, options) => {
   }
 };
 
-/**
- * 根据状态约束过滤可修改的字段
- *
- * 状态说明:
- * - 'draft' (草稿): 学生不可见, 主要信息可改
- * - 'enrolling' (招生中): 学生可见, 主要信息不可变, 状态和内容包装可变
- * - 'ongoing' (进行中): 学生可见, 主要信息不可变, 状态和内容包装可变
- * - 'finished' (已结束): 学生不可见, 全部字段不可变 (仅状态可改)
- * - 'cancelled' (已取消): 学生不可见, 全部字段不可变 (仅状态可改)
- *
- * @param {String} status - 当前课程状态
- * @param {Object} doc - 待更新的文档
- * @returns {Object} 过滤后的可更新文档
- */
-const filterUpdatableFields = (status, doc) => {
-  // 创建一个副本以避免修改原对象
-  const filteredDoc = { ...doc };
-
-  // 状态字段始终可以更新(允许状态流转)
-  // 其他所有字段根据状态决定是否可改
-
-  switch (status) {
-    case 'draft':
-      // 草稿状态: 所有字段都可以修改(除immutable字段)
-      break;
-
-    case 'enrolling':
-    case 'ongoing':
-      // 招生中/进行中: 主要信息不可变, 状态和内容包装可变
-      // 主要信息(不可变): Subject, name, mainTeacher, startDate, totalSessions, maxStudents, price
-      // 内容包装(可变): features, description, posterUrl, videoUrl, highlightVideoUrl
-      // 排课相关(可变): endDate, scheduleRules, defaultRoom, assistantTeacher, frequency
-      const lockedFields = [
-        'Subject',           // 科目
-        'name',              // 班级名称
-        'mainTeacher',       // 主讲老师
-        'startDate',         // 开班日期
-        'totalSessions',     // 总课次
-        'maxStudents',       // 最大学生数
-        'price',             // 价格
-      ];
-
-      // 移除被锁定的字段(如果存在于doc中)
-      lockedFields.forEach(field => {
-        if (filteredDoc.hasOwnProperty(field)) {
-          delete filteredDoc[field];
-        }
-      });
-      break;
-
-    case 'finished':
-    case 'cancelled':
-      // 已结束/已取消: 除了状态, 其他字段都不能修改
-      const allLockedFields = [
-        'Subject', 'name', 'mainTeacher', 'assistantTeacher',
-        'startDate', 'endDate', 'totalSessions', 'frequency',
-        'scheduleRules', 'defaultRoom', 'maxStudents', 'price',
-        'publishDate', 'features', 'description', 'posterUrl',
-        'videoUrl', 'highlightVideoUrl', 'isActive', 'sort',
-      ];
-
-      allLockedFields.forEach(field => {
-        if (filteredDoc.hasOwnProperty(field)) {
-          delete filteredDoc[field];
-        }
-      });
-      break;
-
-    default:
-      // 未知状态, 拒绝所有修改
-      return {};
-  }
-
-  return filteredDoc;
-};
-
 const edit = async (payload = {}, _id, doc, options) => {
   try {
     // 验证权限
@@ -229,9 +149,14 @@ const edit = async (payload = {}, _id, doc, options) => {
       throw ({ code: 404, message: '课程不存在' });
     }
 
-    // 只有超级管理员可以修改所有课程
+    // 权限：超级管理员可改所有课程；经理只能改本机构课程
     if (!payload.isAdmin) {
-      throw ({ code: 403, message: "您无权修改此课程" });
+      if (payload.currentUser?.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "您无权修改此课程" });
+      }
+      if (targetCourse.Org.toString() !== payload.currentUser.Org.toString()) {
+        throw ({ code: 403, message: "您无权修改此课程" });
+      }
     }
 
     // 根据状态约束过滤可修改的字段
@@ -252,6 +177,7 @@ const edit = async (payload = {}, _id, doc, options) => {
       }
     }
 
+    doc.updatedBy = payload.currentUser._id; // 设置更新者
     // 更新课程信息
     targetCourse.set(doc);
     const { item } = await DAO.edit(targetCourse, options);

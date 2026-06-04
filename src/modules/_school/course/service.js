@@ -34,10 +34,6 @@ class CourseSV {
     try {
       const { item } = await CourseDAO.detail(payload, _id, options);
 
-      if (!item) {
-        throw ({ code: 404, message: "此数据已不存在" });
-      }
-
       return { item };
     } catch (e) {
       console.error('CourseSV detail error:', e);

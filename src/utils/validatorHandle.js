@@ -102,16 +102,16 @@ exports.commonBodyRules = {
             .isObject().withMessage(msg || `${field} 必须是对象格式`),
 
     // 数字验证
-    validateNumber: (field, msg = '', options = { min: 0 }) =>
+    validateNumber: (field, msg = '', options = { min: 0, max: 99999999 }) =>
         body(field)
             .notEmpty().withMessage(`${field} 不能为空`)
-            .isInt(options).withMessage(msg || `${field} 必须是大于等于 ${options.min} 的整数`)
+            .isInt(options).withMessage(msg || `${field} 必须是大于等于 ${options.min} 的整数，且不能超过 ${options.max}`)
             .toInt(),
 
-    optionalNumber: (field, msg = '', options = { min: 0 }) =>
+    optionalNumber: (field, msg = '', options = { min: 0, max: 99999999 }) =>
         body(field)
             .optional()
-            .isInt(options).withMessage(msg || `${field} 必须是大于等于 ${options.min} 的整数`)
+            .isInt(options).withMessage(msg || `${field} 必须是大于等于 ${options.min} 的整数，且不能超过 ${options.max}`)
             .toInt(),
 
     // 字符串验证
@@ -220,10 +220,10 @@ exports.commonQueryRules = {
             .toBoolean(),
 
     // 数字验证（分页/排序等）
-    optionalNumber: (field, msg = '', options = { min: 1 }) =>
+    optionalNumber: (field, msg = '', options = { min: 1, max: 99999999 }) =>
         query(field)
             .optional()
-            .isInt(options).withMessage(msg || `${field} 必须是大于等于 ${options.min} 的整数`)
+            .isInt(options).withMessage(msg || `${field} 必须是大于等于 ${options.min} 的整数，且不能超过 ${options.max}`)
             .toInt(),
 
     // 字符串验证（模糊查询等）

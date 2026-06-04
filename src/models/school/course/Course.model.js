@@ -35,7 +35,7 @@ const CourseDOC = {
     }],
 
     // 默认教室（如有变动放在 Lesson 里）
-    defaultRoom: { type: ObjectId, ref: 'Room' },
+    defaultRoom: { type: ObjectId, ref: 'Room', required: true },
 
     // ==================== 容量与价格 ====================
     maxStudents: { type: Number, default: 8 },
