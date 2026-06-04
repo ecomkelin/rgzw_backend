@@ -120,6 +120,7 @@ const edit = async (payload = {}, _id, doc, options) => {
       }
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
+      doc.updatedBy = payload.currentUser._id;
       if (!payload.isAdmin) {
         if (payload.currentUser.Org.toString() !== targetStudent.Org.toString()) {
           throw ({ code: 403, message: "没有权限修改此学生" });
@@ -137,7 +138,6 @@ const edit = async (payload = {}, _id, doc, options) => {
     if (!doc.Province) delete doc.Province;
     if (!doc.City) delete doc.City;
     if (!doc.Area) delete doc.Area;
-
 
     targetStudent.set(doc);
     const { item } = await DAO.edit(targetStudent, options);

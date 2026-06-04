@@ -17,6 +17,6 @@ router.post('/edit/:id', authenticate, editPermission, editVD, StudentCT.edit);
 
 // 注释：查看自己的学生信息（等做学生账号的时候 再启动）
 // router.post('/self', authenticate, StudentCT.selfDetail);
-// router.post('/edit/self', authenticate, selfUpdateVD, StudentCT.selfUpdate);
+// router.post('/self/edit', authenticate, selfEditVD, StudentCT.selfEdit);
 
 module.exports = router;

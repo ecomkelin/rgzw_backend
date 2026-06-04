@@ -106,12 +106,12 @@ class StudentCT {
 
   // 注释：学生账号修改自己的信息（暂不启用）
   /*
-  selfUpdate = async (req, res) => {
+  selfEdit = async (req, res) => {
     try {
-      const data = await StudentSV.selfUpdate(req.body, req.payload);
+      const data = await StudentSV.edit(req.payload, req.currentStudent._id, req.body);
       return res.status(200).json(ApiResponse.success(data));
     } catch (e) {
-      console.error("StudentCT selfUpdate error: ", e)
+      console.error("StudentCT selfEdit error: ", e)
       const statusCode = e.code || 500;
       return res.status(statusCode).json(ApiResponse.error(e))
     }

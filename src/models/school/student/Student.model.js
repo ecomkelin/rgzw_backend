@@ -14,6 +14,7 @@ const StudentDOC = {
     Account: { type: ObjectId, ref: 'Account', required: true, immutable: true },
     name: { type: String, required: true },       // 真实姓名
     // nameUnicode: { type: String },   // 拼音+code: 主要是让机构知道学生的名字怎么读的，方便机构后续联系学生的时候正确发音，和唯一性
+    description: { type: String },    // 备注信息，机构可以填写一些关于学生的备注信息，方便后续联系和管理
 
     // 证件上的信息
     identityNo: { type: String },       // 身份证号

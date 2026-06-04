@@ -13,14 +13,14 @@ const checkPermission = (permissionType) => {
 
       switch (permissionType) {
         case 'read':
-          hasPermission = true;
+          hasPermission = payload.isAdmin === true || payload.currentUser?.roleTemp === 'manager';
           break;
         case 'add':
           // 创建权限：isAdmin=true 和 roleTemp='manager' 都可以创建学生，但需遵循权限范围
           hasPermission = payload.isAdmin === true || payload.currentUser?.roleTemp === 'manager';
           break;
         case 'edit':
-          hasPermission = true;
+          hasPermission = payload.isAdmin === true || payload.currentUser?.roleTemp === 'manager';
           break;
         case 'manage':
           // 管理权限（激活/禁用等特殊操作）：仅管理员可以

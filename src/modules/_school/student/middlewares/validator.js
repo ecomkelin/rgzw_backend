@@ -36,21 +36,17 @@ exports.editVD = [
   // 路径参数：必填 ObjectId
   commonParamRules.validateObjectId('id'),
   // Body 参数：可选规则
+  commonBodyRules.optionalString('name', { minLength: 2, maxLength: 50 }),
+  commonBodyRules.optionalDate('birthday'),
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalString('phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
-  commonBodyRules.optionalString('name', { minLength: 2, maxLength: 50 }),
-  commonBodyRules.optionalDate('birthday'),
-  commonBodyRules.optionalEnum('gender', ['Male', 'Female']),
   commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('currentAddress', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('school', { minLength: 2, maxLength: 100 }),
   commonBodyRules.optionalEnum('sourceType', ['地推', '传单', '活动', '介绍', '听说', '路过', '抖音', '朋友圈', '其他']),
   commonBodyRules.optionalString('description', { maxLength: 500 }),
-  commonBodyRules.optionalObjectId('Nation'),
-  commonBodyRules.optionalObjectId('Province'),
-  commonBodyRules.optionalObjectId('City'),
-  commonBodyRules.optionalObjectId('Area'),
+
 
   validatorErrorHandle
 ];
@@ -73,7 +69,7 @@ exports.detailVD = [
   validatorErrorHandle
 ];
 
-exports.selfUpdateVD = [
+exports.selfEditVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalString('displayName', { minLength: 2, maxLength: 26 }),
 
