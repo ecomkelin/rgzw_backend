@@ -80,16 +80,16 @@ class RoomCT {
    * @param {Object} req - HTTP请求对象
    * @param {Object} res - HTTP响应对象
    */
-  remove = async (req, res) => {
-    try {
-      const id = req.validData?.id;
-      const { item } = await RoomSV.remove(req.payload, id);
-      return res.status(200).json(ApiResponse.success({ data: { item } }));
-    } catch (e) {
-      console.error("RoomCT remove error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
-    }
-  };
+  // remove = async (req, res) => {
+  //   try {
+  //     const id = req.validData?.id;
+  //     const { item } = await RoomSV.remove(req.payload, id);
+  //     return res.status(200).json(ApiResponse.success({ data: { item } }));
+  //   } catch (e) {
+  //     console.error("RoomCT remove error: ", e);
+  //     return res.status(500).json(ApiResponse.error(e));
+  //   }
+  // };
 }
 
 module.exports = new RoomCT();

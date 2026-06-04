@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v7.4.0
+- 统一payloadChecker
+
 ## v7.3.1
 - 检查了 Account 和 Subject 的bug 做了优化
 

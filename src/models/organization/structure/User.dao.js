@@ -1,13 +1,12 @@
 const DAO = require('@models/DAO');
 const { UserModel, UserEnums, UserDOC } = require('./User.model');
 const { AccountModel } = require('@models/authorization/Account.dao');
+const { userPayloadChecker } = require('@utils/payloadChecker');
 
 const list = async (payload = {}, filter, options) => {
   try {
+    userPayloadChecker(payload);
     // 验证权限
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您没有权限操作User" });
-    }
     if (!payload.isAdmin) {
       filter.Org = payload.currentUser.Org;
       if (payload.currentUser.roleTemp !== 'manager') {
@@ -25,12 +24,9 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
   try {
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "你没有权限访问用户" })
-    }
+    userPayloadChecker(payload);
 
     const { item } = await DAO.detail(UserModel, _id, options);
-
     if (!item) {
       throw ({ code: 404, message: "此 用户 数据已不存在" });
     }
@@ -110,9 +106,7 @@ const add = async (payload, doc, options) => {
  */
 const edit = async (payload = {}, _id, doc, options) => {
   try {
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "你没有权限访问用户" })
-    }
+    userPayloadChecker(payload);
 
     // 验证目标用户是否存在
     const targetUser = await UserModel.findById(_id);

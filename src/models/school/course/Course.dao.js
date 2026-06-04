@@ -4,14 +4,17 @@ const { SubjectModel } = require('./Subject.model');
 const { UserModel } = require('@models/organization/structure/User.model');
 const { RoomModel } = require('@models/organization/physical/Room.model');
 const { StudentCourseModel } = require('@models/school/student/StudentCourse.model');
+const { userPayloadChecker, studentPayloadChecker, payloadChecker } = require('@utils/payloadChecker');
 
 const list = async (payload = {}, filter, options) => {
   try {
     // 验证权限
     if (payload.accountType === 'Student') {
+      studentPayloadChecker(payload);
       // 学生可以查看自己报名的课程或开放的课程
       filter.status = { $in: ['enrolling', 'ongoing'] }; // 只能查看正在招生或进行中的课程
     } else if (payload.accountType === 'User') {
+      userPayloadChecker(payload);
       if (!payload.isAdmin) {
         if (payload.currentUser.roleTemp !== 'manager') {
           // 老师只能查看自己教授的课程
@@ -49,6 +52,7 @@ const detail = async (payload = {}, _id, options) => {
 
     // 验证权限
     if (payload.accountType === 'Student') {
+      studentPayloadChecker(payload);
       // 学生只能查看自己报名的课程或开放的课程
       if (item.status !== 'enrolling' && item.status !== 'ongoing') {
         // 检查是否已报名
@@ -62,6 +66,7 @@ const detail = async (payload = {}, _id, options) => {
         }
       }
     } else if (payload.accountType === 'User') {
+      userPayloadChecker(payload);
       if (!payload.isAdmin) {
         if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此课程" })
@@ -94,9 +99,7 @@ const detail = async (payload = {}, _id, options) => {
  */
 const add = async (payload, doc, options) => {
   try {
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权添加课程" });
-    }
+    userPayloadChecker(payload);
 
     // 只有管理员或任课老师可以创建课程
     if (!payload.isAdmin) {
@@ -218,9 +221,7 @@ const filterUpdatableFields = (status, doc) => {
 const edit = async (payload = {}, _id, doc, options) => {
   try {
     // 验证权限
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权修改课程" });
-    }
+    userPayloadChecker(payload);
 
     // 验证目标课程是否存在
     const targetCourse = await CourseModel.findById(_id);
@@ -264,45 +265,45 @@ const edit = async (payload = {}, _id, doc, options) => {
 };
 
 // Course 不能被删除 remove 只需要在 把 isActive 修改为 false
-const remove = async (payload = {}, _id, options) => {
-  try {
-    // 验证目标课程是否存在
-    const targetCourse = await CourseModel.findById(_id);
-    if (!targetCourse) {
-      throw ({ code: 404, message: '课程不存在' });
-    }
+// const remove = async (payload = {}, _id, options) => {
+//   try {
+//     // 验证目标课程是否存在
+//     const targetCourse = await CourseModel.findById(_id);
+//     if (!targetCourse) {
+//       throw ({ code: 404, message: '课程不存在' });
+//     }
 
-    const existRelatedStudentCourse = await StudentCourseModel.findOne({ Course: _id });
-    if (existRelatedStudentCourse) {
-      throw ({ code: 400, message: "无法删除，此课程有学生报名关联" });
-    }
+//     const existRelatedStudentCourse = await StudentCourseModel.findOne({ Course: _id });
+//     if (existRelatedStudentCourse) {
+//       throw ({ code: 400, message: "无法删除，此课程有学生报名关联" });
+//     }
 
-    // 验证权限
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权删除课程" });
-    }
+//     // 验证权限
+//     if (payload.accountType !== 'User') {
+//       throw ({ code: 403, message: "您无权删除课程" });
+//     }
 
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        // 普通老师只能删除自己主讲的课程
-        if (targetCourse.mainTeacher.toString() !== payload.currentUser._id.toString()) {
-          throw ({ code: 403, message: "您只能删除自己主讲的课程" });
-        }
-      }
-      if (targetCourse.Org.toString() !== payload.currentUser.Org.toString()) {
-        throw ({ code: 403, message: "您无权删除此课程" });
-      }
-    }
+//     if (!payload.isAdmin) {
+//       if (payload.currentUser.roleTemp !== 'manager') {
+//         // 普通老师只能删除自己主讲的课程
+//         if (targetCourse.mainTeacher.toString() !== payload.currentUser._id.toString()) {
+//           throw ({ code: 403, message: "您只能删除自己主讲的课程" });
+//         }
+//       }
+//       if (targetCourse.Org.toString() !== payload.currentUser.Org.toString()) {
+//         throw ({ code: 403, message: "您无权删除此课程" });
+//       }
+//     }
 
-    // 物理删除
-    const { item } = await DAO.remove(CourseModel, _id, options);
-    return { item };
+//     // 物理删除
+//     const { item } = await DAO.remove(CourseModel, _id, options);
+//     return { item };
 
-  } catch (e) {
-    console.error('CourseDao delete error:', e);
-    throw e;
-  }
-}
+//   } catch (e) {
+//     console.error('CourseDao delete error:', e);
+//     throw e;
+//   }
+// }
 
 module.exports = {
   CourseDAO: {
@@ -310,7 +311,7 @@ module.exports = {
     detail,
     add,
     edit,
-    remove,
+    // remove,
   },
   CourseModel, CourseDOC, CourseEnums,
 }

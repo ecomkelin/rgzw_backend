@@ -56,13 +56,8 @@ exports.authenticate = async (req, res, next) => {
     // 将用户身份信息附加到请求对象
     req.payload = payload;
     next();
-  } catch (error) {
-    console.error('认证服务器错误详情:', {
-      message: error.message,
-      url: req.url,
-      method: req.method,
-      timestamp: new Date().toISOString()
-    });
+  } catch (e) {
+    console.error(e);
 
     res.status(500).json({ message: "authenticate 认证服务器错误" });
   }

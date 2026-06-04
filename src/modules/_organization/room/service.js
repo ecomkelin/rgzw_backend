@@ -94,15 +94,15 @@ class RoomSV {
    * @param {Object} options - {session} 事务 
    * @returns {Object} 包含 item(更新后的数据) 的对象
    */
-  async remove(payload, _id, options) {
-    try {
-      const { item } = await RoomDAO.remove(payload, _id, options);
-      return { item };
-    } catch (e) {
-      console.error('RoomSV remove error:', e);
-      throw e;
-    }
-  }
+  // async remove(payload, _id, options) {
+  //   try {
+  //     const { item } = await RoomDAO.remove(payload, _id, options);
+  //     return { item };
+  //   } catch (e) {
+  //     console.error('RoomSV remove error:', e);
+  //     throw e;
+  //   }
+  // }
 }
 
 module.exports = new RoomSV();

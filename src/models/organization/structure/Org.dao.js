@@ -1,8 +1,10 @@
 const { OrgModel, OrgEnums, OrgDOC } = require('./Org.model');
 const DAO = require('@models/DAO');
+const { userPayloadChecker } = require('@utils/payloadChecker');
 
 const list = async (payload = {}, filter, options) => {
   try {
+    userPayloadChecker(payload);
     // 验证权限
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "只有超级管理员才能查看公司列表" });
@@ -18,18 +20,11 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
   try {
+    userPayloadChecker(payload);
     // 验证权限 - 管理员可以查看任何公司，普通用户只能查看自己的公司
     if (!payload.isAdmin) {
-      if (payload.accountType === 'User') {
-        if (payload.currentUser.Org.toString() !== _id.toString()) {
-          throw ({ code: 403, message: "没有权限访问此公司" });
-        }
-      } else if (payload.accountType === 'Student') {
-        if (payload.currentStudent?.Org.toString() !== _id.toString()) {
-          throw ({ code: 403, message: "没有权限访问此公司" });
-        }
-      } else {
-        throw ({ code: 403, message: "您的身份错误" });
+      if (payload.currentUser.Org.toString() !== _id.toString()) {
+        throw ({ code: 403, message: "没有权限访问此公司" });
       }
     }
 
@@ -55,12 +50,12 @@ const detail = async (payload = {}, _id, options) => {
  */
 const add = async (payload, doc, options) => {
   try {
+    userPayloadChecker(payload);
     // 只有管理员可以创建公司
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "只有超级管理员才能创建公司" });
     }
 
-    if (!doc.nickname) doc.nickname = doc.name;
     doc.createdBy = payload.currentUser._id;
 
     const existFilter = [{ unionCode: doc.unionCode }, { name: doc.name }, { nickname: doc.nickname }];
@@ -87,6 +82,7 @@ const add = async (payload, doc, options) => {
  */
 const edit = async (payload = {}, _id, doc, options) => {
   try {
+    userPayloadChecker(payload);
     // 只有管理员可以修改公司
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "没有权限修改公司" });
@@ -95,7 +91,7 @@ const edit = async (payload = {}, _id, doc, options) => {
     // 验证目标公司是否存在
     const targetOrg = await OrgModel.findById(_id);
     if (!targetOrg) {
-      throw ({ code: 11000, message: '公司不存在' });
+      throw ({ code: 404, message: '公司不存在' });
     }
 
     const existFilter = [{ unionCode: doc.unionCode }];
@@ -103,7 +99,7 @@ const edit = async (payload = {}, _id, doc, options) => {
     if (doc.nickname) existFilter.push({ nickname: doc.nickname });
     const existing = await OrgModel.findOne({ _id: { $ne: _id }, $or: existFilter });
     if (existing) {
-      throw ({ code: 11000, message: '统一社会编号或公司名称已被存在' });
+      throw ({ code: 400, message: '统一社会编号或公司名称已被存在' });
     }
 
     targetOrg.set(doc);
