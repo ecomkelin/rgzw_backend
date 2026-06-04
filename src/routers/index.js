@@ -5,7 +5,7 @@ const apiRoutes = require("./__utils/route_apis")
 
 // 路由说明
 router.get("/", (req, res) => {
-    res.json({
+    res.status(200).json({
         code: 200,
         message: "欢迎使用API服务!",
         data: {

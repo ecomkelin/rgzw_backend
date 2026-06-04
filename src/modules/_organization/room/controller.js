@@ -19,7 +19,8 @@ class RoomCT {
       return res.status(200).json(ApiResponse.success({ data: { total, items} }));
     } catch (e) {
       console.error("RoomCT list error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -36,7 +37,8 @@ class RoomCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("RoomCT detail error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 

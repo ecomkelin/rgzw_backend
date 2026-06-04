@@ -13,13 +13,14 @@ const StudentDOC = {
     // 对应的账号ID，一个账号可以对应多个身份（Student），但一个身份只能对应一个账号
     Account: { type: ObjectId, ref: 'Account', required: true, immutable: true },
     name: { type: String, required: true },       // 真实姓名
-    
+    // nameUnicode: { type: String },   // 拼音+code: 主要是让机构知道学生的名字怎么读的，方便机构后续联系学生的时候正确发音，和唯一性
+
     // 证件上的信息
     identityNo: { type: String },       // 身份证号
     birthday: { type: Date },     // 出生日期
     gender: { type: String, enum: ['Male', 'Female'], default: 'Male' },
     address: { type: String },   // 证件地址
-    
+
     // 现居 地址信息
     currentAddress: { type: String },
     phone: { type: String },
@@ -42,14 +43,15 @@ const StudentDOC = {
     isActive: { type: Boolean, default: true },
 
 
-    createBy: { type: ObjectId, ref: 'User' }, // 创建人
+    createBy: { type: ObjectId, ref: 'User', immutable: true }, // 创建人
     updateBy: { type: ObjectId, ref: 'User' }, // 创建人
 
-    Org: { type: ObjectId, ref: 'Org' }, // 机构ID，冗余字段，方便查询  
+    Org: { type: ObjectId, ref: 'Org', required: true, immutable: true }, // 机构ID，冗余字段，方便查询  
 };
 const docSchema = new Schema(StudentDOC, { timestamps: true });
 
 docSchema.index({ identityNo: 1 }, { unique: true, partialFilterExpression: { identityNo: { $exists: true, $ne: null } } });
+// docSchema.index({ nameUnicode: 1 }, { unique: true, partialFilterExpression: { nameUnicode: { $exists: true, $ne: null } } });
 
 StudentModel = mongoose.model('Student', docSchema);
 

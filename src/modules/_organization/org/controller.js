@@ -10,7 +10,8 @@ class OrgCT {
       return res.status(200).json(ApiResponse.success({ data: { total, items } }));
     } catch (e) {
       console.error("OrgCT list error: ", e)
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 
@@ -22,7 +23,8 @@ class OrgCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT detail error: ", e)
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 
@@ -33,7 +35,8 @@ class OrgCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT add error: ", e)
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 
@@ -47,7 +50,8 @@ class OrgCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT edit error: ", e)
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 
@@ -63,7 +67,8 @@ class OrgCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT selfDetail error: ", e)
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 }

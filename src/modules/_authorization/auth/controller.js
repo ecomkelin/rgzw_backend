@@ -29,7 +29,8 @@ class LoginCT {
       return this.authorizationRes(res, authResRtData);
     } catch (e) {
       console.error("LoginCT login error:", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -47,7 +48,8 @@ class LoginCT {
       return this.authorizationRes(res, authResRtData);
     } catch (e) {
       console.error("LoginCT refreshToken error:", e);
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 
@@ -61,7 +63,8 @@ class LoginCT {
       return res.status(200).json(ApiResponse.success({ message: "成功退出" }));
     } catch (e) {
       console.error('LoginCT logout error:', e);
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 

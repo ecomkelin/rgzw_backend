@@ -118,7 +118,6 @@ src/modules/_authorization/auth/
 - `@utils/JwtUtil`: JWT令牌操作
 - `@utils/sessionValidator`: 会话验证
 - `@utils/response`: 统一响应格式
-- `@utils/asyncHandler`: 异步错误处理
 - `@middlewares/auth`: 认证中间件
 
 ### 依赖的中间件

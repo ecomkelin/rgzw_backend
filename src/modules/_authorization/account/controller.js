@@ -10,7 +10,8 @@ class AccountCT {
       return res.status(200).json(ApiResponse.success({ data: { total, items } }));
     } catch (e) {
       console.error("AccountCT list error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   }
 
@@ -22,7 +23,8 @@ class AccountCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("AccountCT detail error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -32,7 +34,8 @@ class AccountCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("AccountCT add error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -46,7 +49,8 @@ class AccountCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("AccountCT edit error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -59,7 +63,8 @@ class AccountCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("AccountCT selfDetail error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -73,7 +78,8 @@ class AccountCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("AccountCT selfEdit error: ", e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 

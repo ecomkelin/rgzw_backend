@@ -21,7 +21,6 @@
 - **规范**：
   - 只负责请求参数传递给服务层，响应服务层结果
   - 不直接操作数据库
-  - 统一使用 `asyncHandler` 包装异步函数
   - 统一使用 `ApiResponse` 返回响应
   - 不进行复杂的业务逻辑处理
 
@@ -94,7 +93,7 @@ async edit(payload, _id, doc) {
 
 ### 错误处理流程
 1. Service 层：`throw { code: XXX, message: "..." }`
-2. Controller 层：通过 `asyncHandler` 捕获并使用 `ApiResponse.error()` 返回响应
+2. Controller 层：捕获并使用 `ApiResponse.error()` 返回响应
 
 ## 输入验证规范
 

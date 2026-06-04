@@ -9,10 +9,11 @@ class StudentCT {
       const { filter, options } = req.validData || {};
       const { total, items } = await StudentSV.list(req.payload, filter, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items} }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items } }));
     } catch (e) {
       console.error("StudentCT list error: ", e)
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 
@@ -24,7 +25,8 @@ class StudentCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("StudentCT detail error: ", e)
-      return res.json(ApiResponse.error(e))
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
 
@@ -74,7 +76,7 @@ class StudentCT {
 
   edit = async (req, res) => {
     try {
-      const id = req.validData?.id;
+      const id = req.validData.id;
       const doc = req.validData;
       delete doc.id
 

@@ -80,8 +80,6 @@ rgzw_backend 是一个基于 Node.js/Express 构建的应用程序，使用 Mong
 ## 编程模式
 
 ### 控制器模式
-控制器扩展类并使用 asyncHandler 包装器进行错误处理：
-- 方法定义为带有 `asyncHandler` 包装器的类方法
 - 响应使用 `ApiResponse` 实用程序进行一致性格式化
 - 通过中间件进行标准化错误处理
 
@@ -96,8 +94,7 @@ rgzw_backend 是一个基于 Node.js/Express 构建的应用程序，使用 Mong
 - 错误响应具有标准化的代码和格式
 
 ### 错误处理模式
-- 错误通过 `asyncHandler` 中间件捕获
-- 服务层使用统一的错误格式抛出：`throw({code: Number, message: String})`
+- 服务层、DAO层、中间件等统一使用的错误格式抛出：`throw({code: Number, message: String})`
 - 控制器层接收错误并使用 `ApiResponse.error()` 根据 code 返回适当响应
 - 开发环境中详细记录，在生产环境中精简响应
 - 自定义错误对象带有 `code` 属性用于正确处理

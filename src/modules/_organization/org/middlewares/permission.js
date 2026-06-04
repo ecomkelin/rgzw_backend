@@ -41,7 +41,8 @@ const checkPermission = (permissionType) => {
       next();
     } catch (e) {
       console.error('Org Permission check error:', e);
-      return res.json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 };

@@ -14,7 +14,7 @@ app.use(express.json());
 
 // 简单的健康检查端点，模仿原应用的行为
 app.get('/', (req, res) => {
-  res.json({
+  res.status(200).json({
     code: 200,
     message: '服务器运行正常, /api 查看接口文档',
     uptime: process.uptime()

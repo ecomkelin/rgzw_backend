@@ -45,7 +45,7 @@ app.use(monitorMiddleware);
 
 // 添加健康检查端点
 app.get('/', (req, res) => {
-  res.json({
+  res.status(200).json({
     code: 200,
     message: '服务器运行正常, /api 查看接口文档',
     uptime: process.uptime()

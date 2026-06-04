@@ -1,13 +1,14 @@
 const DAO = require('@models/DAO');
 const { StudentModel, StudentEnums, StudentDOC } = require('./Student.model');
 const { AccountModel } = require('@models/authorization/Account.dao');
+const { OrgModel } = require('@models/organization/structure/Org.dao');
+const { userPayloadChecker, studentPayloadChecker, payloadChecker } = require('@utils/payloadChecker');
 
 const list = async (payload = {}, filter, options) => {
   try {
-    // 验证权限
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权查看学生列表" });
-    }
+    // 验证权限, 学生账号 只能用populate查看自己的学生信息，用户账号只能查看自己机构的学生信息
+    userPayloadChecker(payload);
+
     if (!payload.isAdmin) {
       filter.Org = payload.currentUser.Org;
       if (payload.currentUser.roleTemp !== 'manager') {
@@ -33,10 +34,12 @@ const detail = async (payload = {}, _id, options) => {
 
     // 验证权限 - 管理员可以查看任何学生，普通用户只能查看自己的学生
     if (payload.accountType === 'Student') {
-      if (item._id.toString() !== payload.currentStudent?.Student.toString()) {
+      studentPayloadChecker(payload);
+      if (item._id.toString() !== payload.currentStudent._id.toString()) {
         throw ({ code: 403, message: "您无权查看此学生" })
       }
     } else if (payload.accountType === 'User') {
+      userPayloadChecker(payload);
       if (!payload.isAdmin) {
         if (item.Org !== payload.currentUser.Org) {
           throw ({ code: 403, message: "您无权查看此学生" })
@@ -62,17 +65,19 @@ const detail = async (payload = {}, _id, options) => {
  */
 const add = async (payload, doc, options) => {
   try {
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权添加学生" });
-    }
+    userPayloadChecker(payload);
     // 只有管理员可以创建学生
     if (!payload.isAdmin) {
       if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建学生" });
       }
+      doc.Org = payload.currentUser.Org;
+    } else {
+      if (!doc.Org) {
+        doc.Org = payload.currentUser.Org;
+      }
     }
 
-    doc.Org = payload.currentUser.Org;
     if (!doc.displayName) doc.displayName = doc.name;
     if (!doc.Nation) delete doc.Nation;
     if (!doc.Province) delete doc.Province;
@@ -82,12 +87,13 @@ const add = async (payload, doc, options) => {
     if (!doc.Account) {
       throw ({ code: 400, message: "学生必须加入 账号信息" });
     }
-    const Account = await AccountModel.findById(doc.Account);
-    if (!Account) {
-      throw ({ code: 404, message: "没有此账号" });
+    const activeAccount = await AccountModel.countDocuments({ _id: doc.Account, isActive: true, accountType: 'Student' });
+    if (activeAccount === 0) {
+      throw ({ code: 404, message: "没有此账号 或者 被禁用 或者 账号类型不是Student" });
     }
-    if (!Account.isActive || Account.accountType !== 'Student') {
-      throw ({ code: 400, message: "账号被禁用 或者 账号类型不是 Student" });
+    const activeOrg = await OrgModel.countDocuments({ _id: doc.Org, isActive: true });
+    if (activeOrg === 0) {
+      throw ({ code: 400, message: "所属机构没有找到或者被禁用" });
     }
 
     const { item } = await DAO.add(StudentModel, doc, options);
@@ -107,12 +113,14 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
 
     // 只有管理员可以修改任何学生，普通用户只能修改自己的学生
-    if (!payload.isAdmin) {
-      if (payload.accountType === 'Student') {
-        if (payload.currentStudent?._id?.toString() !== targetStudent._id.toString()) {
-          throw ({ code: 403, message: "没有权限修改此学生" });
-        }
-      } else if (payload.accountType === 'User') {
+    if (payload.accountType === 'Student') {
+      studentPayloadChecker(payload);
+      if (payload.currentStudent?._id?.toString() !== targetStudent._id.toString()) {
+        throw ({ code: 403, message: "没有权限修改此学生" });
+      }
+    } else if (payload.accountType === 'User') {
+      userPayloadChecker(payload);
+      if (!payload.isAdmin) {
         if (payload.currentUser.Org.toString() !== targetStudent.Org.toString()) {
           throw ({ code: 403, message: "没有权限修改此学生" });
         }
@@ -124,11 +132,6 @@ const edit = async (payload = {}, _id, doc, options) => {
       }
     }
 
-    // 处理密码
-    if (doc.password) {
-      doc.passwordHash = doc.password;
-      delete doc.password;
-    }
     if (!doc.displayName) doc.displayName = doc.name;
     if (!doc.Nation) delete doc.Nation;
     if (!doc.Province) delete doc.Province;

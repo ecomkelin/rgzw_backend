@@ -9,7 +9,7 @@ const ApiResponse = require('../utils/response');
  * @param {Object} res - HTTP响应对象
  * @param {Function} next - 下一个中间件函数
  */
-const errorHandler = (e, req, res, next) => {
+const errorHandler = (e, req, res) => {
   // 记录错误详细信息，便于调试和监控
   console.error('全局错误处理详情:', {
     message: e.message,
@@ -18,10 +18,10 @@ const errorHandler = (e, req, res, next) => {
     method: req.method,
     timestamp: new Date().toISOString()
   });
-
+  const statusCode = e.code || 500;
   // 使用 ApiResponse.error 方法统一处理错误响应
   // 该方法会根据错误代码返回相应的标准格式响应
-  res.json(ApiResponse.error(e));
+  res.status(statusCode).json(ApiResponse.error(e));
 };
 
 module.exports = errorHandler;
