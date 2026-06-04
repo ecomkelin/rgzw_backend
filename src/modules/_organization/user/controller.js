@@ -93,7 +93,8 @@ class UserCT {
       return res.status(200).json(ApiResponse.success({ data }));
     } catch (e) {
       console.error("UserCT create error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -112,7 +113,8 @@ class UserCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("UserCT edit error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -131,7 +133,8 @@ class UserCT {
       return res.status(200).json(ApiResponse.success(data));
     } catch (e) {
       console.error("UserCT selfEdit error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 }

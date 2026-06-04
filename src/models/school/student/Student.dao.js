@@ -127,9 +127,9 @@ const edit = async (payload = {}, _id, doc, options) => {
         if (payload.currentUser.roleTemp !== 'manager') {
           throw ({ code: 403, message: "没有权限修改学生信息" });
         }
-      } else {
-        throw ({ code: 403, message: "您的身份出现了错误" });
       }
+    } else {
+      throw ({ code: 403, message: "您的身份出现了错误" });
     }
 
     if (!doc.displayName) doc.displayName = doc.name;

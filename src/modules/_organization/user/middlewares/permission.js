@@ -13,20 +13,24 @@ const checkPermission = (permissionType) => {
 
       switch (permissionType) {
         case 'read':
-          // 读取权限：超级管理员可以查看所有，经理只能查看自己公司的
-          hasPermission = payload.isAdmin === true;
-          if (!hasPermission && payload.currentUser.roleTemp === 'manager') {
-            // 经理可以查看自己公司的用户
+          // 读取权限：用户可以查看
+          if (payload.accountType === 'User') {
             hasPermission = true;
           }
           break;
-        case 'create':
-          // 创建权限：超级管理员可以创建任意公司用户，经理只能创建自己公司的用户
+        case 'add':
+          // 创建权限：超级管理员可以查看所有，经理只能查看自己公司的
           hasPermission = payload.isAdmin === true;
+          if (!hasPermission && payload.currentUser.roleTemp === 'manager') {
+            hasPermission = true;
+          }
           break;
         case 'edit':
           // 编辑权限：超级管理员可以编辑所有用户，经理只能编辑自己公司的用户
           hasPermission = payload.isAdmin === true;
+          if (!hasPermission && payload.currentUser.roleTemp === 'manager') {
+            hasPermission = true;
+          }
           break;
         case 'manage':
           // 管理权限（激活/禁用等特殊操作）：仅管理员可以
@@ -45,12 +49,13 @@ const checkPermission = (permissionType) => {
       next();
     } catch (e) {
       console.error('User Permission check error:', e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 };
 
 exports.readPermission = checkPermission('read');
-exports.addPermission = checkPermission('create');
+exports.addPermission = checkPermission('add');
 exports.editPermission = checkPermission('edit');
 exports.managePermission = checkPermission('manage');

@@ -20,7 +20,7 @@ const checkPermission = (permissionType) => {
             hasPermission = true;
           }
           break;
-        case 'create':
+        case 'add':
           // 创建权限：超级管理员可以创建任意公司用户，经理只能创建自己公司的用户
           hasPermission = payload.isAdmin === true;
           break;
@@ -45,12 +45,13 @@ const checkPermission = (permissionType) => {
       next();
     } catch (e) {
       console.error('User Permission check error:', e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 };
 
 exports.readPermission = checkPermission('read');
-exports.addPermission = checkPermission('create');
+exports.addPermission = checkPermission('add');
 exports.editPermission = checkPermission('edit');
 exports.managePermission = checkPermission('manage');

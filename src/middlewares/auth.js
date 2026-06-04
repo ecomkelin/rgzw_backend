@@ -58,8 +58,8 @@ exports.authenticate = async (req, res, next) => {
     next();
   } catch (e) {
     console.error(e);
-
-    res.status(500).json({ message: "authenticate 认证服务器错误" });
+    const statusCode = e.code || 500;
+    return res.status(statusCode).json({ message: "authenticate 认证服务器错误" });
   }
 };
 
@@ -90,9 +90,10 @@ exports.studentAuthorize = (requiredRole) => async (req, res, next) => {
 
     // 学生类型的账户，直接通过
     return next();
-  } catch (error) {
-    console.error('学生授权服务器错误:', error);
-    return res.status(500).json({ message: "studentAuthorize 认证服务器错误" });
+  } catch (e) {
+    console.error('学生授权服务器错误:', e);
+    const statusCode = e.code || 500;
+    return res.status(statusCode).json({ message: "studentAuthorize 认证服务器错误" });
   }
 };
 
@@ -153,8 +154,8 @@ exports.userAuthorize = (apiPermission) => async (req, res, next) => {
 
     req.payload = payload; // 确保更新后的payload被传递到后续中间件
     next();
-  } catch (error) {
-    console.error('授权服务器错误:', error);
+  } catch (e) {
+    console.error('授权服务器错误:', e);
     return res.status(500).json({ message: "authorize 认证服务器错误" });
   }
 };

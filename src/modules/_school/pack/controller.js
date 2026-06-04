@@ -54,7 +54,8 @@ class PackCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("PackCT add error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -73,7 +74,8 @@ class PackCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("PackCT edit error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -89,7 +91,8 @@ class PackCT {
   //     return res.status(200).json(ApiResponse.success({ data: { item } }));
   //   } catch (e) {
   //     console.error("PackCT remove error: ", e);
-  //     return res.status(500).json(ApiResponse.error(e));
+  //     const statusCode = e.code || 500;
+  //     return res.status(statusCode).json(ApiResponse.error(e));
   //   }
   // };
 }

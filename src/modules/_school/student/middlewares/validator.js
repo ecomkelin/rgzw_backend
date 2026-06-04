@@ -10,7 +10,7 @@ exports.addVD = [
   commonBodyRules.optionalDate('student.birthday'),
   commonBodyRules.optionalBoolean('student.isActive'),
   commonBodyRules.optionalString('student.phone', { minLength: 10, maxLength: 15 }),
-  commonBodyRules.optionalString('student.identity', { minLength: 15, maxLength: 18 }),
+  commonBodyRules.optionalString('student.identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalString('student.address', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('student.currentAddress', { minLength: 5, maxLength: 200 }),
   commonBodyRules.optionalString('student.school', { minLength: 2, maxLength: 100 }),
@@ -38,7 +38,7 @@ exports.editVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalString('phone', { minLength: 10, maxLength: 15 }),
-  commonBodyRules.optionalString('identity', { minLength: 15, maxLength: 18 }),
+  commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalString('name', { minLength: 2, maxLength: 50 }),
   commonBodyRules.optionalDate('birthday'),
   commonBodyRules.optionalEnum('gender', ['Male', 'Female']),

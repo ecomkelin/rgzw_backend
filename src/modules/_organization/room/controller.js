@@ -16,7 +16,7 @@ class RoomCT {
       const { filter, options } = req.validData || {};
       const { total, items } = await RoomSV.list(req.payload, filter, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items} }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items } }));
     } catch (e) {
       console.error("RoomCT list error: ", e);
       const statusCode = e.code || 500;
@@ -54,7 +54,8 @@ class RoomCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("RoomCT add error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -73,7 +74,8 @@ class RoomCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("RoomCT edit error: ", e);
-      return res.status(500).json(ApiResponse.error(e));
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
 
@@ -89,7 +91,8 @@ class RoomCT {
   //     return res.status(200).json(ApiResponse.success({ data: { item } }));
   //   } catch (e) {
   //     console.error("RoomCT remove error: ", e);
-  //     return res.status(500).json(ApiResponse.error(e));
+  //     const statusCode = e.code || 500;
+  //     return res.status(statusCode).json(ApiResponse.error(e));
   //   }
   // };
 }
