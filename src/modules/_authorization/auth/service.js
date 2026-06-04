@@ -11,8 +11,8 @@ class LoginSV {
   async login(code, password) {
     try {
       const Account = await AccountModel.findOne({ code: code.toUpperCase(), isActive: true })
-        .select('+passwordHash');
-
+        .select('+passwordHash')
+        .populate([{ path: 'currentUser', select: 'nickname Org roleTemp' }, { path: 'currentStudent', select: 'name Org' }])
       if (!Account) {
         throw ({ code: 400, message: '用户不存在或已禁用' });
       }
@@ -33,12 +33,10 @@ class LoginSV {
       await Account.save();
 
       // account user 组合生成 payload
-
-      const accessToken = UtilsJwt.generateAccessToken(Account);
+      const { accessToken, payload } = UtilsJwt.generateAccessToken(Account);
       const refreshToken = UtilsJwt.generateRefreshToken(Account._id, sessionId);
       const refreshTokenExpiresAt = UtilsJwt.generateExpiresAt();
-
-      return { accessToken, account: Account, refreshToken, refreshTokenExpiresAt, sessionId };
+      return { account: Account, payload, accessToken, refreshToken, refreshTokenExpiresAt, sessionId };
     } catch (e) {
       console.error('LoginSV login error:', e);
       throw e;
@@ -54,6 +52,7 @@ class LoginSV {
 
       const Account = await AccountModel.findOne({ _id: decoded._id, isActive: true })
         .select('+currentSessionId')
+        .populate([{ path: 'currentUser', select: 'nickname Org roleTemp' }, { path: 'currentStudent', select: 'name Org' }]);
 
       if (!Account) {
         throw ({ code: 400, message: '用户不存在或已禁用' });
@@ -68,11 +67,11 @@ class LoginSV {
       Account.currentSessionId = sessionId;
       await Account.save();
 
-      const accessToken = UtilsJwt.generateAccessToken(Account);
+      const { accessToken, payload } = UtilsJwt.generateAccessToken(Account);
       const refreshToken = UtilsJwt.generateRefreshToken(Account._id, sessionId);
       const refreshTokenExpiresAt = UtilsJwt.generateExpiresAt();
 
-      return { accessToken, account: Account, refreshToken, refreshTokenExpiresAt, sessionId };
+      return { account: Account, payload, accessToken, refreshToken, refreshTokenExpiresAt, sessionId };
     } catch (e) {
       console.error('LoginSV refreshToken error:', error);
       throw e;
@@ -134,4 +133,8 @@ class LoginSV {
 
 }
 
-module.exports = new LoginSV(); 
+const loginSv = new LoginSV();
+// setTimeout(() => {
+//   loginSv.login("ADMIN001", "Test1234@");
+// }, 1000);
+module.exports = loginSv;

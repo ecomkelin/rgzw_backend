@@ -11,17 +11,46 @@ class JwtUtil {
    * @returns {string} 访问令牌
    */
   static generateAccessToken(Account) {
+    if (Account.accountType === 'User') {
+      if (!Account.currentUser || !Account.currentUser.Org || !Account.currentUser.roleTemp || !Account.currentUser.nickname) {
+        throw ({ code: 400, message: 'generateAccessToken 用户信息不完整，请联系管理员' });
+      }
+      if (Account.currentStudent) {
+        throw ({ code: 400, message: 'generateAccessToken 账号信息异常（有学生信息），请联系管理员' });
+      }
+    } else if (Account.accountType === 'Student') {
+      if (!Account.currentStudent || !Account.currentStudent.name || !Account.currentStudent.Org) {
+        throw ({ code: 400, message: 'generateAccessToken 学生信息不完整，请联系管理员' });
+      }
+      if (Account.currentUser) {
+        throw ({ code: 400, message: 'generateAccessToken 账号信息异常（有用户信息），请联系管理员' });
+      }
+    } else {
+      throw ({ code: 403, message: 'generateAccessToken 您的账号 身份异常' });
+    }
     // 生成访问令牌，默认5分钟
     const payload = {
       _id: Account._id,
       accountType: Account.accountType,
       isAdmin: Account.isAdmin,
       sessionId: Account.currentSessionId,
+      currentUser: Account.currentUser ? {
+        _id: Account.currentUser._id,
+        nickname: Account.currentUser.nickname,
+        Org: Account.currentUser.Org,
+        roleTemp: Account.currentUser.roleTemp
+      } : undefined,
+      currentStudent: Account.currentStudent ? {
+        _id: Account.currentStudent._id,
+        name: Account.currentStudent.name,
+        Org: Account.currentStudent.Org
+      } : undefined
     }
 
     const expiresIn = process.env.ACCESS_TOKEN_EXPIRED || '5m';
     try {
-      return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn });
+      const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn });
+      return { accessToken, payload };
     } catch (e) {
       console.error('Error generating access token:', e);
       throw e;

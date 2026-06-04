@@ -141,6 +141,7 @@ _module_name/
 ### 文档目录 (doc/)
 - `ARCHITECTURE.md` - 项目架构详细说明
 - `DEVELOPMENT_STANDARD.md` - 开发规范和标准
+- `LOGIN_PAYLOAD_STRUCTURE.md` - **Login Payload 结构规范**（含 `payloadChecker` 工具使用）
 - 其他技术文档
 
 ### 测试文档 (tests/docs/)

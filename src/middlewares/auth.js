@@ -21,37 +21,40 @@ exports.authenticate = async (req, res, next) => {
     const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
 
     // 验证并解码访问令牌
-    const decoded = verifyAccessToken(token);
-    if (!decoded) {
+    const payload = verifyAccessToken(token);
+    if (!payload) {
       return res.status(401).json({ message: "令牌无效或已过期" });
     }
 
     // 从数据库获取账户信息
-    const Account = await AccountModel.findById(decoded._id);
+    const Account = await AccountModel.findById(payload._id);
     if (!Account || !Account.isActive) {
       return res.status(401).json({ message: "账号不存在或者被禁用" });
     }
 
+    if (Account.accountType === 'User') {
+      if (payload.currentUser?._id.toString() !== Account.currentUser.toString()) {
+        return res.status(401).json({ message: "您的登陆信息与账号用户信息的当前账号不符 请重新登陆" });
+      }
+    } else if (Account.accountType === 'Student') {
+      if (payload.currentStudent?._id.toString() !== Account.currentStudent.toString()) {
+        return res.status(401).json({ message: "您的登陆信息与账号学生信息的当前账号不符 请重新登陆" });
+      }
+    } else {
+      return res.status(401).json({ message: "账号类型无效" });
+    }
+
     // 检查会话是否有效（防止并发登录）
-    if (Account.currentSessionId !== decoded.sessionId) {
+    if (Account.currentSessionId !== payload.sessionId) {
       if (process.env.NODE_ENV === 'production') {
         return res.status(401).json({ message: "会话已失效或已在其他设备登录，请重新登录" });
       } else {
-        console.warn(`会话ID不匹配, 账户 ${Account.code}。期望 ${Account.currentSessionId}，获得 ${decoded.sessionId}`);
+        console.warn(`会话ID不匹配, 账户 ${Account.code}。期望 ${Account.currentSessionId}，获得 ${payload.sessionId}`);
       }
     }
 
     // 将用户身份信息附加到请求对象
-    req.payload = { ...decoded };
-
-    // 根据账户类型设置相应的目标用户/学生信息
-    if (Account.accountType === 'User') {
-      req.payload.currentUser = { _id: Account.currentUser };
-    } else if (Account.accountType === 'Student') {
-      req.payload.currentStudent = { _id: Account.currentStudent };
-    } else {
-      return res.status(401).json({ message: "账号类型无效" });
-    }
+    req.payload = payload;
     next();
   } catch (error) {
     console.error('认证服务器错误详情:', {
@@ -83,6 +86,11 @@ exports.studentAuthorize = (requiredRole) => async (req, res, next) => {
     const Student = await StudentModel.findOne({ _id: payload.currentStudent._id });
     if (!Student || !Student.isActive) {
       return res.status(401).json({ message: "学生账号不存在或者被禁用" });
+    }
+
+    const Org = await OrgModel.findById(Student.Org);
+    if (!Org || !Org.isActive) {
+      return res.status(401).json({ message: "学生所属机构不存在或者被禁用" });
     }
 
     // 学生类型的账户，直接通过
@@ -118,14 +126,8 @@ exports.userAuthorize = (apiPermission) => async (req, res, next) => {
       return res.status(401).json({ message: "用户所属机构不存在或者被禁用" });
     }
 
-    // 将完整的用户信息添加到payload中，供后续中间件使用
-    payload.currentUser = {
-      _id: User._id,
-      Org: User.Org,
-    };
     // 如果是管理员，直接通过
     if (payload.isAdmin) {
-      req.payload = payload; // 确保更新后的payload被传递到后续中间件
       return next();
     }
 

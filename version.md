@@ -1,5 +1,10 @@
 # 版本更新日志
 
+## v7.3.0
+- 优化了 登陆/refreshToken 的payload
+- 新增 pack 课包模块
+- 更新了文档
+
 ## v7.2.2
 - course 的 validator edit 有问题 已经解决
 
@@ -15,7 +20,7 @@
 - 更新 _Subject.dao.js 到 Subject.dao.js
 
 ## v7.1.0
-- 新增了 subject 科目模块
+- 新增了 Subject 科目模块
 - 其他信息调整
 
 ## v7.0.2

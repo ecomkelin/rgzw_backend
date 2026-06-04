@@ -4,9 +4,10 @@
 
 ## 文档列表
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - 项目架构详细说明
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - 项目四层架构规范（路由/Controller/Service/DAO）
+- [DATABASE_ARCHITECTURE.md](./DATABASE_ARCHITECTURE.md) - 数据库设计
 - [DEVELOPMENT_STANDARD.md](./DEVELOPMENT_STANDARD.md) - 开发规范和标准
-- 其他技术文档
+- [LOGIN_PAYLOAD_STRUCTURE.md](./LOGIN_PAYLOAD_STRUCTURE.md) - **Login Payload 结构规范（含 payloadChecker 工具使用）**
 
 ## 文档分类
 
@@ -14,6 +15,7 @@
 - 系统架构设计
 - 技术选型说明
 - 模块关系说明
+- [LOGIN_PAYLOAD_STRUCTURE.md](./LOGIN_PAYLOAD_STRUCTURE.md) - 登录认证与 Payload 流转规范
 
 ### 开发文档
 - 编码规范

@@ -60,6 +60,31 @@ rgzw_backend/
 - `POST /api/student/add/` - 创建学员
 - `POST /api/student/edit/:id` - 编辑学员
 
+### 课包相关
+- `POST /api/pack/list` - 获取课包列表（学生可查全平台 isActive=true）
+- `POST /api/pack/detail/:id` - 获取课包详情
+- `POST /api/pack/add` - 创建课包
+- `POST /api/pack/edit/:id` - 编辑课包
+- `POST /api/pack/remove/:id` - 删除课包
+
+### 课程相关
+- `POST /api/course/list` - 获取课程列表
+- `POST /api/course/detail/:id` - 获取课程详情
+- `POST /api/course/add` - 创建课程
+- `POST /api/course/edit/:id` - 编辑课程（含状态约束）
+
+### 科目相关
+- `POST /api/subject/list` - 获取科目列表
+- `POST /api/subject/detail/:id` - 获取科目详情
+- `POST /api/subject/add` - 创建科目
+- `POST /api/subject/edit/:id` - 编辑科目
+
+### 教室相关
+- `POST /api/room/list` - 获取教室列表
+- `POST /api/room/detail/:id` - 获取教室详情
+- `POST /api/room/add` - 创建教室
+- `POST /api/room/edit/:id` - 编辑教室
+
 ## 数据库模型
 
 ### Account 模型

@@ -2,7 +2,7 @@ const AuthSV = require('./service');
 const ApiResponse = require('@utils/response');
 
 class LoginCT {
-  authorizationRes(res, { account, accessToken, refreshToken, refreshTokenExpiresAt }) {
+  authorizationRes(res, { account, payload, accessToken, refreshToken, refreshTokenExpiresAt }) {
     // 设置 HttpOnly 的 Refresh Token Cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -15,6 +15,7 @@ class LoginCT {
     res.status(200).json(ApiResponse.success({
       data: {
         accessToken,
+        payload,
         account
       }
     }));

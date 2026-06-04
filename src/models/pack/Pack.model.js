@@ -15,7 +15,7 @@ const PackEnums = {
 const PackDOC = {
   // ==================== 基础信息 ====================
   name: { type: String, required: true },            // 课包名称，如“Python 16课时常规包”
-  type: { type: String, enum: PackEnums.typeEnums, default: '课时包' },
+  type: { type: String, enum: PackEnums.typeEnums, default: '课时包', required: true },  // 课包类型，默认为“课时包”
   description: { type: String },
 
   // ==================== 课时 ====================
