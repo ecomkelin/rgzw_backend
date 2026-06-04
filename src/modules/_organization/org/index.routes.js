@@ -16,6 +16,6 @@ router.post('/add', authenticate, addPermission, addVD, OrgCT.add);
 router.post('/edit/:id', authenticate, editPermission, editVD, OrgCT.edit);
 
 // 查看自己的帐户
-router.post('/self', authenticate, userAuthorize(), OrgCT.selfDetail);
+router.post('/self', authenticate, OrgCT.selfDetail);
 
 module.exports = router;

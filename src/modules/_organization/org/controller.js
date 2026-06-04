@@ -1,13 +1,13 @@
 const OrgSV = require('./service');
 const ApiResponse = require('@utils/response');
-
+const { payloadChecker } = require('@utils/payloadChecker');
 class OrgCT {
   list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
       const { total, items } = await OrgSV.list(req.payload, filter, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items} }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items } }));
     } catch (e) {
       console.error("OrgCT list error: ", e)
       return res.json(ApiResponse.error(e))
@@ -33,7 +33,7 @@ class OrgCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT add error: ", e)
-      return res.status(500).json(ApiResponse.error(e))
+      return res.json(ApiResponse.error(e))
     }
   };
 
@@ -47,20 +47,23 @@ class OrgCT {
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT edit error: ", e)
-      return res.status(500).json(ApiResponse.error(e))
+      return res.json(ApiResponse.error(e))
     }
   };
 
   selfDetail = async (req, res) => {
     try {
-      const id = req.payload?.currentUser.Org;
-      const { options = [] } = req.validData || {};
-      const { item } = await OrgSV.detail(req.payload, id, options);
+      payloadChecker(req.payload);
+      const payload = req.payload;
+      const id = payload.accountType === 'User' ? payload.currentUser.Org : payload.currentStudent.Org;
+
+      const { options = {} } = req.validData || {};
+      const { item } = await OrgSV.detail(payload, id, options);
 
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("OrgCT selfDetail error: ", e)
-      return res.status(500).json(ApiResponse.error(e))
+      return res.json(ApiResponse.error(e))
     }
   };
 }

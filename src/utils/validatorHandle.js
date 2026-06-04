@@ -327,18 +327,18 @@ exports.listOptionsValidator = [
 
     body('options.skip')
         .optional()
-        .isInt({ min: 1, max: maxPageSize })
-        .withMessage(`options.skip 必须是 1-${maxPageSize} 之间的整数`)
+        .isInt({ min: 0 })
+        .withMessage(`options.skip 必须是 大于等于 0 的整数`)
         .toInt(),
 
-    body('options.sortObj')
+    body('options.sort')
         .optional()
         .isObject()
-        .withMessage('options.sortObj 必须是对象格式')
-        .custom(sortObj => {
-            for (const [key, value] of Object.entries(sortObj)) {
+        .withMessage('options.sort 必须是对象格式')
+        .custom(sort => {
+            for (const [key, value] of Object.entries(sort)) {
                 if (![1, -1].includes(value)) {
-                    throw ({ code: 500, message: `sortObj.${key} 的值必须是 1（升序）或 -1（降序）` });
+                    throw ({ code: 500, message: `sort.${key} 的值必须是 1（升序）或 -1（降序）` });
                 }
             }
             return true;

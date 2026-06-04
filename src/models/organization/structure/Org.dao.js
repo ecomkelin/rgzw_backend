@@ -58,9 +58,19 @@ const add = async (payload, doc, options) => {
 
     doc.createdBy = payload.currentUser._id;
 
-    const existFilter = [{ unionCode: doc.unionCode }, { name: doc.name }, { nickname: doc.nickname }];
-    const existing = await OrgModel.findOne({ $or: existFilter });
-    if (existing) {
+    if (doc.isMain === true) {
+      const existingMain = await OrgModel.countDocuments({ isMain: true });
+      if (existingMain > 0) {
+        throw ({ code: 400, message: '已经存在一个主公司，无法创建另一个主公司' });
+      }
+    }
+
+    const existFilter = [];
+    if (doc.unionCode) existFilter.push({ unionCode: doc.unionCode });
+    if (doc.name) existFilter.push({ name: doc.name });
+    if (doc.nickname) existFilter.push({ nickname: doc.nickname });
+    const existing = await OrgModel.countDocuments({ $or: existFilter });
+    if (existing > 0) {
       throw ({ code: 400, message: '统一账号或公司名称或公司简称已被占用' });
     }
 
@@ -94,20 +104,27 @@ const edit = async (payload = {}, _id, doc, options) => {
       throw ({ code: 404, message: '公司不存在' });
     }
 
-    const existFilter = [{ unionCode: doc.unionCode }];
-    if (doc.name) existFilter.push({ name: doc.name });
-    if (doc.nickname) existFilter.push({ nickname: doc.nickname });
-    const existing = await OrgModel.findOne({ _id: { $ne: _id }, $or: existFilter });
-    if (existing) {
-      throw ({ code: 400, message: '统一社会编号或公司名称已被存在' });
+    if (doc.isMain === true) {
+      const existingMain = await OrgModel.countDocuments({ _id: { $ne: _id }, isMain: true });
+      if (existingMain > 0) {
+        throw ({ code: 400, message: '已经存在一个主公司，无法创建另一个主公司' });
+      }
     }
 
+    const existFilter = [];
+    if (doc.nickname && doc.name !== targetOrg.name) existFilter.push({ nickname: doc.nickname });
+    const existing = await OrgModel.findOne({ _id: { $ne: _id }, $or: existFilter });
+    if (existing) {
+      throw ({ code: 400, message: '统一社会编号或公司名称或公司简称已被存在' });
+    }
+
+    doc.updatedBy = payload.currentUser._id;
     targetOrg.set(doc);
-    const { item } = await DAO.edit(targetOrg, _id, doc);
+    const { item } = await DAO.edit(targetOrg, options);
 
     return { item };
   } catch (e) {
-    console.error('OrgSV edit error:', e);
+    console.error('OrgDao edit error:', e);
     throw e;
   }
 };

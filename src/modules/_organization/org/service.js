@@ -30,10 +30,6 @@ class OrgSV {
     try {
       const { item } = await OrgDAO.detail(payload, _id, options);
 
-      if (!item) {
-        throw ({ code: 403, message: "此数据已不存在" });
-      }
-
       return { item };
     } catch (e) {
       console.error('OrgSV detail error:', e);
@@ -69,10 +65,10 @@ class OrgSV {
    * @param {*} doc 
    * @returns 
    */
-  async edit(payload, _id, doc) {
+  async edit(payload, _id, doc, options) {
     try {
       deleteImmutableFront(doc, OrgDOC);
-      const { item } = await OrgDAO.edit(payload, _id, doc);
+      const { item } = await OrgDAO.edit(payload, _id, doc, options);
       return { item };
     } catch (e) {
       console.error('OrgSV edit error:', e);
