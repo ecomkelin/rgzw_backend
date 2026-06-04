@@ -10,10 +10,8 @@ exports.addVD = [
   commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalNumber('sort'),
-  commonBodyRules.optionalString('name', { minLength: 2, maxLength: 50 }),
   commonBodyRules.optionalString('phone', { minLength: 10, maxLength: 15 }),
   commonBodyRules.optionalString('address', { minLength: 5, maxLength: 200 }),
-  commonBodyRules.optionalString('identityNo', { minLength: 15, maxLength: 18 }),
   commonBodyRules.optionalEnum('gender', AccountEnums.genderEnums),
   commonBodyRules.optionalEnum('accountType', AccountEnums.accountTypeEnums),
 

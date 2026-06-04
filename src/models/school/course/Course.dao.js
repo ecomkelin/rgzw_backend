@@ -13,7 +13,7 @@ const list = async (payload = {}, filter, options) => {
       filter.status = { $in: ['enrolling', 'ongoing'] }; // 只能查看正在招生或进行中的课程
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           // 老师只能查看自己教授的课程
           filter.$or = [
             { mainTeacher: payload.currentUser._id },
@@ -63,7 +63,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此课程" })
         }
         // 老师只能查看自己相关的课程
@@ -100,7 +100,7 @@ const add = async (payload, doc, options) => {
 
     // 只有管理员或任课老师可以创建课程
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建课程" });
       }
     }
@@ -283,13 +283,13 @@ const remove = async (payload = {}, _id, options) => {
     }
 
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         // 普通老师只能删除自己主讲的课程
         if (targetCourse.mainTeacher.toString() !== payload.currentUser._id.toString()) {
           throw ({ code: 403, message: "您只能删除自己主讲的课程" });
         }
       }
-      if (targetCourse.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetCourse.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权删除此课程" });
       }
     }

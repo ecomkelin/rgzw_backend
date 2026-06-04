@@ -8,7 +8,7 @@ const list = async (payload = {}, filter, options) => {
     if (payload.accountType === 'User') {
       userPayloadChecker(payload);
       if (!payload.isAdmin) {
-        filter.Org = payload.currentUser?.Org;
+        filter.Org = payload.currentUser.Org;
       }
     } else if (payload.accountType === 'Student') {
       studentPayloadChecker(payload);
@@ -121,40 +121,40 @@ const edit = async (payload = {}, _id, doc, options) => {
 };
 
 // 删除
-const remove = async (payload, _id, options) => {
-  try {
-    userPayloadChecker(payload);
+// const remove = async (payload, _id, options) => {
+//   try {
+//     userPayloadChecker(payload);
 
-    // 验证目标课包是否存在
-    const targetPack = await PackModel.findById(_id);
-    if (!targetPack) {
-      throw ({ code: 404, message: '课包不存在' });
-    }
+//     // 验证目标课包是否存在
+//     const targetPack = await PackModel.findById(_id);
+//     if (!targetPack) {
+//       throw ({ code: 404, message: '课包不存在' });
+//     }
 
-    // 只有管理员可以删除课包
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能删除课包" });
-      }
-      if (targetPack.Org.toString() !== payload.currentUser.Org.toString()) {
-        throw ({ code: 403, message: "您无权删除此非本公司的课包" });
-      }
-    }
+//     // 只有管理员可以删除课包
+//     if (!payload.isAdmin) {
+//       if (payload.currentUser.roleTemp !== 'manager') {
+//         throw ({ code: 403, message: "只有管理员才能删除课包" });
+//       }
+//       if (targetPack.Org.toString() !== payload.currentUser.Org.toString()) {
+//         throw ({ code: 403, message: "您无权删除此非本公司的课包" });
+//       }
+//     }
 
-    // 删除课包前，检查是否有订单关联
-    const existRelatedOrderPack = await OrderPackModel.countDocuments({ Pack: _id });
-    if (existRelatedOrderPack > 0) {
-      throw ({ code: 400, message: "无法删除，此课包有相关订单关联" });
-    }
+//     // 删除课包前，检查是否有订单关联
+//     const existRelatedOrderPack = await OrderPackModel.countDocuments({ Pack: _id });
+//     if (existRelatedOrderPack > 0) {
+//       throw ({ code: 400, message: "无法删除，此课包有相关订单关联" });
+//     }
 
-    const { item } = await DAO.remove(PackModel, _id, options);
-    return { item };
+//     const { item } = await DAO.remove(PackModel, _id, options);
+//     return { item };
 
-  } catch (e) {
-    console.error('PackDao delete error:', e);
-    throw e;
-  }
-};
+//   } catch (e) {
+//     console.error('PackDao delete error:', e);
+//     throw e;
+//   }
+// };
 
 module.exports = {
   PackDAO: {
@@ -162,7 +162,7 @@ module.exports = {
     detail,
     add,
     edit,
-    remove,
+    // remove,
   },
   PackModel, PackDOC, PackEnums,
 }

@@ -14,9 +14,9 @@ class CourseCT {
   list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
-      const { total, items, permFilter } = await CourseSV.list(req.payload, filter, options);
+      const { total, items } = await CourseSV.list(req.payload, filter, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items} }));
     } catch (e) {
       console.error("CourseCT list error: ", e);
       return res.json(ApiResponse.error(e));

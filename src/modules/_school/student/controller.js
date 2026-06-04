@@ -7,9 +7,9 @@ class StudentCT {
   list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
-      const { total, items, permFilter } = await StudentSV.list(req.payload, filter, options);
+      const { total, items } = await StudentSV.list(req.payload, filter, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items} }));
     } catch (e) {
       console.error("StudentCT list error: ", e)
       return res.json(ApiResponse.error(e))

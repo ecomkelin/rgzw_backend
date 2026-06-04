@@ -12,12 +12,12 @@ class SubjectSV {
    * @param {Object} payload - 账户身份信息
    * @param {Object} filter - 过滤条件，默认为空对象
    * @param {Object} options - 查询选项 { limit=100, skip=0, sort={}, populate=[{path: ''}] }
-   * @returns {Object} 包含 items(数据列表), total(总数), permFilter(权限过滤器) 的对象
+   * @returns {Object} 包含 items(数据列表), total(总数)
    */
   async list(payload, filter = {}, options) {
     try {
-      const { items, total, permFilter } = await SubjectDAO.list(payload, filter, options);
-      return { items, total, permFilter };
+      const { items, total } = await SubjectDAO.list(payload, filter, options);
+      return { items, total };
     } catch (e) {
       console.error('SubjectSV list error:', e);
       throw e;
@@ -95,20 +95,15 @@ class SubjectSV {
    * @param {Object} options - {session} 事务 
    * @returns {Object} 包含 item(更新后的数据) 的对象
    */
-  async remove(payload, _id, options) {
-    try {
-      const existRelatedCourse = await CourseModel.exists({ subject: _id });
-      if (existRelatedCourse) {
-        throw ({ code: 400, message: "无法删除，此数据有相关课程关联" });
-      }
-
-      const { item } = await SubjectDAO.remove(payload, _id, options);
-      return { item };
-    } catch (e) {
-      console.error('SubjectSV remove error:', e);
-      throw e;
-    }
-  }
+  // async remove(payload, _id, options) {
+  //   try {
+  //     const { item } = await SubjectDAO.remove(payload, _id, options);
+  //     return { item };
+  //   } catch (e) {
+  //     console.error('SubjectSV remove error:', e);
+  //     throw e;
+  //   }
+  // }
 }
 
 module.exports = new SubjectSV();

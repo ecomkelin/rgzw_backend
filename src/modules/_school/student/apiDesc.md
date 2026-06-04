@@ -30,7 +30,6 @@ Student模块负责学生信息的管理，包括学生的增删改查功能。
 - **响应**:
   - `total`: 总数
   - `items`: 学生列表
-  - `permFilter`: 权限过滤信息
 
 ### 2. 获取学生详情
 - **路径**: `POST /api/student/detail/:id`

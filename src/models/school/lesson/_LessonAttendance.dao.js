@@ -17,7 +17,7 @@ const list = async (payload = {}, filter, options) => {
       filter.Student = student._id;
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           // 老师只能查看自己授课课程的考勤
           filter.$or = [
             { 'Lesson.teacher': payload.currentUser._id },
@@ -56,7 +56,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此课堂考勤" });
         }
         // 老师只能查看自己授课课程的考勤
@@ -97,7 +97,7 @@ const add = async (payload, doc, options) => {
 
     // 只有管理员或任课老师可以创建课堂考勤
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员或任课老师才能添加课堂考勤" });
       }
     }
@@ -164,10 +164,10 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
 
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员或任课老师才能修改课堂考勤" });
       }
-      if (targetAttendance.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetAttendance.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权修改此课堂考勤" });
       }
     }

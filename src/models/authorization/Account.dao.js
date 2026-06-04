@@ -1,18 +1,17 @@
 const { AccountModel, AccountEnums, AccountDOC } = require('./Account.model');
 const DAO = require('@models/DAO');
+const { userPayloadChecker, payloadChecker } = require('@/utils/payloadChecker');
 
 const list = async (payload = {}, filter, options) => {
     try {
+        userPayloadChecker(payload);
         // 验证权限
         if (!payload.isAdmin) {
             throw ({ code: 403, message: "只有管理员才能查看账户列表" });
         }
 
-        // 根据权限 剩下的 filter 只查询活跃账户
-        const permFilter = { ...filter };
-
-        const { items, total } = await DAO.list(AccountModel, permFilter, options);
-        return { items, total, permFilter };
+        const { items, total } = await DAO.list(AccountModel, filter, options);
+        return { items, total };
     } catch (e) {
         console.error('AccountDao list error:', e);
         throw e;
@@ -21,6 +20,7 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
     try {
+        payloadChecker(payload);
         // 验证权限 - 管理员可以查看任何账户，普通用户只能查看自己的账户
         if (!payload.isAdmin) {
             if (payload._id.toString() !== _id.toString()) {
@@ -49,15 +49,10 @@ const detail = async (payload = {}, _id, options) => {
  */
 const add = async (payload, doc, options) => {
     try {
+        userPayloadChecker(payload);
         // 只有管理员可以创建账户
         if (!payload.isAdmin) {
-            if (payload.accountType !== 'User') {
-                throw ({ code: 403, message: "您无权添加账户" });
-            }
-            doc.isAdmin = false
-            if (payload.currentUser?.roleTemp !== 'manager') {
-                throw ({ code: 403, message: "只有管理员才能创建账户" });
-            }
+            throw ({ code: 403, message: "您无权添加账户" });
         }
 
         // 处理密码
@@ -66,10 +61,9 @@ const add = async (payload, doc, options) => {
             delete doc.password;
         }
 
-        doc.createdBy = payload.currentUser?._id;
-        if (!doc.nickname) doc.nickname = doc.name;
+        doc.createdBy = payload.currentUser._id;
         if (!doc.Nation) delete doc.Nation;
-        if (!doc.Provence) delete doc.Provence;
+        if (!doc.Province) delete doc.Province;
         if (!doc.City) delete doc.City;
         if (!doc.Area) delete doc.Area;
 
@@ -102,6 +96,7 @@ const add = async (payload, doc, options) => {
  */
 const edit = async (payload = {}, _id, doc, options) => {
     try {
+        payloadChecker(payload);
         // 只有管理员可以修改任何账户，普通用户只能修改自己的账户
         if (!payload.isAdmin) {
             if (payload._id.toString() !== _id.toString()) {
@@ -111,7 +106,7 @@ const edit = async (payload = {}, _id, doc, options) => {
         // 验证目标账户是否存在
         const targetAccount = await AccountModel.findById(_id);
         if (!targetAccount) {
-            throw ({ code: 11000, message: '账户不存在' });
+            throw ({ code: 404, message: '账户不存在' });
         }
 
         // 处理密码
@@ -119,18 +114,18 @@ const edit = async (payload = {}, _id, doc, options) => {
             doc.passwordHash = doc.password;
             delete doc.password;
         }
-        if (!doc.displayName) doc.displayName = doc.name;
         if (!doc.Nation) delete doc.Nation;
-        if (!doc.Provence) delete doc.Provence;
+        if (!doc.Province) delete doc.Province;
         if (!doc.City) delete doc.City;
         if (!doc.Area) delete doc.Area;
+        doc.updatedBy = payload.currentUser._id;
 
         const existFilter = [{ code: doc.code }];
         if (doc.phone) existFilter.push({ phone: doc.phone });
         if (doc.identityNo) existFilter.push({ identityNo: doc.identityNo });
         const existing = await AccountModel.findOne({ _id: { $ne: _id }, $or: existFilter });
         if (existing) {
-            throw ({ message: 11000, code: '手机号或账号已被占用' });
+            throw ({ code: 400, message: '账号或手机号或身份证号已被占用' });
         }
 
         targetAccount.set(doc);

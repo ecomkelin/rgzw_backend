@@ -1,19 +1,19 @@
 const DAO = require('@models/DAO');
 const { CourseModel } = require('./Course.model');
 const { SubjectModel, SubjectDOC, SubjectEnums } = require('./Subject.model');
+const { userPayloadChecker, studentPayloadChecker, payloadChecker } = require('@utils/payloadChecker');
 
 const list = async (payload = {}, filter, options) => {
   try {
     // 验证权限
     if (payload.accountType === 'Student') {
+      studentPayloadChecker(payload);
       // 学生只能查看激活且展示的科目
       filter.isShow = true;
       filter.isActive = true;
     } else if (payload.accountType === 'User') {
+      userPayloadChecker(payload);
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
-          throw ({ code: 403, message: "您无权查看科目列表" });
-        }
         filter.Org = payload.currentUser.Org;
       }
     } else {
@@ -38,13 +38,15 @@ const detail = async (payload = {}, _id, options) => {
 
     // 验证权限
     if (payload.accountType === 'Student') {
+      studentPayloadChecker(payload);
       // 学生只能查看激活且展示的科目
       if (!item.isShow || !item.isActive) {
         throw ({ code: 403, message: "您无权查看此科目" });
       }
     } else if (payload.accountType === 'User') {
+      userPayloadChecker(payload);
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此科目" })
         }
       }
@@ -68,18 +70,16 @@ const detail = async (payload = {}, _id, options) => {
  */
 const add = async (payload, doc, options) => {
   try {
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权添加科目" });
-    }
-
+    userPayloadChecker(payload);
     // 只有管理员可以创建科目
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建科目" });
       }
     }
 
     doc.Org = payload.currentUser.Org;
+    doc.createdBy = payload.currentUser._id;
 
     const { item } = await DAO.add(SubjectModel, doc, options);
     return { item };
@@ -91,26 +91,25 @@ const add = async (payload, doc, options) => {
 
 const edit = async (payload = {}, _id, doc, options) => {
   try {
+    // 验证权限
+    userPayloadChecker(payload);
+
     // 验证目标科目是否存在
     const targetSubject = await SubjectModel.findById(_id);
     if (!targetSubject) {
       throw ({ code: 404, message: '科目不存在' });
     }
 
-    // 验证权限
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权修改科目" });
-    }
-
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能修改科目" });
       }
-      if (targetSubject.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetSubject.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权修改此科目" });
       }
     }
 
+    doc.updatedBy = payload.currentUser._id;
     targetSubject.set(doc);
     const { item } = await DAO.edit(targetSubject, options);
 
@@ -123,42 +122,38 @@ const edit = async (payload = {}, _id, doc, options) => {
 };
 
 // 删除
-const remove = async (payload = {}, _id, options) => {
-  try {
-    // 验证目标科目是否存在
-    const targetSubject = await SubjectModel.findById(_id);
-    if (!targetSubject) {
-      throw ({ code: 404, message: '科目不存在' });
-    }
+// const remove = async (payload = {}, _id, options) => {
+//   try {
+//     userPayloadChecker(payload);
+//     // 验证目标科目是否存在
+//     const targetSubject = await SubjectModel.findById(_id);
+//     if (!targetSubject) {
+//       throw ({ code: 404, message: '科目不存在' });
+//     }
 
-    // 验证权限
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "您无权删除科目" });
-    }
+//     if (!payload.isAdmin) {
+//       if (payload.currentUser.roleTemp !== 'manager') {
+//         throw ({ code: 403, message: "只有管理员才能删除科目" });
+//       }
+//       if (targetSubject.Org.toString() !== payload.currentUser.Org.toString()) {
+//         throw ({ code: 403, message: "您无权删除此科目" });
+//       }
+//     }
 
-    if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能删除科目" });
-      }
-      if (targetSubject.Org.toString() !== payload.currentUser?.Org.toString()) {
-        throw ({ code: 403, message: "您无权删除此科目" });
-      }
-    }
+//     // 验证是否有课程关联
+//     const existRelatedCourse = await CourseModel.countDocuments({ Subject: _id });
+//     if (existRelatedCourse > 0) {
+//       throw ({ code: 400, message: "无法删除，此数据有相关课程关联" });
+//     }
 
-    // 验证是否有课程关联
-    const existRelatedCourse = await CourseModel.findOne({ subject: _id });
-    if (existRelatedCourse) {
-      throw ({ code: 400, message: "无法删除，此数据有相关课程关联" });
-    }
+//     const { item } = await DAO.remove(SubjectModel, _id, options);
+//     return { item };
 
-    const { item } = await DAO.remove(SubjectModel, _id, options);
-    return { item };
-
-  } catch (e) {
-    console.error('SubjectDao delete error:', e);
-    throw e;
-  }
-}
+//   } catch (e) {
+//     console.error('SubjectDao delete error:', e);
+//     throw e;
+//   }
+// }
 
 module.exports = {
   SubjectDAO: {
@@ -166,7 +161,7 @@ module.exports = {
     detail,
     add,
     edit,
-    remove
+    // remove
   },
   SubjectModel,
   SubjectDOC,

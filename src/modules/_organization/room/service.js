@@ -11,12 +11,12 @@ class RoomSV {
    * @param {Object} payload - 账户身份信息
    * @param {Object} filter - 过滤条件，默认为空对象
    * @param {Object} options - 查询选项 { limit=100, skip=0, sort={}, populate=[{path: ''}] }
-   * @returns {Object} 包含 items(数据列表), total(总数), permFilter(权限过滤器) 的对象
+   * @returns {Object} 包含 items(数据列表), total(总数)
    */
   async list(payload, filter = {}, options) {
     try {
-      const { items, total, permFilter } = await RoomDAO.list(payload, filter, options);
-      return { items, total, permFilter };
+      const { items, total } = await RoomDAO.list(payload, filter, options);
+      return { items, total };
     } catch (e) {
       console.error('RoomSV list error:', e);
       throw e;

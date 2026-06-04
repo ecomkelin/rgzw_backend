@@ -4,10 +4,10 @@ const ApiResponse = require('@utils/response');
 class AccountCT {
   list = async (req, res) => {
     try {
-      const { filter, options } = req.validData || {};
-      const { total, items, permFilter } = await AccountSV.list(req.payload, filter, options);
+      const { filter: filterInput, options } = req.validData || {};
+      const { total, items } = await AccountSV.list(req.payload, filterInput, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items } }));
     } catch (e) {
       console.error("AccountCT list error: ", e);
       return res.json(ApiResponse.error(e));
@@ -28,9 +28,6 @@ class AccountCT {
 
   add = async (req, res) => {
     try {
-      const doc = req.validData;
-      delete doc.id
-
       const { item } = await AccountSV.add(req.payload, req.validData);
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
@@ -45,7 +42,7 @@ class AccountCT {
       const doc = req.validData;
       delete doc.id
 
-      const { item } = await AccountSV.edit(req.payload, req.params.id, req.validData);
+      const { item } = await AccountSV.edit(req.payload, id, doc);
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("AccountCT edit error: ", e);
@@ -68,13 +65,14 @@ class AccountCT {
 
   selfEdit = async (req, res) => {
     try {
-      const id = req.payload?._id;
-      const doc = req.validData
-      const data = await AccountSV.edit(req.payload, id, doc);
+      const id = req.payload._id;
+      const doc = req.validData;
+      delete doc.id
+      const { item } = await AccountSV.edit(req.payload, id, doc);
 
-      return res.status(200).json(ApiResponse.success({ data }));
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
-      console.error("AccountCT selfUpdate error: ", e);
+      console.error("AccountCT selfEdit error: ", e);
       return res.json(ApiResponse.error(e));
     }
   };

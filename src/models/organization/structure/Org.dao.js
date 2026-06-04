@@ -21,7 +21,7 @@ const detail = async (payload = {}, _id, options) => {
     // 验证权限 - 管理员可以查看任何公司，普通用户只能查看自己的公司
     if (!payload.isAdmin) {
       if (payload.accountType === 'User') {
-        if (payload.currentUser?.Org.toString() !== _id.toString()) {
+        if (payload.currentUser.Org.toString() !== _id.toString()) {
           throw ({ code: 403, message: "没有权限访问此公司" });
         }
       } else if (payload.accountType === 'Student') {
@@ -61,7 +61,7 @@ const add = async (payload, doc, options) => {
     }
 
     if (!doc.nickname) doc.nickname = doc.name;
-    doc.createdBy = payload.currentUser?._id;
+    doc.createdBy = payload.currentUser._id;
 
     const existFilter = [{ unionCode: doc.unionCode }, { name: doc.name }, { nickname: doc.nickname }];
     const existing = await OrgModel.findOne({ $or: existFilter });

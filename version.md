@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v7.3.1
+- 检查了 Account 和 Subject 的bug 做了优化
+
 ## v7.3.0
 - 优化了 登陆/refreshToken 的payload
 - 新增 pack 课包模块

@@ -19,7 +19,7 @@ const list = async (payload = {}, filter, options) => {
       filter.Course = { $in: courseIds };
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           // 老师只能查看自己授课的课次
           filter.$or = [
             { teacher: payload.currentUser._id },
@@ -68,7 +68,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此课程" });
         }
         // 老师只能查看自己授课的课次
@@ -108,7 +108,7 @@ const add = async (payload, doc, options) => {
 
     // 只有管理员或任课老师可以创建课程
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         // 老师只能为自己授课的课程创建课次
         if (doc.teacher && doc.teacher.toString() !== payload.currentUser._id.toString()) {
           throw ({ code: 403, message: "您只能为自己的课程添加课次" });
@@ -165,7 +165,7 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
 
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         // 老师只能修改自己授课的课次
         if (targetLesson.teacher && targetLesson.teacher.toString() !== payload.currentUser._id.toString()) {
           const course = await CourseModel.findById(targetLesson.Course);
@@ -175,7 +175,7 @@ const edit = async (payload = {}, _id, doc, options) => {
           }
         }
       }
-      if (targetLesson.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetLesson.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权修改此课程" });
       }
     }

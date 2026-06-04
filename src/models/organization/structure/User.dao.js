@@ -9,8 +9,8 @@ const list = async (payload = {}, filter, options) => {
       throw ({ code: 403, message: "您没有权限操作User" });
     }
     if (!payload.isAdmin) {
-      filter.Org = payload.currentUser?.Org;
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      filter.Org = payload.currentUser.Org;
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有超级管理员才能查看用户列表" });
       }
     }
@@ -37,10 +37,10 @@ const detail = async (payload = {}, _id, options) => {
 
     // 验证权限 - 管理员可以查看任何用户，普通用户只能查看自己的用户
     if (!payload.isAdmin) {
-      if (payload.currentUser?.Org?.toString() !== item.Org.toString()) {
+      if (payload.currentUser.Org?.toString() !== item.Org.toString()) {
         throw ({ code: 403, message: "你没有权限访问此用户" })
       }
-      if (payload.currentUser?.roleTemp !== 'manager' && payload.currentUser?._id?.toString() !== item._id.toString()) {
+      if (payload.currentUser.roleTemp !== 'manager' && payload.currentUser._id?.toString() !== item._id.toString()) {
         throw ({ code: 403, message: "没有权限访问此用户" });
       }
     }

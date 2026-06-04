@@ -108,7 +108,7 @@ type AccessTokenPayload = {
   sessionId: string;              // 当前会话 ID（防并发登录）
 
   // ==================== User 身份（accountType === 'User' 时存在）====================
-  currentUser?: {
+  currentUser: {
     _id: string;                  // User._id
     nickname: string;             // User.nickname
     Org: string;                  // User.Org（ObjectId）
@@ -154,7 +154,7 @@ exports.authenticate = async (req, res, next) => {
 
   // 3. 校验 token 中的身份与 Account 一致
   if (Account.accountType === 'User') {
-    if (payload.currentUser?._id.toString() !== Account.currentUser.toString()) {
+    if (payload.currentUser._id.toString() !== Account.currentUser.toString()) {
       throw 401;  // 提示重新登录
     }
   } else if (Account.accountType === 'Student') {
@@ -184,10 +184,10 @@ exports.authenticate = async (req, res, next) => {
 
 ```javascript
 // ✅ 推荐：直接用 token 注入的字段
-if (payload.currentUser?.roleTemp !== 'manager') { ... }
+if (payload.currentUser.roleTemp !== 'manager') { ... }
 
 // ❌ 错误：依赖数据库重建
-if (payload.currentUser?.roleTemp === undefined) {
+if (payload.currentUser.roleTemp === undefined) {
   // roleTemp 应该是 token 里有的，不要从 DB 重建
 }
 ```

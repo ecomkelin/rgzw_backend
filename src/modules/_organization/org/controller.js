@@ -5,9 +5,9 @@ class OrgCT {
   list = async (req, res) => {
     try {
       const { filter, options } = req.validData || {};
-      const { total, items, permFilter } = await OrgSV.list(req.payload, filter, options);
+      const { total, items } = await OrgSV.list(req.payload, filter, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items, options: { permFilter } } }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items} }));
     } catch (e) {
       console.error("OrgCT list error: ", e)
       return res.json(ApiResponse.error(e))
@@ -53,7 +53,7 @@ class OrgCT {
 
   selfDetail = async (req, res) => {
     try {
-      const id = req.payload?.currentUser?.Org;
+      const id = req.payload?.currentUser.Org;
       const { options = [] } = req.validData || {};
       const { item } = await OrgSV.detail(req.payload, id, options);
 

@@ -6,14 +6,14 @@ class AccountSV {
   /**
    * 
    * @param {*} payload 
-   * @param {*} filter find(filter)的过滤条件，允许根据账户的基本信息进行过滤，例如：isActive、isAdmin、gender、accountType等字段，以及关联的Nation/Province/City/Area等字段
+   * @param {*} filterInput find(filter)的过滤条件，允许根据账户的基本信息进行过滤，例如：isActive、isAdmin、gender、accountType等字段，以及关联的Nation/Province/City/Area等字段
    * @param {*} options { limit=100, skip=0, sort={}, populate=[{path: ''}] }
    * @returns 
    */
   async list(payload, filter = {}, options) {
     try {
-      const { items, total, permFilter } = await AccountDAO.list(payload, filter, options);
-      return { items, total, permFilter };
+      const { items, total } = await AccountDAO.list(payload, filter, options);
+      return { items, total };
     } catch (e) {
       console.error('AccountSV list error:', e);
       throw e;

@@ -16,7 +16,7 @@ const list = async (payload = {}, filter, options) => {
       filter.Student = student._id;
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           // 老师只能查看自己评价的或自己授课课程的评价
           filter.$or = [
             { Teacher: payload.currentUser._id },
@@ -55,7 +55,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此课堂评价" });
         }
       }
@@ -85,7 +85,7 @@ const add = async (payload, doc, options) => {
 
     // 只有管理员或任课老师可以添加课堂评价
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         // 老师只能评价自己授课的课程
         if (!doc.Teacher || doc.Teacher.toString() !== payload.currentUser._id.toString()) {
           throw ({ code: 403, message: "您只能评价自己授课的课程" });
@@ -153,13 +153,13 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
 
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         // 只有评价老师或管理员可以修改评价
         if (targetEvaluation.Teacher.toString() !== payload.currentUser._id.toString()) {
           throw ({ code: 403, message: "您无权修改此课堂评价" });
         }
       }
-      if (targetEvaluation.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetEvaluation.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权修改此课堂评价" });
       }
     }

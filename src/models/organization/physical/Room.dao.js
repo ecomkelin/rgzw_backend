@@ -9,7 +9,7 @@ const list = async (payload = {}, filter, options) => {
       throw ({ code: 403, message: "学生无权查看教室列表" });
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           throw ({ code: 403, message: "您无权查看教室列表" });
         }
         filter.Org = payload.currentUser.Org;
@@ -39,7 +39,7 @@ const detail = async (payload = {}, _id, options) => {
       throw ({ code: 403, message: "学生无权查看教室详情" });
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此教室" })
         }
       }
@@ -73,7 +73,7 @@ const add = async (payload, doc, options) => {
     // 只有管理员可以创建教室
     if (!payload.isAdmin) {
       doc.Org = payload.currentUser.Org;  // 普通用户只能创建属于自己的机构的教室
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建教室" });
       }
     } else {
@@ -106,10 +106,10 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
 
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能修改教室" });
       }
-      if (targetRoom.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetRoom.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权修改此教室" });
       }
     }
@@ -139,10 +139,10 @@ const remove = async (payload = {}, _id, options) => {
     }
 
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能删除教室" });
       }
-      if (targetRoom.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetRoom.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权删除此教室" });
       }
     }

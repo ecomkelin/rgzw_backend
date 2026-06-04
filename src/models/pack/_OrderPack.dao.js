@@ -17,7 +17,7 @@ const list = async (payload = {}, filter, options) => {
     } else if (payload.accountType === 'User') {
       // 用户需是管理员或经理
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           throw ({ code: 403, message: "您无权查看课包订单列表" });
         }
         filter.Org = payload.currentUser.Org;
@@ -51,7 +51,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此订单" });
         }
       }
@@ -81,7 +81,7 @@ const add = async (payload, doc, options) => {
 
     // 只有管理员可以创建订单
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建课包订单" });
       }
     }
@@ -144,10 +144,10 @@ const edit = async (payload = {}, _id, doc, options) => {
       throw ({ code: 403, message: "您无权修改课包订单" });
     }
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能修改课包订单" });
       }
-      if (targetOrder.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetOrder.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权修改此订单" });
       }
     }

@@ -16,7 +16,7 @@ const list = async (payload = {}, filter, options) => {
       filter.Student = student._id;
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (payload.currentUser?.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp !== 'manager') {
           throw ({ code: 403, message: "您无权查看学生课包列表" });
         }
         filter.Org = payload.currentUser.Org;
@@ -50,7 +50,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org.toString() !== payload.currentUser?.Org.toString()) {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此学生课包" });
         }
       }
@@ -80,7 +80,7 @@ const add = async (payload, doc, options) => {
 
     // 只有管理员可以添加学生课包
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能添加学生课包" });
       }
     }
@@ -141,10 +141,10 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
 
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能修改学生课包" });
       }
-      if (targetStudentPack.Org.toString() !== payload.currentUser?.Org.toString()) {
+      if (targetStudentPack.Org.toString() !== payload.currentUser.Org.toString()) {
         throw ({ code: 403, message: "您无权修改此学生课包" });
       }
     }

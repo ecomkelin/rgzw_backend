@@ -33,7 +33,7 @@ exports.authenticate = async (req, res, next) => {
     }
 
     if (Account.accountType === 'User') {
-      if (payload.currentUser?._id.toString() !== Account.currentUser.toString()) {
+      if (payload.currentUser._id.toString() !== Account.currentUser.toString()) {
         return res.status(401).json({ message: "您的登陆信息与账号用户信息的当前账号不符 请重新登陆" });
       }
     } else if (Account.accountType === 'Student') {

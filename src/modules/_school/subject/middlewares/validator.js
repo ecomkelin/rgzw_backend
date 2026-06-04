@@ -60,7 +60,7 @@ exports.detailVD = [
   validatorErrorHandle
 ];
 
-exports.removeVD = [
-  commonParamRules.validateObjectId('id'),
-  validatorErrorHandle
-];
+// exports.removeVD = [
+//   commonParamRules.validateObjectId('id'),
+//   validatorErrorHandle
+// ];

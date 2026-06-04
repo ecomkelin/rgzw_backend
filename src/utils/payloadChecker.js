@@ -9,8 +9,8 @@ exports.payloadChecker = (payload = {}) => {
         if (!payload.currentUser.Org) {
             throw ({ code: 403, message: "您的账户信息有误: 您是用户 需要有机构信息" });
         }
-        if (!payload.currentUser.name) {
-            throw ({ code: 403, message: "您的账户信息有误: 您是用户 需要有用户姓名" });
+        if (!payload.currentUser.nickname) {
+            throw ({ code: 403, message: "您的账户信息有误: 您是用户 需要有用户昵称" });
         }
         if (!payload.currentUser.roleTemp) {
             throw ({ code: 403, message: "您的账户信息有误: 您是用户 需要有角色信息" });
@@ -46,8 +46,8 @@ exports.userPayloadChecker = (payload = {}) => {
     if (!payload.currentUser.Org) {
         throw ({ code: 403, message: "用户机构信息缺失" });
     }
-    if (!payload.currentUser.name) {
-        throw ({ code: 403, message: "用户姓名缺失" });
+    if (!payload.currentUser.nickname) {
+        throw ({ code: 403, message: "用户昵称缺失" });
     }
     if (!payload.currentUser.roleTemp) {
         throw ({ code: 403, message: "用户角色信息缺失" });

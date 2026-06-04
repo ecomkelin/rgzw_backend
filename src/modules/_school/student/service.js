@@ -11,8 +11,8 @@ class StudentSV {
      */
   async list(payload, filter = {}, options) {
     try {
-      const { items, total, permFilter } = await StudentDAO.list(payload, filter, options);
-      return { items, total, permFilter };
+      const { items, total } = await StudentDAO.list(payload, filter, options);
+      return { items, total };
     } catch (e) {
       console.error('StudentSV list error:', e);
       throw e;

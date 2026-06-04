@@ -10,7 +10,7 @@ const list = async (payload = {}, filter, options) => {
     }
     if (!payload.isAdmin) {
       filter.Org = payload.currentUser.Org;
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "您无权查看学生列表" });
       }
     }
@@ -38,7 +38,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'User') {
       if (!payload.isAdmin) {
-        if (item.Org !== payload.currentUser?.Org) {
+        if (item.Org !== payload.currentUser.Org) {
           throw ({ code: 403, message: "您无权查看此学生" })
         }
       }
@@ -67,7 +67,7 @@ const add = async (payload, doc, options) => {
     }
     // 只有管理员可以创建学生
     if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
+      if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建学生" });
       }
     }
@@ -75,7 +75,7 @@ const add = async (payload, doc, options) => {
     doc.Org = payload.currentUser.Org;
     if (!doc.displayName) doc.displayName = doc.name;
     if (!doc.Nation) delete doc.Nation;
-    if (!doc.Provence) delete doc.Provence;
+    if (!doc.Province) delete doc.Province;
     if (!doc.City) delete doc.City;
     if (!doc.Area) delete doc.Area;
 
@@ -113,7 +113,7 @@ const edit = async (payload = {}, _id, doc, options) => {
           throw ({ code: 403, message: "没有权限修改此学生" });
         }
       } else if (payload.accountType === 'User') {
-        if (payload.currentUser?.Org.toString() !== targetStudent.Org.toString()) {
+        if (payload.currentUser.Org.toString() !== targetStudent.Org.toString()) {
           throw ({ code: 403, message: "没有权限修改此学生" });
         }
         if (payload.currentUser.roleTemp !== 'manager') {
@@ -131,7 +131,7 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
     if (!doc.displayName) doc.displayName = doc.name;
     if (!doc.Nation) delete doc.Nation;
-    if (!doc.Provence) delete doc.Provence;
+    if (!doc.Province) delete doc.Province;
     if (!doc.City) delete doc.City;
     if (!doc.Area) delete doc.Area;
 

@@ -51,6 +51,6 @@ const checkPermission = (permissionType) => {
 };
 
 exports.readPermission = checkPermission('read');
-exports.createPermission = checkPermission('create');
+exports.addPermission = checkPermission('create');
 exports.editPermission = checkPermission('edit');
 exports.managePermission = checkPermission('manage');

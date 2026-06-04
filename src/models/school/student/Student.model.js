@@ -24,7 +24,7 @@ const StudentDOC = {
     currentAddress: { type: String },
     phone: { type: String },
     Nation: { type: ObjectId, ref: 'Nation' },  // 从 province 冗余过来的
-    Provence: { type: ObjectId, ref: 'Province' }, // 从 City 冗余过来的
+    Province: { type: ObjectId, ref: 'Province' }, // 从 City 冗余过来的
     City: { type: ObjectId, ref: 'City' },  // 从 Area 冗余过来的
     Area: { type: ObjectId, ref: 'Area' },
 
