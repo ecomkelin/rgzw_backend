@@ -5,8 +5,9 @@ const { UserEnums } = require('@models/organization/structure/User.dao');
 exports.addVD = [
   // Body 参数：可选规则
   commonBodyRules.validateObject('user'),
-  commonBodyRules.validateBoolean('user.isActive'),
+  commonBodyRules.optionalBoolean('user.isActive'),
   commonBodyRules.validateEnum('user.roleTemp', UserEnums.roleSimpEnums),
+  commonBodyRules.validateString('user.nickname', { minLength: 2, maxLength: 26 }),
 
   commonBodyRules.optionalObjectId('user.Org'),
   commonBodyRules.optionalObjectId('user.Account'),
@@ -28,9 +29,9 @@ exports.editVD = [
   commonParamRules.validateObjectId('id'),
   // Body 参数：可选规则
   commonBodyRules.optionalBoolean('isActive'),
+  commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 26 }),
   commonBodyRules.optionalNumber('sort'),
   commonBodyRules.optionalEnum('roleTemp', UserEnums.roleSimpEnums),
-  commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 26 }),
 
   validatorErrorHandle
 ];
@@ -38,7 +39,7 @@ exports.editVD = [
 
 exports.listVD = [
   commonBodyRules.optionalObject('filter'),
-  commonBodyRules.optionalString('filter.regExp', { minLength: 0, maxLength: 50 }),
+  commonBodyRules.optionalString('filter.regExp', { minLength: 0, maxLength: 50 }), // nickname模糊搜索
   commonBodyRules.optionalBoolean('filter.isActive'),
   commonBodyRules.optionalObjectId('filter.Org'),
   commonBodyRules.optionalObjectId('filter.Account'),

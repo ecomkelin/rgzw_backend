@@ -58,9 +58,8 @@ const detail = async (payload = {}, _id, options) => {
 const add = async (payload, doc, options) => {
   try {
     // 只有管理员可以创建用户
-    if (payload.accountType !== 'User') {
-      throw ({ code: 403, message: "你没有权限添加用户" })
-    }
+    userPayloadChecker(payload);
+
     if (!payload.isAdmin) {
       doc.Org = payload.currentUser.Org
       if (payload.currentUser.roleTemp !== 'manager') {

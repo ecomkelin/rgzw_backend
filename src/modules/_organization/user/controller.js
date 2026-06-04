@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const AccountSV = require('../../_authorization/account/service');
 const UserSV = require('./service');
 const ApiResponse = require('@utils/response');
+const { userPayloadChecker } = require('@utils/payloadChecker');
 
 /**
  * 用户控制器类
@@ -18,7 +19,7 @@ class UserCT {
       const { filter, options } = req.validData || {};
       const { total, items } = await UserSV.list(req.payload, filter, options);
 
-      return res.status(200).json(ApiResponse.success({ data: { total, items} }));
+      return res.status(200).json(ApiResponse.success({ data: { total, items } }));
     } catch (e) {
       console.error("UserCT list error: ", e);
       return res.json(ApiResponse.error(e));
@@ -120,11 +121,9 @@ class UserCT {
    */
   selfEdit = async (req, res) => {
     try {
+      userPayloadChecker(req.payload);
       const payload = req.payload;
-      if (!payload || !payload.accountType !== 'User' || !payload.currentUserId) {
-        throw ({ code: 400, message: "无效的用户信息" });
-      }
-      const id = payload.currentUserId;
+      const id = payload.currentUser._id;
       const doc = req.validData;
       const data = await UserSV.edit(payload, id, doc);
       return res.status(200).json(ApiResponse.success(data));
