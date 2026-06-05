@@ -1,6 +1,14 @@
 const jwt = require('jsonwebtoken');
 
 /**
+ * 刷新令牌过期时间（天）
+ * 单一来源：同时控制 JWT 自身的 `exp` 字段、服务端返回的 `refreshTokenExpiresAt` Date，以及 HTTP Cookie 的 `maxAge` / `expires`
+ * 文档与代码必须保持一致
+ */
+const REFRESH_TTL_DAYS = parseInt(process.env.REFRESH_TTL_D || '7', 10);
+const REFRESH_TTL_MS = REFRESH_TTL_DAYS * 24 * 60 * 60 * 1000;
+
+/**
  * JWT工具类
  * 用于处理令牌的生成、验证等操作
  */
@@ -63,9 +71,8 @@ class JwtUtil {
    * @returns {string} 刷新令牌
    */
   static generateRefreshToken(_id, sessionId) {
-    // 生成刷新令牌，默认7天
-    const expiresIn = process.env.REFRESH_TTL_D || '7d';
-    return jwt.sign({ _id, sessionId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn });
+    // 刷新令牌过期时间（与 REFRESH_TTL_DAYS 常量保持一致）
+    return jwt.sign({ _id, sessionId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${REFRESH_TTL_DAYS}d` });
   }
 
   /**
@@ -73,11 +80,8 @@ class JwtUtil {
    * @returns {Date} 过期时间
    */
   static generateExpiresAt() {
-    // 计算刷新令牌过期时间，默认7天后
-    const refreshTokenExpiresAt = new Date();
-    const daysToAdd = parseInt(process.env.REFRESH_TOKEN_DAYS || '7', 10);
-    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + daysToAdd);
-    return refreshTokenExpiresAt;
+    // 与 REFRESH_TTL_DAYS 常量保持一致
+    return new Date(Date.now() + REFRESH_TTL_MS);
   }
 
   /**
@@ -115,3 +119,5 @@ class JwtUtil {
 }
 
 module.exports = JwtUtil;
+module.exports.REFRESH_TTL_DAYS = REFRESH_TTL_DAYS;
+module.exports.REFRESH_TTL_MS = REFRESH_TTL_MS;

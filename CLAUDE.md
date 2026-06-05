@@ -11,13 +11,11 @@ rgzw_backend 是一个基于 Node.js/Express 构建的应用程序，使用 Mong
 应用程序遵循模块化架构，包含以下关键目录：
 
 - `src/` - 主要源代码
-  - `models/` - 数据库模式和数据访问对象 (DAO)
-  - `modules/` - 功能模块 (认证、组织、学校等)
-  - `routers/` - Express 路由和路由加载工具
-  - `controllers/` - 请求处理逻辑 (在模块内)
-  - `services/` - 业务逻辑 (在模块内)
-  - `middlewares/` - Express 中间件函数
-  - `utils/` - 实用函数和辅助工具
+  - `models/` - 数据库模式和数据访问对象 (DAO)，按业务领域分组（authorization / organization / school / pack）
+  - `modules/` - 业务功能模块 (认证、组织、学校等)；**每个模块内部自带四层结构**（详见下文"模块结构"段）
+  - `routers/` - 自动路由加载入口（`src/routers/index.js` 扫描 `src/modules/**/*.routes.js`）
+  - `middlewares/` - 通用中间件函数（authenticate / userAuthorize / error / logger）
+  - `utils/` - 实用函数和辅助工具（JwtUtil / payloadChecker / ApiResponse …）
 
 ## 路由系统
 

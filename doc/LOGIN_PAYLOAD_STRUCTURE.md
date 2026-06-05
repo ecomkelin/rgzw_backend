@@ -61,15 +61,19 @@ Content-Type: application/json
 ```
 
 - `refreshToken` 通过 **HttpOnly Cookie** 设置，前端 JS 无法访问
-- Cookie 配置：
+- Cookie 配置（`src/modules/_authorization/auth/controller.js`）:
   ```javascript
+  const { REFRESH_TTL_MS } = require('@utils/JwtUtil');
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
-    maxAge: 30 * 24 * 60 * 60 * 1000  // 30天
+    sameSite: 'lax',
+    expires: refreshTokenExpiresAt,           // 来自 JwtUtil.generateExpiresAt()
+    maxAge: REFRESH_TTL_MS,                    // 单一来源：JwtUtil.REFRESH_TTL_DAYS
   });
   ```
+  TTL 由 `.env` 的 `REFRESH_TTL_D` 控制（默认 7 天；本仓库 `.env` 当前设为 30）。
+  Cookie `maxAge`、JWT 自身 `exp` 字段、返回的 `refreshTokenExpiresAt` **三者同源**。
 
 ---
 
@@ -252,12 +256,12 @@ const { studentPayloadChecker } = require('@utils/payloadChecker');
 
 ### 6.2 校验项
 
-#### `userPayloadChecker` 校验
+#### `userPayloadChecker` 校验（以 `src/utils/payloadChecker.js` 为准）
 - `accountType === 'User'`
 - `currentUser` 存在
 - `currentUser._id` 存在
 - `currentUser.Org` 存在
-- `currentUser.name` 存在
+- `currentUser.nickname` 存在（**注意：是 `nickname` 不是 `name`**，User 模型的字段名是 `nickname`）
 - `currentUser.roleTemp` 存在
 
 #### `studentPayloadChecker` 校验

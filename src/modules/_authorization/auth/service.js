@@ -3,11 +3,12 @@ const { UserModel } = require('@models/organization/structure/User.dao');
 const { StudentModel } = require('@models/school/student/Student.dao');
 const UtilsJwt = require('@utils/JwtUtil');
 const { payloadChecker } = require('@utils/payloadChecker');
-const argon2 = require('argon2');
+const crypto = require('node:crypto');
+
 class LoginSV {
   // Generate a unique session ID for preventing concurrent logins
-  generateSessionId = () => argon2.randomBytes(32).toString('hex');
-  
+  generateSessionId = () => crypto.randomBytes(32).toString('hex');
+
 
   async login(code, password) {
     try {

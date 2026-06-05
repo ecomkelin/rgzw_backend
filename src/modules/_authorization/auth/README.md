@@ -131,7 +131,7 @@ src/modules/_authorization/auth/
 
 ### 3. 令牌安全管理
 - 访问令牌: 短时效（默认5分钟）
-- 刷新令牌: 存储在 HttpOnly Cookie 中，防止 XSS 攻击
+- 刷新令牌: 存储在 HttpOnly Cookie 中（**默认7天**，由环境变量 `REFRESH_TTL_D` 控制，本仓库 `.env` 当前设为 30；与 `JwtUtil.REFRESH_TTL_DAYS` / Cookie `maxAge` 保持同源），防止 XSS 攻击
 - 会话验证: 每次访问受保护资源时验证会话有效性
 
 ### 4. 切换身份安全

@@ -1,15 +1,17 @@
 const AuthSV = require('./service');
 const ApiResponse = require('@utils/response');
+const { REFRESH_TTL_MS } = require('@utils/JwtUtil');
 
 class LoginCT {
   authorizationRes(res, { account, payload, accessToken, refreshToken, refreshTokenExpiresAt }) {
     // 设置 HttpOnly 的 Refresh Token Cookie
+    // maxAge 与 JwtUtil.REFRESH_TTL_DAYS 保持一致（默认 7 天），与 refreshTokenExpiresAt 同源
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       expires: refreshTokenExpiresAt,
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30天
+      maxAge: REFRESH_TTL_MS,
     });
     delete account.passwordHash;
     delete account.currentSessionId;
