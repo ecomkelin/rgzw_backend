@@ -16,9 +16,9 @@ const OrderPackDOC = {
   Student: { type: ObjectId, ref: 'Student', required: true, immutable: true },  // 为哪个学生购买
 
   // ==================== 课包快照（冗余，防篡改） ====================
-  Pack: { type: ObjectId, ref: 'Pack', required: true, immutable: true  },
-  packName: { type: String, required: true },
-  totalLesson: { type: Number, required: true },                // 购买课时数
+  Pack: { type: ObjectId, ref: 'Pack', required: true, immutable: true },
+  packName: { type: String, required: true, immutable: true },
+  totalLesson: { type: Number, required: true, immutable: true },                // 购买课时数
   validDays: { type: Number },                                  // 有效期天数
   priceOrigin: { type: Number },                                // 原价（分）
   priceRegular: { type: Number },                               // 常规售价

@@ -51,7 +51,7 @@ const detail = async (payload = {}, _id, options) => {
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
       if (!payload.isAdmin) {
-        if (payload.currentUser.roleTemp !== 'manager') {
+        if (payload.currentUser.roleTemp === 'manager') {
           if (item.Org.toString() !== payload.currentUser.Org.toString()) {
             throw ({ code: 403, message: "您无权查看此订单" });
           }
@@ -97,7 +97,7 @@ const add = async (payload, doc, options) => {
       throw ({ code: 404, message: "指定的学生不存在或被禁用" });
     }
     if (!payload.isAdmin && payload.currentUser.Org.toString() !== student.Org.toString()) {
-      throw ({ code: 404, message: "指定的学生跟您不在一个校区" });
+      throw ({ code: 404, message: "该学生与您不在同一校区,无法下单" });
     }
 
     // Account 由 Student.Account 自动推导(避免前端传错或绕过学生身份)
@@ -117,16 +117,17 @@ const add = async (payload, doc, options) => {
       throw ({ code: 404, message: "指定的课包不存在或被禁用" });
     }
     if (!payload.isAdmin && payload.currentUser.Org.toString() !== pack.Org.toString()) {
-      throw ({ code: 404, message: "指定的课包跟您不在一个校区" });
+      throw ({ code: 404, message: "该课包与您不在同一校区,无法下单" });
     }
     if (pack.Org.toString() !== student.Org.toString()) {
-      throw ({ code: 404, message: "学生购买的课包和学生不在一个校区" });
+      throw ({ code: 404, message: "该学生与课包不在同一校区,无法下单" });
     }
 
 
     // 设置从Pack获取的快照数据
     doc.packName = pack.name;
     doc.totalLesson = pack.totalLesson;
+    doc.validDays = pack.validDays;
     doc.priceOrigin = pack.priceOrigin;
     doc.priceRegular = pack.priceRegular;
     doc.priceSale = pack.priceSale;

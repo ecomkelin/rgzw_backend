@@ -5,7 +5,7 @@ const {
   listOptionsValidator,
   detailOptionsValidator
 } = require('@utils/validatorHandle');
-const { OrderPackEnums } = require('@models/pack/_OrderPack.dao');
+const { OrderPackEnums } = require('@/models/pack/OrderPack.dao');
 
 /**
  * add 校验

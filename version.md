@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v8.2.1
+- 优化了 OrderPack
+
 ## v8.2.0
 - [新增] OrderPack 课包订单模块
    # 问题 还没有跟 StudentPack 关联

@@ -1,4 +1,4 @@
-const { OrderPackDAO, OrderPackDOC } = require('@models/pack/_OrderPack.dao');
+const { OrderPackDAO, OrderPackDOC } = require('@/models/pack/OrderPack.dao');
 const { deleteImmutableFront } = require('@utils/fieldAttributes');
 
 /**

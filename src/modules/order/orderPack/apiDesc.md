@@ -119,8 +119,16 @@
 - **DAO 自动注入 / 推导**:
   - `Account` : 从 `Student.Account` 自动推导(前端不需要也不应该传)
   - `packName` / `totalLesson` / `validDays` / `priceOrigin` / `priceRegular` / `priceSale`: 从 `Pack` 拉取快照
-  - `Org`     : `currentUser.Org`
+  - `Org`     : `student.Org`(取学生所在校区,确保订单归属跟学生一致)
   - `createdBy`: `currentUser._id`
+- **DAO 校验**:
+  - 学生必须存在且 `isActive === true`
+  - 课包必须存在且 `isActive === true`
+  - 课包 `Org` 必须等于学生 `Org`(防止跨校区买课)
+  - **Org 范围校验**:
+    - 管理员 (`isAdmin`): 跳过本段校验,可跨校区下单
+    - 经理 (`manager`): 学生与当前用户同 Org **且** 课包与当前用户同 Org,任一不满足返回 404
+  - 上述校验失败统一返回 404(信息只透露"不存在/不在一个校区",不向非法跨 Org 越权请求透露资源存在性)
 
 ---
 
@@ -157,7 +165,7 @@
 | `paidAt`      | Date   | -  | 支付时间 |
 | `Course`      | ObjectId | - | 关联班级(直接报名班级场景);**强烈建议填写** |
 | `remark`      | String | -  | 备注 |
-| `Org`         | ObjectId | ✅ | 所属组织(自动注入) |
+| `Org`         | ObjectId | ✅(auto) | 所属组织(自动注入,取 `student.Org`,不是 `currentUser.Org`) |
 | `createdBy`   | ObjectId | ✅ | 创建人(自动注入) |
 | `updatedBy`   | ObjectId | -  | 更新人(自动注入) |
 
@@ -178,9 +186,9 @@ orderPackSchema.index({ Org: 1, createdAt: -1 });
 
 | 状态码 | 触发场景 |
 |---|---|
-| `400` | validator 校验失败 |
-| `403` | Student 调用 / 普通老师调用 / manager 跨 Org 操作 |
-| `404` | 订单不存在 / 关联 Account/Student/Pack 不存在 |
+| `400` | validator 校验失败 / Student 未关联账户 |
+| `403` | Student 调用 / 普通老师调用 add 或 edit / detail 中 manager 跨 Org 操作 / edit 中非管理员 |
+| `404` | 订单不存在 / 学生不存在或被禁用 / 课包不存在或被禁用 / 学生关联的账户不存在 / 经理下单时学生与您不在同一校区 / 经理下单时课包与您不在同一校区 / 学生与课包不在同一校区 |
 | `500` | 服务器内部错误 |
 
 ---
