@@ -2,6 +2,7 @@ const DAO = require('@models/DAO');
 const { OrderPackModel, OrderPackEnums, OrderPackDOC } = require('./OrderPack.model');
 const { AccountModel } = require('@models/authorization/Account.dao');
 const { StudentModel } = require('@models/school/student/Student.dao');
+const { CourseModel } = require('@models/school/course/Course.dao');
 const { PackModel } = require('./Pack.dao');
 const { userPayloadChecker, studentPayloadChecker, payloadChecker } = require("@utils/payloadChecker")
 
@@ -97,7 +98,7 @@ const add = async (payload, doc, options) => {
       throw ({ code: 404, message: "指定的学生不存在或被禁用" });
     }
     if (!payload.isAdmin && payload.currentUser.Org.toString() !== student.Org.toString()) {
-      throw ({ code: 404, message: "该学生与您不在同一校区,无法下单" });
+      throw ({ code: 404, message: "您与该学生不在同一校区,无法下单" });
     }
 
     // Account 由 Student.Account 自动推导(避免前端传错或绕过学生身份)
@@ -116,11 +117,18 @@ const add = async (payload, doc, options) => {
     if (!pack || !pack.isActive) {
       throw ({ code: 404, message: "指定的课包不存在或被禁用" });
     }
-    if (!payload.isAdmin && payload.currentUser.Org.toString() !== pack.Org.toString()) {
-      throw ({ code: 404, message: "该课包与您不在同一校区,无法下单" });
-    }
     if (pack.Org.toString() !== student.Org.toString()) {
-      throw ({ code: 404, message: "该学生与课包不在同一校区,无法下单" });
+      throw ({ code: 404, message: "制定的课包与该学生不在同一校区,无法下单" });
+    }
+
+    if (doc.Course) {
+      const course = await CourseModel.findById(doc.Course);
+      if (!course || !course.isActive) {
+        throw ({ code: 404, message: "指定的课程不存在或被禁用" });
+      }
+      if (course.Org.toString() !== student.Org.toString()) {
+        throw ({ code: 404, message: "指定的课程与该学生不在同一校区,无法下单" });
+      }
     }
 
 

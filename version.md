@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v8.2.2
+- 增加了 add OrderPack 对 Course的关联
+
 ## v8.2.1
 - 优化了 OrderPack
 
