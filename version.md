@@ -1,5 +1,9 @@
 # 版本更新日志
 
+## v8.2.0
+- [新增] OrderPack 课包订单模块
+   # 问题 还没有跟 StudentPack 关联
+
 ## v8.1.0
 - [bugger 修复] 查看Org 的DAO中 是否有其他相同的数据 的逻辑错误
    - existFilter.length > 0 才执行 查找是否有

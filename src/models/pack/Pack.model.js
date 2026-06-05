@@ -14,12 +14,12 @@ const PackEnums = {
 
 const PackDOC = {
   // ==================== 基础信息 ====================
-  name: { type: String, required: true },            // 课包名称，如“Python 16课时常规包”
+  name: { type: String, required: true, immutable: true },            // 课包名称，如“Python 16课时常规包”
   type: { type: String, enum: PackEnums.typeEnums, default: '课时包', required: true },  // 课包类型，默认为“课时包”
   description: { type: String },
 
   // ==================== 课时 ====================
-  totalLesson: { type: Number, required: true, default: 16 },   // 课包总课时（消课按次扣，1次课消耗1课时）
+  totalLesson: { type: Number, required: true, default: 16, immutable: true },   // 课包总课时（消课按次扣，1次课消耗1课时）
 
   // ==================== 有效期 ====================
   validDays: { type: Number },                                 // 购买后有效天数，如 365 表示一年
@@ -39,9 +39,9 @@ const PackDOC = {
   sort: { type: Number, default: 0 },
 
   // ==================== 审计 ====================
-  createdBy: { type: ObjectId, ref: 'User', required: true },  // 改为 User 与系统对齐
+  createdBy: { type: ObjectId, ref: 'User', required: true, immutable: true },  // 改为 User 与系统对齐
   updatedBy: { type: ObjectId, ref: 'User' },
-  Org: { type: ObjectId, ref: 'Org', required: true }
+  Org: { type: ObjectId, ref: 'Org', required: true, immutable: true }
 };
 
 const packSchema = new Schema(PackDOC, { timestamps: true });

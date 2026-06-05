@@ -12,19 +12,19 @@ const OrderPackEnums = {
 
 const OrderPackDOC = {
   // ==================== 购买人 ====================
-  Account: { type: ObjectId, ref: 'Account', required: true },  // 家长账户
-  Student: { type: ObjectId, ref: 'Student', required: true },  // 为哪个学生购买
+  Account: { type: ObjectId, ref: 'Account', required: true, immutable: true },  // 家长账户 根据Student 从后端获取
+  Student: { type: ObjectId, ref: 'Student', required: true, immutable: true },  // 为哪个学生购买
 
   // ==================== 课包快照（冗余，防篡改） ====================
-  Pack: { type: ObjectId, ref: 'Pack' },
+  Pack: { type: ObjectId, ref: 'Pack', required: true, immutable: true  },
   packName: { type: String, required: true },
   totalLesson: { type: Number, required: true },                // 购买课时数
   validDays: { type: Number },                                  // 有效期天数
-
-  // ==================== 价格 ====================
   priceOrigin: { type: Number },                                // 原价（分）
   priceRegular: { type: Number },                               // 常规售价
   priceSale: { type: Number },                                  // 折后价
+
+  // ==================== 价格 ====================
   finalPrice: { type: Number, required: true },                 // 实付金额（分）
 
   // ==================== 支付信息 ====================
@@ -34,13 +34,13 @@ const OrderPackDOC = {
   paidAt: { type: Date },
 
   // ==================== 关联课程（可选） ====================
-  Course: { type: ObjectId, ref: 'Course' },                   // 如果直接报名班级，可填写
+  Course: { type: ObjectId, ref: 'Course' },                   // 如果直接报名班级，可填写 强烈建议前端填写
 
   // ==================== 备注与审计 ====================
   remark: { type: String },
-  createdBy: { type: ObjectId, ref: 'User', required: true },
+  createdBy: { type: ObjectId, ref: 'User', required: true, immutable: true },
   updatedBy: { type: ObjectId, ref: 'User' },
-  Org: { type: ObjectId, ref: 'Org', required: true }
+  Org: { type: ObjectId, ref: 'Org', required: true, immutable: true }
 };
 
 const orderPackSchema = new Schema(OrderPackDOC, { timestamps: true });
