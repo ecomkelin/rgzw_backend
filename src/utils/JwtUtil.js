@@ -13,14 +13,14 @@ class JwtUtil {
   static generateAccessToken(Account) {
     if (Account.accountType === 'User') {
       if (!Account.currentUser || !Account.currentUser.Org || !Account.currentUser.roleTemp || !Account.currentUser.nickname) {
-        throw ({ code: 400, message: 'generateAccessToken 用户信息不完整，请联系管理员' });
+        throw ({ code: 400, message: 'generateAccessToken 用户信息不完整，请联系管理员 给账户添加用户信息' });
       }
       if (Account.currentStudent) {
         throw ({ code: 400, message: 'generateAccessToken 账号信息异常（有学生信息），请联系管理员' });
       }
     } else if (Account.accountType === 'Student') {
       if (!Account.currentStudent || !Account.currentStudent.name || !Account.currentStudent.Org) {
-        throw ({ code: 400, message: 'generateAccessToken 学生信息不完整，请联系管理员' });
+        throw ({ code: 400, message: 'generateAccessToken 学生信息不完整，请联系管理员 给账户添加学生信息' });
       }
       if (Account.currentUser) {
         throw ({ code: 400, message: 'generateAccessToken 账号信息异常（有用户信息），请联系管理员' });

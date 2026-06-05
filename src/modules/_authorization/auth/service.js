@@ -1,5 +1,8 @@
 const { AccountModel } = require('@models/authorization/Account.dao');
+const { UserModel } = require('@models/organization/structure/User.dao');
+const { StudentModel } = require('@models/school/student/Student.dao');
 const UtilsJwt = require('@utils/JwtUtil');
+const { payloadChecker } = require('@utils/payloadChecker');
 
 class LoginSV {
   // Generate a unique session ID for preventing concurrent logins
@@ -73,7 +76,61 @@ class LoginSV {
 
       return { account: Account, payload, accessToken, refreshToken, refreshTokenExpiresAt, sessionId };
     } catch (e) {
-      console.error('LoginSV refreshToken error:', error);
+      console.error('LoginSV refreshToken error:', e);
+      throw e;
+    }
+  }
+
+  async switchRole(payload, id) {
+    try {
+      payloadChecker(payload);
+
+      const Account = await AccountModel.findById(payload._id)
+        .select('+currentSessionId'); // 默认不给这个字段 要加上不然, 下次 refresh-token 就会失效
+
+      if (!Account || !Account.isActive) {
+        throw ({ code: 404, message: "账户不存在或者被禁用" });
+      }
+
+      if (payload.accountType === 'User') {
+        const User = await UserModel.findById(id).select("nickname Org roleTemp isActive");
+        if (!User || !User.isActive) {
+          throw ({ code: 404, message: "此用户不存在或者被禁用" });
+        }
+        if (User.Account.toString() !== Account._id.toString()) {
+          throw ({ code: 404, message: "此账号中不存在此用户" });
+        }
+        if (!Account.currentUser || Account.currentUser.toString() !== id.toString()) {
+          Account.currentUser = id;
+          await Account.save();
+        }
+        Account.currentUser = User;
+      } else {
+        const Student = await StudentModel.findById(id).select("Org name isActive");
+        if (!Student || !Student.isActive) {
+          throw ({ code: 404, message: "此学生不存在或者被禁用" });
+        }
+        if (Student.Account.toString() !== Account._id.toString()) {
+          throw ({ code: 404, message: "此账号中不存在此学生" });
+        }
+        if (!Account.currentStudent || Account.currentStudent.toString() !== id.toString()) {
+          Account.currentStudent = id;
+          await Account.save();
+        }
+        if (Student.Org.toString() !== payload.currentStudent.Org.toString()) {
+          console.warn(`[switchRole] 跨机构切换: Account=${Account.code}, from=${payload.currentStudent.Org} to=${Student.Org}`);
+        }
+        Account.currentStudent = Student;
+      }
+
+      // 切换身份后生成新的访问令牌和刷新令牌
+      const { accessToken, payload: newPayload } = UtilsJwt.generateAccessToken(Account);
+      const refreshToken = UtilsJwt.generateRefreshToken(Account._id, Account.currentSessionId);
+      const refreshTokenExpiresAt = UtilsJwt.generateExpiresAt();
+
+      return { account: Account, payload: newPayload, accessToken, refreshToken, refreshTokenExpiresAt, sessionId: Account.currentSessionId };
+    } catch (e) {
+      console.error('LoginSV switchRole error:', e);
       throw e;
     }
   }

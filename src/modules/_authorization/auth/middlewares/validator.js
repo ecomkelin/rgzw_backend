@@ -1,6 +1,6 @@
 const { body } = require('express-validator');
 
-const { validatorErrorHandle, commonBodyRules } = require('@utils/validatorHandle');
+const { validatorErrorHandle, commonBodyRules, commonParamRules } = require('@utils/validatorHandle');
 
 // 登录验证规则
 exports.loginVD = [
@@ -9,3 +9,9 @@ exports.loginVD = [
 
   validatorErrorHandle
 ];
+
+exports.switchRoleVD = [
+  commonParamRules.validateObjectId('id'),
+
+  validatorErrorHandle
+]

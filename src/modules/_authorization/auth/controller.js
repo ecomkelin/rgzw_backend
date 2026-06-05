@@ -53,6 +53,16 @@ class LoginCT {
     }
   };
 
+  switchRole = async (req, res) => {
+    try {
+      const authResRtData = await AuthSV.switchRole(req.payload, req.params.id);
+      return this.authorizationRes(res, authResRtData);
+    } catch (e) {
+      console.error("LoginCT switchRole error:", e);
+      const statusCode = e.code || 500;
+      return res.status(statusCode).json(ApiResponse.error(e))
+    }
+  };
   // 登出
   logout = async (req, res) => {
     try {
