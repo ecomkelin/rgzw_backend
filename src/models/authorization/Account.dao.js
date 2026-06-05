@@ -97,6 +97,9 @@ const add = async (payload, doc, options) => {
 const edit = async (payload = {}, _id, doc, options) => {
     try {
         payloadChecker(payload);
+        if (doc.isActive == false && payload._id === _id) {
+            throw ({ code: 400, message: "您不能禁用自己" });
+        }
         // 只有管理员可以修改任何账户，普通用户只能修改自己的账户
         if (!payload.isAdmin) {
             if (payload._id.toString() !== _id.toString()) {

@@ -93,6 +93,11 @@ const add = async (payload, doc, options) => {
 const edit = async (payload = {}, _id, doc, options) => {
   try {
     userPayloadChecker(payload);
+    if (doc.isActive == false) {
+      if (payload.currentUser.Org === _id) {
+        throw ({ code: 400, message: "不能禁用当前用户的公司" });
+      }
+    }
     // 只有管理员可以修改公司
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "没有权限修改公司" });
@@ -116,10 +121,10 @@ const edit = async (payload = {}, _id, doc, options) => {
     if (doc.nickname && doc.nickname !== targetOrg.nickname) existFilter.push({ nickname: doc.nickname });
     if (existFilter.length > 0) {
       existingFilter['$or'] = existFilter;
-    }
-    const existing = await OrgModel.findOne(existingFilter);
-    if (existing) {
-      throw ({ code: 400, message: '统一社会编号或公司名称或公司简称已被存在' });
+      const existing = await OrgModel.countDocuments(existingFilter);
+      if (existing > 0) {
+        throw ({ code: 400, message: '统一社会编号或公司名称或公司简称已被存在' });
+      }
     }
 
     doc.updatedBy = payload.currentUser._id;

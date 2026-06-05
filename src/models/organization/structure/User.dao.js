@@ -106,7 +106,11 @@ const add = async (payload, doc, options) => {
 const edit = async (payload = {}, _id, doc, options) => {
   try {
     userPayloadChecker(payload);
-
+    if (doc.isActive == false) {
+      if (payload.currentUser._id === _id) {
+        throw ({ code: 400, message: "不能禁用 自己的当前的用户" });
+      }
+    }
     // 验证目标用户是否存在
     const targetUser = await UserModel.findById(_id);
     if (!targetUser) {
