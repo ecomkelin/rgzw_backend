@@ -116,7 +116,7 @@ Student 模块负责学生档案的管理。一个 Account（家长/用户账号
   - `Account` 必须存在、`isActive === true`、`accountType === 'Student'`，否则 404
   - `Org` 必须存在且 `isActive === true`，否则 400
   - 若未传 `displayName`，自动以 `name` 填充
-- **事务**: 当 `process.env.ACID === 'true'` 时，创建 Account 与 Student 处于同一事务
+- **事务**: 当 `process.env.ACID_CHECK === 'on'` 时，创建 Account 与 Student 处于同一事务
 - **响应**:
   ```json
   {

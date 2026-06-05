@@ -32,9 +32,10 @@ class StudentCT {
 
   add = async (req, res) => {
     try {
+      const ACID_CHECK = (process.env.ACID_CHECK === 'on');
       let session = null;
 
-      if (process.env.ACID === 'true') {
+      if (ACID_CHECK) {
         // 启动事务
         session = await mongoose.startSession();
         session.startTransaction(); // 开启事务
@@ -61,7 +62,7 @@ class StudentCT {
       const { item: itemStudent } = await StudentSV.add(payload, doc_Student, { session });
       data.itemStudent = itemStudent;
 
-      if (process.env.ACID === 'true') {
+      if (ACID_CHECK) {
         // 全部成功 → 提交事务
         await session.commitTransaction();
         session.endSession();

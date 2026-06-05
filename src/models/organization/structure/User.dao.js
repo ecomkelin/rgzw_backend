@@ -125,15 +125,18 @@ const edit = async (payload = {}, _id, doc, options) => {
       }
     }
 
+    // 拒绝修改 Account / Org：这两个字段在 schema 上 immutable:true，DAO 层显式剔除
+    // 一来防止脏数据流到后续中间件，二来给前端一个明确的 400 而不是"静默吞掉"
+    if (doc.Account !== undefined || doc.Org !== undefined) {
+      throw ({ code: 400, message: 'Account 与 Org 为不可变字段，不允许修改' });
+    }
+    delete doc.Account;
+    delete doc.Org;
+
     // 处理密码
     if (doc.password) {
       doc.passwordHash = doc.password;
       delete doc.password;
-    }
-
-    const existing = await UserModel.findOne({ _id: { $ne: _id }, Account: doc.Account, Org: doc.Org });
-    if (existing) {
-      throw ({ code: 400, message: '同一个账号 不能有同一个公司的其他用户' });
     }
 
     targetUser.set(doc);

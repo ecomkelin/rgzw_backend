@@ -45,8 +45,10 @@ exports.authenticate = async (req, res, next) => {
     }
 
     // 检查会话是否有效（防止并发登录）
+    const SESSION_CHECK = (process.env.SESSION_CHECK === 'on');
     if (Account.currentSessionId !== payload.sessionId) {
-      if (process.env.NODE_ENV === 'production') {
+      // 线上生产和测试需要开启 或者本地需要测试会话也可以开启
+      if (SESSION_CHECK) {
         return res.status(401).json({ message: "会话已失效或已在其他设备登录，请重新登录" });
       } else {
         console.warn(`会话ID不匹配, 账户 ${Account.code}。期望 ${Account.currentSessionId}，获得 ${payload.sessionId}`);

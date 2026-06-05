@@ -47,7 +47,7 @@ class JwtUtil {
       } : undefined
     }
 
-    const expiresIn = process.env.ACCESS_TOKEN_EXPIRED || '5m';
+    const expiresIn = process.env.ACCESS_TTL_M || '5m';
     try {
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn });
       return { accessToken, payload };
@@ -64,7 +64,7 @@ class JwtUtil {
    */
   static generateRefreshToken(_id, sessionId) {
     // 生成刷新令牌，默认7天
-    const expiresIn = process.env.REFRESH_TOKEN_EXPIRED || '7d';
+    const expiresIn = process.env.REFRESH_TTL_D || '7d';
     return jwt.sign({ _id, sessionId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn });
   }
 

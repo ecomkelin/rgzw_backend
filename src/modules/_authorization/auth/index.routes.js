@@ -14,7 +14,7 @@ router.get('/refresh-token', AuthCT.refreshToken);
 router.post('/switch-role/:id', authenticate, switchRoleVD, AuthCT.switchRole);
 
 // 登出路由
-router.get('/logout', authenticate, AuthCT.logout);
+router.post('/logout', authenticate, AuthCT.logout);
 
 
 module.exports = router; 

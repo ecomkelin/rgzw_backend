@@ -7,10 +7,12 @@ class LoginCT {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
+      sameSite: 'lax',
       expires: refreshTokenExpiresAt,
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30天
     });
+    delete account.passwordHash;
+    delete account.currentSessionId;
     // 构建返回的认证数据
     res.status(200).json(ApiResponse.success({
       data: {
@@ -70,6 +72,7 @@ class LoginCT {
       if (!result) {
         throw ({ code: 400, message: "退出失败" })
       }
+      res.clearCookie('refreshToken', { path: '/', httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' });
       return res.status(200).json(ApiResponse.success({ message: "成功退出" }));
     } catch (e) {
       console.error('LoginCT logout error:', e);

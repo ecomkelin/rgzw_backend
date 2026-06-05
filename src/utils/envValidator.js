@@ -59,8 +59,8 @@ const DEFAULT_REQUIRED_VARS = [
 
 const DEFAULT_VALIDATIONS = {
   'PORT': (value) => /^\d+$/.test(value) && parseInt(value) > 0 && parseInt(value) <= 65535,
-  'ACCESS_TOKEN_EXPIRED': (value) => typeof value === 'string' && value.length > 0,
-  'REFRESH_TOKEN_EXPIRED': (value) => typeof value === 'string' && value.length > 0
+  'ACCESS_TTL_M': (value) => typeof value === 'string' && value.length > 0,
+  'REFRESH_TTL_D': (value) => typeof value === 'string' && value.length > 0
 };
 
 module.exports = {

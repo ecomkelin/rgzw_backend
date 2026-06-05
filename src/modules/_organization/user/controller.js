@@ -52,9 +52,10 @@ class UserCT {
    */
   add = async (req, res) => {
     try {
+      const ACID_CHECK = (process.env.ACID_CHECK === 'on');
       let session = null;   // 事务会话
 
-      if (process.env.ACID === 'true') {
+      if (ACID_CHECK) {
         // 启动事务
         session = await mongoose.startSession();
         session.startTransaction(); // 开启事务
@@ -83,7 +84,7 @@ class UserCT {
       const { item: itemUser } = await UserSV.add(payload, doc_User, { session });
       data.itemUser = itemUser;
 
-      if (process.env.ACID === 'true') {
+      if (ACID_CHECK) {
         // 全部成功 → 提交事务
         await session.commitTransaction();
         session.endSession();
@@ -129,8 +130,8 @@ class UserCT {
       const payload = req.payload;
       const id = payload.currentUser._id;
       const doc = req.validData;
-      const data = await UserSV.edit(payload, id, doc);
-      return res.status(200).json(ApiResponse.success(data));
+      const { item } = await UserSV.edit(payload, id, doc);
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("UserCT selfEdit error: ", e);
       const statusCode = e.code || 500;

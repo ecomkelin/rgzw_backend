@@ -111,9 +111,13 @@ const edit = async (payload = {}, _id, doc, options) => {
       }
     }
 
+    const existingFilter = { _id: { $ne: _id } };
     const existFilter = [];
-    if (doc.nickname && doc.name !== targetOrg.name) existFilter.push({ nickname: doc.nickname });
-    const existing = await OrgModel.findOne({ _id: { $ne: _id }, $or: existFilter });
+    if (doc.nickname && doc.nickname !== targetOrg.nickname) existFilter.push({ nickname: doc.nickname });
+    if (existFilter.length > 0) {
+      existingFilter['$or'] = existFilter;
+    }
+    const existing = await OrgModel.findOne(existingFilter);
     if (existing) {
       throw ({ code: 400, message: '统一社会编号或公司名称或公司简称已被存在' });
     }

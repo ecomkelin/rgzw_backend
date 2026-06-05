@@ -17,8 +17,8 @@ NODE_ENV=test
 MONGODB_TEST_URI=mongodb://localhost:27017/rgzw_test
 ACCESS_TOKEN_SECRET=test_access_secret_key
 REFRESH_TOKEN_SECRET=test_refresh_secret_key
-ACCESS_TOKEN_EXPIRED=15m
-REFRESH_TOKEN_EXPIRED=7d
+ACCESS_TTL_M=15m
+REFRESH_TTL_D=7d
 ```
 
 ## 运行测试

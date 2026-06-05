@@ -43,5 +43,5 @@ studentPackSchema.index({ Student: 1, status: 1 });
 studentPackSchema.index({ Account: 1 });
 
 
-const StudentPackModel = mongoose.model('StudentPack', enrollmentSchema);
+const StudentPackModel = mongoose.model('StudentPack', studentPackSchema);
 module.exports = { StudentPackModel, StudentPackEnums, StudentPackDOC };
