@@ -71,3 +71,16 @@ exports.studentPayloadChecker = (payload = {}) => {
         throw ({ code: 403, message: "学生姓名缺失" });
     }
 }
+
+
+
+exports.isStudent = (payload) => payload?.accountType === 'Student';
+
+exports.isUser = (payload) => payload?.accountType === 'User';
+
+exports.isManager = (payload) =>
+    payload?.accountType === 'User' && payload.currentUser?.roleTemp === 'manager';
+
+exports.isAdmin = (payload) =>
+    payload?.accountType === 'User' && payload.isAdmin === true;
+

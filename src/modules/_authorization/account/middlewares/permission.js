@@ -1,5 +1,5 @@
 const ApiResponse = require('@utils/response');
-
+const { isAdmin } = require('@utils/payloadChecker')
 // 通用权限检查函数
 const checkPermission = (permissionType) => {
   return (req, res, next) => {
@@ -13,21 +13,20 @@ const checkPermission = (permissionType) => {
 
       switch (permissionType) {
         case 'read':
-          // 读取权限：只有管理员可以读取其他账户信息
-          hasPermission = payload.isAdmin === true;
-          break;
-        case 'add':
-          // 创建权限：只有管理员可以创建账户
-          hasPermission = payload.isAdmin === true;
+          // 读取权限：只有超级管理员可以读取其他账户信息
+          hasPermission = isAdmin(payload);
           break;
         case 'edit':
-          // 编辑权限：只有管理员可以编辑账户
-          hasPermission = payload.isAdmin === true;
+          // 编辑权限：只有超级管理员可以编辑账户
+          hasPermission = isAdmin(payload);
           break;
-        case 'manage':
-          // 管理权限：只有管理员可以管理账户（激活/禁用等）
-          hasPermission = payload.isAdmin === true;
+        case 'add':
+          // 创建权限：只有超级管理员可以创建账户
+          hasPermission = isAdmin(payload);
           break;
+        // case 'remove':
+        //   hasPermission = isAdmin(payload);
+        //   break;
         default:
           hasPermission = false;
       }
@@ -47,7 +46,7 @@ const checkPermission = (permissionType) => {
   };
 };
 
-exports.readPermission = checkPermission('read');
-exports.addPermission = checkPermission('add');
-exports.editPermission = checkPermission('edit');
-exports.managePermission = checkPermission('manage');
+exports.read = checkPermission('read');
+exports.edit = checkPermission('edit');
+exports.add = checkPermission('add');
+// exports.removePermission = checkPermission('remove');

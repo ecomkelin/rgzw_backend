@@ -1,4 +1,5 @@
 const ApiResponse = require('@utils/response');
+const { isManager } = require('@utils/payloadChecker')
 
 // 通用权限检查函数
 const checkPermission = (permissionType) => {
@@ -10,34 +11,25 @@ const checkPermission = (permissionType) => {
       console.info(`Checking ${permissionType} permission for User:`, payload._id);
 
       let hasPermission = false;
-
-      switch (permissionType) {
-        case 'read':
-          // 读取权限：用户可以查看
-          if (payload.accountType === 'User') {
+      if (payload.accountType === 'User') {
+        switch (permissionType) {
+          case 'read':
+            hasPermission = isManager(payload);
+            break;
+          case 'add':
+            hasPermission = isManager(payload);
+            break;
+          case 'edit':
+            hasPermission = isManager(payload);
+            break;
+          // case 'remove':
+          //   hasPermission = isAdmin(payload);
+          //   break;
+          case 'selfDetail':
             hasPermission = true;
-          }
-          break;
-        case 'add':
-          // 创建权限：超级管理员可以查看所有，经理只能查看自己公司的
-          hasPermission = payload.isAdmin === true;
-          if (!hasPermission && payload.currentUser.roleTemp === 'manager') {
-            hasPermission = true;
-          }
-          break;
-        case 'edit':
-          // 编辑权限：超级管理员可以编辑所有用户，经理只能编辑自己公司的用户
-          hasPermission = payload.isAdmin === true;
-          if (!hasPermission && payload.currentUser.roleTemp === 'manager') {
-            hasPermission = true;
-          }
-          break;
-        case 'manage':
-          // 管理权限（激活/禁用等特殊操作）：仅管理员可以
-          hasPermission = payload.isAdmin === true;
-          break;
-        default:
-          hasPermission = false;
+          default:
+            hasPermission = false;
+        }
       }
 
       if (!hasPermission) {
@@ -55,7 +47,7 @@ const checkPermission = (permissionType) => {
   };
 };
 
-exports.readPermission = checkPermission('read');
-exports.addPermission = checkPermission('add');
-exports.editPermission = checkPermission('edit');
-exports.managePermission = checkPermission('manage');
+exports.read = checkPermission('read');
+exports.add = checkPermission('add');
+exports.edit = checkPermission('edit');
+exports.selfDetail = checkPermission('selfDetail');

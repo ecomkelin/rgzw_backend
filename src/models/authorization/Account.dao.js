@@ -7,7 +7,7 @@ const list = async (payload = {}, filter, options) => {
         userPayloadChecker(payload);
         // 验证权限
         if (!payload.isAdmin) {
-            throw ({ code: 403, message: "只有管理员才能查看账户列表" });
+            throw ({ code: 403, message: "只有超级管理员才能查看账户列表" });
         }
 
         const { items, total } = await DAO.list(AccountModel, filter, options);
@@ -21,7 +21,7 @@ const list = async (payload = {}, filter, options) => {
 const detail = async (payload = {}, _id, options) => {
     try {
         payloadChecker(payload);
-        // 验证权限 - 管理员可以查看任何账户，普通用户只能查看自己的账户
+        // 验证权限 - 超级管理员可以查看任何账户，普通用户只能查看自己的账户
         if (!payload.isAdmin) {
             if (payload._id.toString() !== _id.toString()) {
                 throw ({ code: 403, message: "没有权限访问此账户" });
@@ -50,9 +50,12 @@ const detail = async (payload = {}, _id, options) => {
 const add = async (payload, doc, options) => {
     try {
         userPayloadChecker(payload);
-        // 只有管理员可以创建账户
-        if (!payload.isAdmin) {
+        // 只有超级管理员可以创建账户
+        if (payload.currentUser.roleTemp !== 'manager') {
             throw ({ code: 403, message: "您无权添加账户" });
+        }
+        if (!payload.isAdmin) {
+            doc.isAdmin = false;
         }
 
         // 处理密码
@@ -97,19 +100,35 @@ const add = async (payload, doc, options) => {
 const edit = async (payload = {}, _id, doc, options) => {
     try {
         payloadChecker(payload);
-        if (doc.isActive == false && payload._id === _id) {
+
+        // 如果自己修改自己 则不能自己禁用自己
+        if (payload._id.toString() === _id.toString() && doc.isActive === false) {
             throw ({ code: 400, message: "您不能禁用自己" });
         }
-        // 只有管理员可以修改任何账户，普通用户只能修改自己的账户
+
+        // 只有超级管理员可以修改任何账户，普通用户只能修改自己的账户
         if (!payload.isAdmin) {
             if (payload._id.toString() !== _id.toString()) {
                 throw ({ code: 403, message: "没有权限修改此账户" });
             }
         }
         // 验证目标账户是否存在
-        const targetAccount = await AccountModel.findById(_id);
+        const targetAccount = await AccountModel.findById(_id)
+            .select('+passwordHash')
         if (!targetAccount) {
             throw ({ code: 404, message: '账户不存在' });
+        }
+
+        // 如果是自己修改自己 改密码 需要输入原密码
+        if (payload._id.toString() === _id.toString() && doc.password) {
+            if (!doc.originalPassword) {
+                throw ({ code: 400, message: "请输入原密码" });
+            }
+            const isMatch = await targetAccount.comparePassword(doc.originalPassword);
+            if (!isMatch) {
+                throw ({ code: 400, message: '您的原密码错误' });
+            }
+            delete doc.originalPassword;
         }
 
         // 处理密码

@@ -1,4 +1,5 @@
 const ApiResponse = require('@utils/response');
+const { isManager } = require('@utils/payloadChecker')
 
 // 通用权限检查函数
 const checkPermission = (permissionType) => {
@@ -13,18 +14,19 @@ const checkPermission = (permissionType) => {
 
       switch (permissionType) {
         case 'read':
-          hasPermission = payload.isAdmin === true || payload.currentUser?.roleTemp === 'manager';
+          hasPermission = isManager(payload);
           break;
         case 'add':
-          // 创建权限：isAdmin=true 和 roleTemp='manager' 都可以创建学生，但需遵循权限范围
-          hasPermission = payload.isAdmin === true || payload.currentUser?.roleTemp === 'manager';
+          hasPermission = isManager(payload);
           break;
         case 'edit':
-          hasPermission = payload.isAdmin === true || payload.currentUser?.roleTemp === 'manager';
+          hasPermission = isManager(payload);
           break;
-        case 'manage':
-          // 管理权限（激活/禁用等特殊操作）：仅管理员可以
-          hasPermission = payload.isAdmin === true;
+        // case 'remove':
+        //   hasPermission = isAdmin(payload);
+        //   break;
+        case 'selfStudent':
+          hasPermission = payload.accountType === 'Student'
           break;
         default:
           hasPermission = false;
@@ -45,7 +47,7 @@ const checkPermission = (permissionType) => {
   };
 };
 
-exports.readPermission = checkPermission('read');
-exports.addPermission = checkPermission('add');
-exports.editPermission = checkPermission('edit');
-exports.managePermission = checkPermission('manage');
+exports.read = checkPermission('read');
+exports.add = checkPermission('add');
+exports.edit = checkPermission('edit');
+exports.selfStudent = checkPermission('selfStudent');

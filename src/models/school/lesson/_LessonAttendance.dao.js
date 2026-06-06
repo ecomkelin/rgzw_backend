@@ -179,7 +179,7 @@ const edit = async (payload = {}, _id, doc, options) => {
         const studentPack = await StudentPackModel.findById(targetAttendance.StudentPack);
         if (studentPack && studentPack.remainingLesson > 0) {
           studentPack.remainingLesson -= 1;
-          studentPack.usedLesson += 1;
+          studentPack.LessonAttendances.push(targetAttendance._id);
           if (studentPack.remainingLesson <= 0) {
             studentPack.status = 'exhausted';
           }

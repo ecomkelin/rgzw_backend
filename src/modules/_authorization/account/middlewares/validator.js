@@ -22,6 +22,7 @@ exports.editVD = [
   // 路径参数：必填 ObjectId
   commonParamRules.validateObjectId('id'),
   // Body 参数：可选规则
+  commonBodyRules.optionalString('originalPassword', { minLength: 8, maxLength: 16 }),
   commonBodyRules.optionalString('password', { minLength: 8, maxLength: 16 }),
   commonBodyRules.optionalBoolean('isActive'),
   commonBodyRules.optionalNumber('sort'),

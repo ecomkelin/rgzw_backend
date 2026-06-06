@@ -12,17 +12,14 @@ const list = async (payload = {}, filter, options) => {
     if (payload.accountType === 'Student') {
       studentPayloadChecker(payload);
       // 学生可以查看自己报名的课程或开放的课程
+      // filter.Org = payload.currentStudent.Org; // 由前端控制吧
       filter.status = { $in: ['enrolling', 'ongoing'] }; // 只能查看正在招生或进行中的课程
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
-      if (payload.isAdmin) {
-        // 管理员: 全部课程
-      } else if (payload.currentUser?.roleTemp === 'manager') {
+      // 管理员: 全部课程 
+      if (!payload.isAdmin) {
         // 经理: 仅本机构
         filter.Org = payload.currentUser.Org;
-      } else {
-        // 其他 User 角色(老师/普通员工) 无权查看课程列表
-        throw ({ code: 403, message: "您无权查看课程列表" });
       }
     } else {
       throw ({ code: 403, message: "您的身份有误" });
@@ -68,9 +65,6 @@ const detail = async (payload = {}, _id, options) => {
       userPayloadChecker(payload);
       if (!payload.isAdmin) {
         // 非管理员必须是 manager 才能查看课程
-        if (payload.currentUser?.roleTemp !== 'manager') {
-          throw ({ code: 403, message: "您无权查看此课程" });
-        }
         if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此课程" })
         }
@@ -98,10 +92,8 @@ const add = async (payload, doc, options) => {
     userPayloadChecker(payload);
 
     // 只有管理员或任课老师可以创建课程
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能创建课程" });
-      }
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能创建课程" });
     }
 
     // 验证关联项存在性
@@ -142,6 +134,9 @@ const edit = async (payload = {}, _id, doc, options) => {
   try {
     // 验证权限
     userPayloadChecker(payload);
+    if (payload.currentUser?.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "您无权修改此课程" });
+    }
 
     // 验证目标课程是否存在
     const targetCourse = await CourseModel.findById(_id);
@@ -150,13 +145,8 @@ const edit = async (payload = {}, _id, doc, options) => {
     }
 
     // 权限：超级管理员可改所有课程；经理只能改本机构课程
-    if (!payload.isAdmin) {
-      if (payload.currentUser?.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "您无权修改此课程" });
-      }
-      if (targetCourse.Org.toString() !== payload.currentUser.Org.toString()) {
-        throw ({ code: 403, message: "您无权修改此课程" });
-      }
+    if (targetCourse.Org.toString() !== payload.currentUser.Org.toString()) {
+      throw ({ code: 403, message: "需要本公司管理员的权限修改此课程" });
     }
 
     // 根据状态约束过滤可修改的字段

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const AccountSV = require('../../_authorization/account/service');
 const StudentSV = require('./service');
 const ApiResponse = require('@utils/response');
-
+const { studentPayloadChecker } = require('@utils/payloadChecker')
 class StudentCT {
   list = async (req, res) => {
     try {
@@ -91,33 +91,40 @@ class StudentCT {
     }
   };
 
-  // 注释：学生账号查看自己的信息（暂不启用）
-  /*
+  // 注释：学生账号查看自己的信息
   selfDetail = async (req, res) => {
     try {
-      const data = await StudentSV.selfDetail(req.payload);
-      return res.status(200).json(ApiResponse.success(data));
+      const payload = req.payload;
+      const { options } = req.validData || {};
+
+      studentPayloadChecker(payload);
+
+      const { item } = await StudentSV.detail(payload, payload.currentStudent._id, options);
+
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("StudentCT selfDetail error: ", e);
       const statusCode = e.code || 500;
       return res.status(statusCode).json(ApiResponse.error(e));
     }
   };
-  */
 
-  // 注释：学生账号修改自己的信息（暂不启用）
-  /*
+  // 注释：学生账号修改自己的信息
   selfEdit = async (req, res) => {
     try {
-      const data = await StudentSV.edit(req.payload, req.currentStudent._id, req.body);
-      return res.status(200).json(ApiResponse.success(data));
+      const payload = req.payload;
+      studentPayloadChecker(payload);
+
+      const doc = req.validData;
+
+      const { item } = await StudentSV.edit(payload, payload.currentStudent._id, doc);
+      return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error("StudentCT selfEdit error: ", e)
       const statusCode = e.code || 500;
       return res.status(statusCode).json(ApiResponse.error(e))
     }
   };
-  */
 }
 
 module.exports = new StudentCT();

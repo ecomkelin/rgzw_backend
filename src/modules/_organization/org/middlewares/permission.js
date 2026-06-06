@@ -1,5 +1,5 @@
 const ApiResponse = require('@utils/response');
-
+const { isAdmin } = require('@utils/payloadChecker')
 // 通用权限检查函数
 const checkPermission = (permissionType) => {
   return (req, res, next) => {
@@ -13,21 +13,20 @@ const checkPermission = (permissionType) => {
 
       switch (permissionType) {
         case 'read':
-          // 读取权限：管理员可以查看所有机构，普通用户只能查看自己所在机构
-          hasPermission = payload.isAdmin === true;
+          // 读取权限：超级管理员可以查看所有机构，普通用户只能查看自己所在机构
+          hasPermission = isAdmin(payload);
           break;
         case 'add':
           // 创建权限：只有管理员
-          hasPermission = payload.isAdmin === true;
+          hasPermission = isAdmin(payload);
           break;
         case 'edit':
           // 编辑权限：只有管理员
-          hasPermission = payload.isAdmin === true;
+          hasPermission = isAdmin(payload);
           break;
-        case 'manage':
-          // 管理权限（激活/禁用）：只有管理员
-          hasPermission = payload.isAdmin === true;
-          break;
+        // case 'remove':
+        //   hasPermission = isAdmin(payload);
+        //   break;
         default:
           hasPermission = false;
       }
@@ -47,7 +46,6 @@ const checkPermission = (permissionType) => {
   };
 };
 
-exports.readPermission = checkPermission('read');
-exports.addPermission = checkPermission('add');
-exports.editPermission = checkPermission('edit');
-exports.managePermission = checkPermission('manage');
+exports.read = checkPermission('read');
+exports.add = checkPermission('add');
+exports.edit = checkPermission('edit');

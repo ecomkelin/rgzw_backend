@@ -72,10 +72,8 @@ const add = async (payload, doc, options) => {
   try {
     userPayloadChecker(payload);
     // 只有管理员可以创建科目
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能创建科目" });
-      }
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能创建科目" });
     }
 
     doc.Org = payload.currentUser.Org;
@@ -93,6 +91,9 @@ const edit = async (payload = {}, _id, doc, options) => {
   try {
     // 验证权限
     userPayloadChecker(payload);
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能修改科目" });
+    }
 
     // 验证目标科目是否存在
     const targetSubject = await SubjectModel.findById(_id);
@@ -100,13 +101,8 @@ const edit = async (payload = {}, _id, doc, options) => {
       throw ({ code: 404, message: '科目不存在' });
     }
 
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能修改科目" });
-      }
-      if (targetSubject.Org.toString() !== payload.currentUser.Org.toString()) {
-        throw ({ code: 403, message: "您无权修改此科目" });
-      }
+    if (targetSubject.Org.toString() !== payload.currentUser.Org.toString()) {
+      throw ({ code: 403, message: "您需要本公司管理员的权限 修改此科目" });
     }
 
     doc.updatedBy = payload.currentUser._id;

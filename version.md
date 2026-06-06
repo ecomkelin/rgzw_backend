@@ -1,5 +1,10 @@
 # 版本更新日志
 
+## v8.3.0
+- 大量权限优化
+   - 尽量避免跨Org操作， 现在跨Org只有三个功能: 新增Org 禁用Org 和 新增User 需要 isAdmin
+   - isAdmin 的Account 下面所有的 User 一定是 roleTemp是manager
+
 ## v8.2.2
 - 增加了 add OrderPack 对 Course的关联
 

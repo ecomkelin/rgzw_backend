@@ -1,5 +1,5 @@
 const ApiResponse = require('@utils/response');
-
+const { isManager } = require('@utils/payloadChecker')
 // 通用权限检查函数
 const checkPermission = (permissionType) => {
   return (req, res, next) => {
@@ -12,26 +12,17 @@ const checkPermission = (permissionType) => {
       let hasPermission = false;
 
       switch (permissionType) {
-        case 'read':
-          // 读取权限：超级管理员可以查看所有，经理只能查看自己公司的
-          hasPermission = payload.isAdmin === true;
-          if (!hasPermission && payload.currentUser.roleTemp === 'manager') {
-            // 经理可以查看自己公司的用户
-            hasPermission = true;
-          }
-          break;
         case 'add':
-          // 创建权限：超级管理员可以创建任意公司用户，经理只能创建自己公司的用户
-          hasPermission = payload.isAdmin === true;
+          // 创建权限：管理员可以创建
+          hasPermission = isManager(payload);
           break;
         case 'edit':
-          // 编辑权限：超级管理员可以编辑所有用户，经理只能编辑自己公司的用户
-          hasPermission = payload.isAdmin === true;
+          // 编辑权限：管理员可以编辑
+          hasPermission = isManager(payload);
           break;
-        case 'manage':
-          // 管理权限（激活/禁用等特殊操作）：仅管理员可以
-          hasPermission = payload.isAdmin === true;
-          break;
+        // case 'remove':
+        //   hasPermission = isAdmin(payload);
+        //   break;
         default:
           hasPermission = false;
       }
@@ -51,7 +42,5 @@ const checkPermission = (permissionType) => {
   };
 };
 
-exports.readPermission = checkPermission('read');
-exports.addPermission = checkPermission('add');
-exports.editPermission = checkPermission('edit');
-exports.managePermission = checkPermission('manage');
+exports.add = checkPermission('add');
+exports.edit = checkPermission('edit');

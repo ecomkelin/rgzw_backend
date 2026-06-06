@@ -44,10 +44,7 @@ const detail = async (payload = {}, _id, options) => {
       }
     } else if (payload.accountType === 'Student') {
       studentPayloadChecker(payload);
-      if (item.isActive !== true) {
-        throw ({ code: 403, message: "您无权查看此课包" })
-      }
-      if (item.Org.toString() !== payload.currentStudent.Org.toString()) {
+      if (item.isActive) {
         throw ({ code: 403, message: "您无权查看此课包" })
       }
     } else {
@@ -72,10 +69,8 @@ const add = async (payload, doc, options) => {
   try {
     userPayloadChecker(payload);
     // 只有管理员可以创建课包
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能创建课包" });
-      }
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能创建课包" });
     }
 
     doc.Org = payload.currentUser.Org;
@@ -93,19 +88,18 @@ const edit = async (payload = {}, _id, doc, options) => {
   try {
     userPayloadChecker(payload);
     // 验证目标课包是否存在
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能修改课包" });
+    }
+
     const targetPack = await PackModel.findById(_id);
     if (!targetPack) {
       throw ({ code: 404, message: '课包不存在' });
     }
 
     // 只有管理员可以修改课包
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能修改课包" });
-      }
-      if (targetPack.Org.toString() !== payload.currentUser.Org.toString()) {
-        throw ({ code: 403, message: "您无权修改此非本公司的课包" });
-      }
+    if (targetPack.Org.toString() !== payload.currentUser.Org.toString()) {
+      throw ({ code: 403, message: "需要本公司管理员的权限修改课包" });
     }
 
     doc.updatedBy = payload.currentUser._id;

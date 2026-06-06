@@ -8,9 +8,6 @@ const list = async (payload = {}, filter, options) => {
     userPayloadChecker(payload);
     // 验证权限
     if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "您无权查看教室列表" });
-      }
       filter.Org = payload.currentUser.Org;
     }
 
@@ -57,10 +54,8 @@ const add = async (payload, doc, options) => {
   try {
     userPayloadChecker(payload);
     // 只有管理员可以创建教室
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能创建教室" });
-      }
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能创建教室" });
     }
     doc.Org = payload.currentUser.Org;  // 普通用户只能创建属于自己的机构的教室
 
@@ -78,18 +73,17 @@ const edit = async (payload = {}, _id, doc, options) => {
   try {
     userPayloadChecker(payload);
     // 验证目标教室是否存在
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能修改教室" });
+    }
+
     const targetRoom = await RoomModel.findById(_id);
     if (!targetRoom) {
       throw ({ code: 404, message: '教室不存在' });
     }
 
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能修改教室" });
-      }
-      if (targetRoom.Org.toString() !== payload.currentUser.Org.toString()) {
-        throw ({ code: 403, message: "您无权修改此教室" });
-      }
+    if (targetRoom.Org.toString() !== payload.currentUser.Org.toString()) {
+      throw ({ code: 403, message: "您的角色不允许修改其他公司的教室" });
     }
 
     doc.updatedBy = payload.currentUser._id;

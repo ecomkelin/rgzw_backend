@@ -12,14 +12,14 @@ const list = async (payload = {}, filter, options) => {
     if (payload.accountType === 'Student') {
       studentPayloadChecker(payload);
       // 学生只能看自己的订单
-      filter.Student = payload.currentStudent._id;
+      filter.Account = payload._id;
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
       // 用户需是管理员或经理
+      if (payload.currentUser.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "您无权查看课包订单列表" });
+      }
       if (!payload.isAdmin) {
-        if (payload.currentUser.roleTemp !== 'manager') {
-          throw ({ code: 403, message: "您无权查看课包订单列表" });
-        }
         filter.Org = payload.currentUser.Org;
       }
     } else {
@@ -46,19 +46,18 @@ const detail = async (payload = {}, _id, options) => {
     if (payload.accountType === 'Student') {
       studentPayloadChecker(payload);
       // 学生只能查看自己相关的订单
-      if (item.Student.toString() !== payload.currentStudent._id.toString()) {
+      if (item.Account.toString() !== payload._id.toString()) {
         throw ({ code: 403, message: "您无权查看此订单" });
       }
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
       if (!payload.isAdmin) {
-        if (payload.currentUser.roleTemp === 'manager') {
-          if (item.Org.toString() !== payload.currentUser.Org.toString()) {
-            throw ({ code: 403, message: "您无权查看此订单" });
-          }
-        } else {
+        if (item.Org.toString() !== payload.currentUser.Org.toString()) {
           throw ({ code: 403, message: "您无权查看此订单" });
         }
+      }
+      if (payload.currentUser.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "您无权查看课包订单" });
       }
     } else {
       throw ({ code: 403, message: "您的身份有误" });
@@ -80,13 +79,17 @@ const detail = async (payload = {}, _id, options) => {
  */
 const add = async (payload, doc, options) => {
   try {
-    userPayloadChecker(payload);
-
-    // 只有管理员可以创建订单
-    if (!payload.isAdmin) {
+    if (payload.accountType === 'User') {
+      userPayloadChecker(payload);
+      doc.Org = payload.currentUser.Org;
+      // 只有管理员可以创建订单
       if (payload.currentUser.roleTemp !== 'manager') {
         throw ({ code: 403, message: "只有管理员才能创建课包订单" });
       }
+    } else if (payload.accountType === 'Student') {
+      studentPayloadChecker(payload)
+      doc.Student = payload.currentStudent._id;
+      doc.Org = payload.currentStudent.Org;
     }
 
     // 验证Student存在性
@@ -97,7 +100,7 @@ const add = async (payload, doc, options) => {
     if (!student || !student.isActive) {
       throw ({ code: 404, message: "指定的学生不存在或被禁用" });
     }
-    if (!payload.isAdmin && payload.currentUser.Org.toString() !== student.Org.toString()) {
+    if (student.Org.toString() !== doc.Org.toString()) {
       throw ({ code: 404, message: "您与该学生不在同一校区,无法下单" });
     }
 
@@ -106,8 +109,8 @@ const add = async (payload, doc, options) => {
       throw ({ code: 400, message: "该学生未关联账户,无法下单" });
     }
     const account = await AccountModel.findById(student.Account);
-    if (!account) {
-      throw ({ code: 404, message: "学生关联的账户不存在" });
+    if (!account || !account.isActive) {
+      throw ({ code: 404, message: "学生关联的账户不存在或账号被禁用" });
     }
 
     if (!doc.Pack) {
@@ -117,7 +120,7 @@ const add = async (payload, doc, options) => {
     if (!pack || !pack.isActive) {
       throw ({ code: 404, message: "指定的课包不存在或被禁用" });
     }
-    if (pack.Org.toString() !== student.Org.toString()) {
+    if (pack.Org.toString() !== doc.Org.toString()) {
       throw ({ code: 404, message: "制定的课包与该学生不在同一校区,无法下单" });
     }
 
@@ -126,7 +129,7 @@ const add = async (payload, doc, options) => {
       if (!course || !course.isActive) {
         throw ({ code: 404, message: "指定的课程不存在或被禁用" });
       }
-      if (course.Org.toString() !== student.Org.toString()) {
+      if (course.Org.toString() !== doc.Org.toString()) {
         throw ({ code: 404, message: "指定的课程与该学生不在同一校区,无法下单" });
       }
     }
@@ -142,7 +145,6 @@ const add = async (payload, doc, options) => {
 
     doc.Account = student.Account;
     // 确保 Org 和 createdBy 字段正确设置
-    doc.Org = student.Org;
     doc.createdBy = payload.currentUser._id;
 
     const { item } = await DAO.add(OrderPackModel, doc, options);
@@ -157,12 +159,15 @@ const edit = async (payload = {}, _id, doc, options) => {
   try {
     userPayloadChecker(payload);
     if (!payload.isAdmin) {
-      throw ({ code: 403, message: "只有超级管理员能够修改课包订单" });
+      throw ({ code: 403, message: "只有管理员能够修改课包订单" });
     }
     // 验证目标订单是否存在
     const targetOrder = await OrderPackModel.findById(_id);
     if (!targetOrder) {
       throw ({ code: 404, message: '课包订单不存在' });
+    }
+    if (targetOrder.Org.toString() !== payload.currentUser.Org.toString()) {
+      throw ({ code: 404, message: '您的身份不能修改其他学校的课包订单信息' });
     }
 
     // 更新订单状态等信息

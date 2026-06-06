@@ -8,6 +8,7 @@
 - [DATABASE_ARCHITECTURE.md](./DATABASE_ARCHITECTURE.md) - 数据库设计
 - [DEVELOPMENT_STANDARD.md](./DEVELOPMENT_STANDARD.md) - 开发规范和标准
 - [LOGIN_PAYLOAD_STRUCTURE.md](./LOGIN_PAYLOAD_STRUCTURE.md) - **Login Payload 结构规范（含 payloadChecker 工具使用）**
+- [PERMISSION_DESIGN.md](./PERMISSION_DESIGN.md) - **权限设计规范（角色 / Org 隔离 / 跨公司白名单，2026-06-06 新增）**
 
 ## 文档分类
 
@@ -16,6 +17,7 @@
 - 技术选型说明
 - 模块关系说明
 - [LOGIN_PAYLOAD_STRUCTURE.md](./LOGIN_PAYLOAD_STRUCTURE.md) - 登录认证与 Payload 流转规范
+- [PERMISSION_DESIGN.md](./PERMISSION_DESIGN.md) - 权限模型设计（两层级防御 / Org 隔离 / 不变量）
 
 ### 开发文档
 - 编码规范

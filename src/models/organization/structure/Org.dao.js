@@ -4,8 +4,8 @@ const { userPayloadChecker } = require('@utils/payloadChecker');
 
 const list = async (payload = {}, filter, options) => {
   try {
-    userPayloadChecker(payload);
     // 验证权限
+    userPayloadChecker(payload);
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "只有超级管理员才能查看公司列表" });
     }
@@ -20,8 +20,9 @@ const list = async (payload = {}, filter, options) => {
 
 const detail = async (payload = {}, _id, options) => {
   try {
-    userPayloadChecker(payload);
     // 验证权限 - 管理员可以查看任何公司，普通用户只能查看自己的公司
+    // 学生用populate查看
+    userPayloadChecker(payload);
     if (!payload.isAdmin) {
       if (payload.currentUser.Org.toString() !== _id.toString()) {
         throw ({ code: 403, message: "没有权限访问此公司" });
@@ -58,7 +59,7 @@ const add = async (payload, doc, options) => {
 
     doc.createdBy = payload.currentUser._id;
 
-    if (doc.isMain === true) {
+    if (doc.isMain) {
       const existingMain = await OrgModel.countDocuments({ isMain: true });
       if (existingMain > 0) {
         throw ({ code: 400, message: '已经存在一个主公司，无法创建另一个主公司' });
@@ -93,14 +94,19 @@ const add = async (payload, doc, options) => {
 const edit = async (payload = {}, _id, doc, options) => {
   try {
     userPayloadChecker(payload);
-    if (doc.isActive == false) {
-      if (payload.currentUser.Org === _id) {
-        throw ({ code: 400, message: "不能禁用当前用户的公司" });
-      }
-    }
-    // 只有管理员可以修改公司
+    // 只有超级管理员可以修改公司
     if (!payload.isAdmin) {
       throw ({ code: 403, message: "没有权限修改公司" });
+    }
+
+    /** 限制:  先判断 不能禁用 当前用户的公司, 
+     * 只能修改其他公司的 isActive
+     * 不然 本角色就不能登陆了
+     */
+    if (doc.isActive === false) {
+      if (payload.currentUser.Org.toString() === _id.toString()) {
+        throw ({ code: 400, message: "不能禁用当前用户的公司, 要换到另外的身份禁用此公司" });
+      }
     }
 
     // 验证目标公司是否存在
@@ -109,7 +115,7 @@ const edit = async (payload = {}, _id, doc, options) => {
       throw ({ code: 404, message: '公司不存在' });
     }
 
-    if (doc.isMain === true) {
+    if (doc.isMain) {
       const existingMain = await OrgModel.countDocuments({ _id: { $ne: _id }, isMain: true });
       if (existingMain > 0) {
         throw ({ code: 400, message: '已经存在一个主公司，无法创建另一个主公司' });

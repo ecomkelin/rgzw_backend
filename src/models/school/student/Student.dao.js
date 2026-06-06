@@ -6,14 +6,15 @@ const { userPayloadChecker, studentPayloadChecker, payloadChecker } = require('@
 
 const list = async (payload = {}, filter, options) => {
   try {
-    // 验证权限, 学生账号 只能用populate查看自己的学生信息，用户账号只能查看自己机构的学生信息
+    // 验证权限, 学生账号 只能用populate查看自己的学生信息，
+    // 普通用户账号只能查看自己机构的学生信息
     userPayloadChecker(payload);
 
     if (!payload.isAdmin) {
       filter.Org = payload.currentUser.Org;
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "您无权查看学生列表" });
-      }
+    }
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "您无权查看学生列表" });
     }
 
     const { items, total } = await DAO.list(StudentModel, filter, options);
@@ -45,6 +46,10 @@ const detail = async (payload = {}, _id, options) => {
           throw ({ code: 403, message: "您无权查看此学生" })
         }
       }
+      /** ** 普通用户 查看学生的规则 比如 自己上课的学生 */
+      if (payload.currentUser.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "您无权查看学生" })
+      }
     } else {
       throw ({ code: 403, message: "您的身份有误" })
     }
@@ -67,16 +72,10 @@ const add = async (payload, doc, options) => {
   try {
     userPayloadChecker(payload);
     // 只有管理员可以创建学生
-    if (!payload.isAdmin) {
-      if (payload.currentUser.roleTemp !== 'manager') {
-        throw ({ code: 403, message: "只有管理员才能创建学生" });
-      }
-      doc.Org = payload.currentUser.Org;
-    } else {
-      if (!doc.Org) {
-        doc.Org = payload.currentUser.Org;
-      }
+    if (payload.currentUser.roleTemp !== 'manager') {
+      throw ({ code: 403, message: "只有管理员才能创建学生" });
     }
+    doc.Org = payload.currentUser.Org;
 
     if (!doc.displayName) doc.displayName = doc.name;
     if (!doc.Nation) delete doc.Nation;
@@ -115,19 +114,20 @@ const edit = async (payload = {}, _id, doc, options) => {
     // 只有管理员可以修改任何学生，普通用户只能修改自己的学生
     if (payload.accountType === 'Student') {
       studentPayloadChecker(payload);
-      if (payload.currentStudent?._id?.toString() !== targetStudent._id.toString()) {
-        throw ({ code: 403, message: "没有权限修改此学生" });
+      if (payload.currentStudent._id.toString() !== targetStudent._id.toString()) {
+        throw ({ code: 403, message: "没有权限修改其他学生信息" });
+      }
+      if (doc.isActive === false) {
+        throw ({ code: 403, message: "不能修改 禁用信息" });
       }
     } else if (payload.accountType === 'User') {
       userPayloadChecker(payload);
       doc.updatedBy = payload.currentUser._id;
-      if (!payload.isAdmin) {
-        if (payload.currentUser.Org.toString() !== targetStudent.Org.toString()) {
-          throw ({ code: 403, message: "没有权限修改此学生" });
-        }
-        if (payload.currentUser.roleTemp !== 'manager') {
-          throw ({ code: 403, message: "没有权限修改学生信息" });
-        }
+      if (payload.currentUser.roleTemp !== 'manager') {
+        throw ({ code: 403, message: "没有权限修改学生信息" });
+      }
+      if (payload.currentUser.Org.toString() !== targetStudent.Org.toString()) {
+        throw ({ code: 403, message: "需要本公司管理员的权限 才能修改此学生" });
       }
     } else {
       throw ({ code: 403, message: "您的身份出现了错误" });

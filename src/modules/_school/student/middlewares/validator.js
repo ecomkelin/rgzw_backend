@@ -1,4 +1,4 @@
-const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator } = require('@utils/validatorHandle');
+const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator, detailOptionsValidator } = require('@utils/validatorHandle');
 const { AccountEnums } = require('@models/authorization/Account.dao');
 // 注意：这里我们不需要User.model，因为学生模块有自己的验证规则
 
@@ -66,6 +66,13 @@ exports.listVD = [
 // 4. 查询单条标签（仅 Param 参数）
 exports.detailVD = [
   commonParamRules.validateObjectId('id'),
+
+  ...detailOptionsValidator,
+  validatorErrorHandle
+];
+
+exports.selfDetailVD = [
+  detailOptionsValidator,
   validatorErrorHandle
 ];
 

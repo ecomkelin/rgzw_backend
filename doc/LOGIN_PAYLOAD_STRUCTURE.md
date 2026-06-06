@@ -241,7 +241,7 @@ exports.userAuthorize = (apiPermission) => async (req, res, next) => {
 
 DAO 层的标准做法是先调 `payloadChecker` 校验 payload 完整性（[src/utils/payloadChecker.js](../../src/utils/payloadChecker.js)）。
 
-### 6.1 三个具名导出
+### 6.1 三个具名导出（payload 完整性校验）
 
 ```javascript
 // 通用：自动识别 User/Student
@@ -254,7 +254,43 @@ const { userPayloadChecker } = require('@utils/payloadChecker');
 const { studentPayloadChecker } = require('@utils/payloadChecker');
 ```
 
-### 6.2 校验项
+### 6.2 四个身份 helper（角色判断，2026-06-06 新增）
+
+`payloadChecker.js` 还导出四个布尔 helper，用于 **route 中间件 / DAO 的角色判断**：
+
+```javascript
+const { isStudent, isUser, isManager, isAdmin } = require('@utils/payloadChecker');
+
+isStudent(payload)  // accountType === 'Student'
+isUser(payload)     // accountType === 'User'
+isManager(payload)  // accountType === 'User' && currentUser.roleTemp === 'manager'
+isAdmin(payload)    // accountType === 'User' && isAdmin === true
+```
+
+派生关系（必须保证）：
+
+```
+isAdmin   ⇒  isManager   ⇒  isUser   (isStudent 互斥)
+```
+
+> **不变量**：`isAdmin === true` 的 Account，其关联 User 一定 `roleTemp === 'manager'`。代码层在 [User.dao.js](../../src/models/organization/structure/User.dao.js) 的 `add` / `edit` 强制对齐。
+>
+> 这意味着 route 中间件用 `isManager` 判断时，超管会一并通过；DAO 末尾再用 `roleTemp === 'manager'` 兜底时同样会通过。**两层是等价的**。
+
+### 6.3 route 中间件标准用法
+
+```javascript
+// src/modules/_organization/user/middlewares/permission.js
+const { isManager } = require('@utils/payloadChecker');
+
+case 'read':  hasPermission = isManager(payload); break;
+case 'add':   hasPermission = isManager(payload); break;
+case 'edit':  hasPermission = isManager(payload); break;
+```
+
+更详细的权限模型、Org 隔离、跨公司白名单等见 [PERMISSION_DESIGN.md](./PERMISSION_DESIGN.md)。
+
+### 6.4 校验项
 
 #### `userPayloadChecker` 校验（以 `src/utils/payloadChecker.js` 为准）
 - `accountType === 'User'`
@@ -272,7 +308,7 @@ const { studentPayloadChecker } = require('@utils/payloadChecker');
 - `currentStudent.Org` 存在
 - `currentStudent.name` 存在
 
-### 6.3 DAO 中推荐用法
+### 6.5 DAO 中推荐用法
 
 ```javascript
 const { userPayloadChecker, studentPayloadChecker } = require('@utils/payloadChecker');
@@ -303,6 +339,8 @@ const list = async (payload = {}, filter, options) => {
 
 ## 7. 常见业务场景
 
+> **本章只列与 `payload` / `payloadChecker` 相关的最小代码片段**。完整的权限模型 / Org 隔离 / 跨公司白名单见 [PERMISSION_DESIGN.md](./PERMISSION_DESIGN.md)。
+
 ### 7.1 仅管理员可创建
 
 ```javascript
@@ -316,6 +354,13 @@ const add = async (payload, doc) => {
   // ...
 };
 ```
+
+> 等价写法（推荐，2026-06-06 后）：用 `isManager(payload)` helper 替代手写判断。
+> ```javascript
+> if (!isManager(payload)) {
+>   throw ({ code: 403, message: "只有管理员才能创建" });
+> }
+> ```
 
 ### 7.2 跨 Org 防护
 
@@ -368,13 +413,16 @@ if (payload.accountType === 'Student') {
 | 2026-06-04 | `JwtUtil.js` 移除 `'Admin'` 死分支，改为 `'Student'` | 错误消息准确 |
 | 2026-06-04 | `payloadChecker` 工具引入 | DAO 层字段非空校验统一 |
 | 2026-06-04 | `userAuthorize` 不再重写 `payload.currentUser` | 数据范围字段 `deptsRange` 正常注入 |
+| 2026-06-06 | 新增 `isStudent` / `isUser` / `isManager` / `isAdmin` 四个身份 helper | route 中间件统一使用 helper 判定 |
+| 2026-06-06 | 文档新增 [PERMISSION_DESIGN.md](./PERMISSION_DESIGN.md) | 权限模型、Org 隔离规则集中维护 |
 
 ---
 
 ## 11. 关联文档
 
 - [ARCHITECTURE.md](../../doc/ARCHITECTURE.md) - 四层架构规范
+- [PERMISSION_DESIGN.md](../../doc/PERMISSION_DESIGN.md) - **权限设计规范（角色 / Org 隔离 / 跨公司白名单）**
 - [src/middlewares/auth.js](../../src/middlewares/auth.js) - 中间件实现
 - [src/utils/JwtUtil.js](../../src/utils/JwtUtil.js) - Token 工具
-- [src/utils/payloadChecker.js](../../src/utils/payloadChecker.js) - Payload 校验工具
+- [src/utils/payloadChecker.js](../../src/utils/payloadChecker.js) - Payload 校验工具 + 身份 helper
 - [src/modules/_authorization/auth/apiDesc.md](../../src/modules/_authorization/auth/apiDesc.md) - 认证模块 API 文档

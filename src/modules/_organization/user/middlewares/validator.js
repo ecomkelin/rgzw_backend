@@ -56,6 +56,11 @@ exports.detailVD = [
   validatorErrorHandle
 ];
 
+exports.selfDetailVD = [
+  ...detailOptionsValidator, // 分页, 排序
+  validatorErrorHandle
+];
+
 exports.selfEditVD = [
   // Body 参数：可选规则
   commonBodyRules.optionalString('nickname', { minLength: 2, maxLength: 26 }),
