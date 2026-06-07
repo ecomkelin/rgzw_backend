@@ -4,6 +4,7 @@ const { AccountModel } = require('@models/authorization/Account.dao');
 const { StudentModel } = require('@models/school/student/Student.dao');
 const { CourseModel } = require('@models/school/course/Course.dao');
 const { PackModel } = require('./Pack.dao');
+const { StudentPackDAO } = require('@models/school/student/StudentPack.dao');
 const { userPayloadChecker, studentPayloadChecker, payloadChecker } = require("@utils/payloadChecker")
 
 const list = async (payload = {}, filter, options) => {
@@ -148,6 +149,15 @@ const add = async (payload, doc, options) => {
     doc.createdBy = payload.currentUser._id;
 
     const { item } = await DAO.add(OrderPackModel, doc, options);
+
+    // 自动落地 StudentPack (resource='OrderPack')
+    // 唯一稀疏索引防重复; createFromOrderPack 内部已 catch 11000 冲突, 不会让订单失败
+    try {
+      await StudentPackDAO.createFromOrderPack(item, payload, options);
+    } catch (e) {
+      console.error('OrderPackDao.add: 自动创建 StudentPack 失败, 但订单已落库', e);
+    }
+
     return { item };
   } catch (e) {
     console.error('OrderPackDao create error:', e);

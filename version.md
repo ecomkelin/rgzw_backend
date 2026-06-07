@@ -1,5 +1,8 @@
 # 版本更新日志
 
+## v8.4.0
+- 加入 StudentPack 模块
+
 ## v8.3.0
 - 大量权限优化
    - 尽量避免跨Org操作， 现在跨Org只有三个功能: 新增Org 禁用Org 和 新增User 需要 isAdmin
