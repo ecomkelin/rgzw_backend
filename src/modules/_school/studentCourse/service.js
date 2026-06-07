@@ -51,9 +51,7 @@ class StudentCourseSV {
       // 1. 删除前端不可变字段 (DAO 会重新注入)
       deleteImmutableFront(doc, StudentCourseDOC);
       // 2. 显式删除 immutable 字段, 防止前端误传
-      delete doc.Student;        // 由 validator 保证必填, 后续 DAO 不依赖此值, 但保留也无妨
       delete doc.Account;
-      delete doc.Course;
       delete doc.Org;
       delete doc.createdBy;
       delete doc.nameCourse;

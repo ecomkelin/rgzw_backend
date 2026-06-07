@@ -1,5 +1,7 @@
 # 版本更新日志
 
+## v8.5.1
+- [bugger] server层禁止了 传入 Student 和 Course。 已经修复
 ## v8.5.0
 - 新增 StudentCourse 模块
 
