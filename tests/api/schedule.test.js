@@ -241,3 +241,73 @@ describe('schedule.service', () => {
         expect(fail.error).toBe('llm_unavailable');
     });
 });
+
+// =============================================================
+// Validator 回归: 锁住 commonBodyRules.optionalDate 的 helper 改动
+// 之前 4 个 by-* 端点 + overview 在前端不发 from/to 时会报
+// "from 必须是合法的日期" (因为 express-validator 的 optional() 不带
+// { nullable: true, checkFalsy: true } 不会跳过空串/null).
+// 这里直接跑 express-validator chain (auth/authenticate 那层没必要走),
+// 用 4 个端点对应的 validator, 4 个端点都发空 body, 期望无错.
+// =============================================================
+describe('schedule validator — empty body 回归', () => {
+    const { validationResult } = require('express-validator');
+    const Validator = require('@modules/_school/schedule/middlewares/validator');
+
+    // 跑一条 chain, 收集 errors
+    const runChain = async (chain, body = {}) => {
+        const req = { body, params: {}, query: {} };
+        for (const v of chain) {
+            if (v && typeof v.run === 'function') await v.run(req);
+        }
+        return validationResult(req).array();
+    };
+
+    test('12. entityRangeVD 空 body 不报 "from 必须是合法的日期"', async () => {
+        const errs = await runChain(Validator.entityRangeVD, {});
+        const msg = errs.find(e => /from 必须是合法的日期/.test(e.msg));
+        expect(msg).toBeUndefined();
+    });
+
+    test('13. entityRangeVD null body (前端 axios 发 null) 不报错', async () => {
+        const errs = await runChain(Validator.entityRangeVD, { from: null, to: null });
+        const msg = errs.find(e => /from 必须是合法的日期/.test(e.msg));
+        expect(msg).toBeUndefined();
+    });
+
+    test('14. overviewVD 空 body 不报 "from 必须是合法的日期"', async () => {
+        const errs = await runChain(Validator.overviewVD, {});
+        const msg = errs.find(e => /from 必须是合法的日期/.test(e.msg));
+        expect(msg).toBeUndefined();
+    });
+
+    test('14b. overviewVD 完整 ISO 8601 日期通过 (axios 实际发的格式)', async () => {
+        const errs = await runChain(Validator.overviewVD, {
+            from: '2026-06-01T00:00:00.000Z',
+            to:   '2026-06-30T23:59:59.000Z'
+        });
+        const dateErrs = errs.filter(e => e.path === 'from' || e.path === 'to');
+        expect(dateErrs).toEqual([]);
+    });
+
+    test('14c. overviewVD 非法日期 (from: "not-a-date") 仍然要拦下', async () => {
+        const errs = await runChain(Validator.overviewVD, { from: 'not-a-date' });
+        expect(errs.find(e => /from 必须是合法的日期/.test(e.msg))).toBeDefined();
+    });
+
+    test('15. entityRangeVD 真的发非法日期 (from: "not-a-date") 仍然要拦下', async () => {
+        // helper 改动不能把真正的"非日期"也放过去, 这条保证 isDate 还在工作
+        const errs = await runChain(Validator.entityRangeVD, { from: 'not-a-date' });
+        expect(errs.find(e => /from 必须是合法的日期/.test(e.msg))).toBeDefined();
+    });
+
+    test('16. entityRangeVD 正常 ISO 日期通过', async () => {
+        const errs = await runChain(Validator.entityRangeVD, {
+            from: '2026-06-01T00:00:00.000Z',
+            to:   '2026-06-30T23:59:59.000Z'
+        });
+        // 只关注 from/to 路径的日期错误, listOptionsValidator 里的 populate.* 规则不在此次改动范围
+        const dateErrs = errs.filter(e => e.path === 'from' || e.path === 'to');
+        expect(dateErrs).toEqual([]);
+    });
+});

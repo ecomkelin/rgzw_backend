@@ -30,6 +30,19 @@ exports.validatorErrorHandle = (req, res, next) => {
 
 
 // ====================== 1. Body 参数通用规则（请求体） ======================
+
+/**
+ * 自定义日期校验: 接受 Date 对象 / Date 字符串 (含 ISO 8601 完整格式)
+ * 不能用 validator.isDate: v13.15 默认只识别 YYYY/MM/DD 这种短格式,
+ * axios 序列化 Date 得到 `2026-06-01T00:00:00.000Z` 会被拒.
+ * 用 Date.parse 作为兜底即可 (ISO / RFC2822 / YYYY-MM-DD 都能 parse).
+ */
+const isAcceptableDate = (v) => {
+    if (v instanceof Date) return !isNaN(v.getTime());
+    if (typeof v === 'string') return !isNaN(Date.parse(v));
+    return false;
+};
+
 exports.commonBodyRules = {
     // 数组验证
     validateArray: (field, options = { maxLength: 10000, msg: '' }) =>
@@ -73,11 +86,13 @@ exports.commonBodyRules = {
     validateDate: (field, msg = '') =>
         body(field)
             .notEmpty().withMessage(`${field} 不能为空`)
-            .isDate().withMessage(msg || `${field} 必须是合法的日期`),
+            .custom(isAcceptableDate).withMessage(msg || `${field} 必须是合法的日期`),
     optionalDate: (field, msg = '') =>
         body(field)
-            .optional()
-            .isDate().withMessage(msg || `${field} 必须是合法的日期`),
+            // nullable: true  让 null 通过; checkFalsy: true 让 '' / undefined 也通过
+            // 业务侧 (service.js) 本身就用 `if (from)` 短路, 真正不合法的日期不会影响过滤
+            .optional({ nullable: true, checkFalsy: true })
+            .custom(isAcceptableDate).withMessage(msg || `${field} 必须是合法的日期`),
 
     // 布尔值验证
     validateBoolean: (field, msg = '') =>

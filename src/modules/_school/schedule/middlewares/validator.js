@@ -2,11 +2,9 @@ const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsVali
 const { body } = require('express-validator');
 
 // 通用: 时间范围 + 可选 teacher/room/student + 可选 excludeLessonId
+// 注意: 4 个 entityId 走 URL path param, 各自端点只携带 1 个,
+// 不能在这里同时强制校验 4 个 param. entityId 校验下沉到 controller.listBy.
 exports.entityRangeVD = [
-    commonParamRules.validateObjectId('courseId'),
-    commonParamRules.validateObjectId('roomId'),
-    commonParamRules.validateObjectId('teacherId'),
-    commonParamRules.validateObjectId('studentId'),
     commonBodyRules.optionalDate('from'),
     commonBodyRules.optionalDate('to'),
     ...listOptionsValidator,
@@ -48,6 +46,10 @@ exports.conflictVD = [
 ];
 
 // 汇总查询
+// 走 commonBodyRules.optionalDate 而不是裸的 .isDate():
+//   validator@13.15 的 isDate() 只识别 YYYY/MM/DD 短格式, axios 把 Date
+//   序列化成 ISO 8601 完整字符串 (含 T...Z) 会被拒, 报 "from 必须是合法的日期".
+//   commonBodyRules.optionalDate 内部用 Date.parse, ISO / RFC2822 都能过.
 exports.overviewVD = [
     commonBodyRules.optionalDate('from'),
     commonBodyRules.optionalDate('to'),

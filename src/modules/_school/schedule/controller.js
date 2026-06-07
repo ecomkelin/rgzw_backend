@@ -1,5 +1,6 @@
 const ScheduleSV = require('./service');
 const ApiResponse = require('@utils/response');
+const { ObjectId } = require('mongoose').Types;
 
 class ScheduleCT {
     preview = async (req, res) => {
@@ -29,6 +30,9 @@ class ScheduleCT {
         try {
             // 路径 :id 走 param 校验, 但 :courseId/:roomId/:teacherId/:studentId 也都是 param
             const entityId = req.params.courseId || req.params.roomId || req.params.teacherId || req.params.studentId;
+            if (!entityId || !ObjectId.isValid(entityId)) {
+                return res.status(400).json(ApiResponse.error({ code: 400, message: `${entity}Id 必须是合法的 ObjectId` }));
+            }
             const { from, to, options } = req.validData || {};
             const data = await ScheduleSV.listByEntity(req.payload, entity, entityId, { from, to, options });
             return res.status(200).json(ApiResponse.success({ data }));
