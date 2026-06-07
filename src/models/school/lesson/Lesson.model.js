@@ -36,7 +36,7 @@ const LessonDOC = {
     },
 
     // ==================== 教室 ====================
-    classroom: { type: ObjectId, ref: 'Classroom' },     // 实际使用教室
+    classroom: { type: ObjectId, ref: 'Room' },          // 实际使用教室 (ref 与 Room.model 注册名一致)
 
     // ==================== 内容与总结 ====================
     description: { type: String },                       // 本节课教学内容摘要

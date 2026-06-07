@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const { deleteImmutableFront } = require("@/utils/fieldAttributes");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
+const TimeBlockSchema = require('@models/__global/TimeBlock.schema');
 
 const UserEnums = { roleSimpEnums: ['manager', 'teacher'] };
 
@@ -24,6 +25,9 @@ const UserDOC = {
 
     avatar: { type: String }, // 头像URL
     isActive: { type: Boolean, default: true }, // 是否启用
+
+    // 排课: 老师不可用时段 (其他兼职 / 休假 / 学校课)
+    unavailableSlots: [TimeBlockSchema],
 
     sort: { type: Number, default: 0 }, // 排序字段，越大越靠前
     createdBy: { type: ObjectId, ref: 'Account', immutable: true },

@@ -1,5 +1,7 @@
 const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator, detailOptionsValidator } = require('@utils/validatorHandle');
+const { body } = require('express-validator');
 const { CourseEnums } = require('@/models/school/course/Course.dao');
+const { validateTimeBlock } = require('@utils/timeBlock');
 
 exports.addVD = [
   commonBodyRules.validateObjectId('Subject'),
@@ -11,9 +13,24 @@ exports.addVD = [
   commonBodyRules.validateNumber('totalSessions', { min: 0 }),
   commonBodyRules.validateEnum('frequency', CourseEnums.frequencyEnums),
   commonBodyRules.optionalArray('scheduleRules'),
-  commonBodyRules.validateNumber('scheduleRules.*.dayOfWeek', '', { min: 0, max: 6 }),
-  commonBodyRules.validateString('scheduleRules.*.startTime'),
-  commonBodyRules.validateString('scheduleRules.*.endTime'),
+  // scheduleRules 单条规则可选字段 (三选一时间范围 + 起止时间 + 可选 teacher/room/note/reason)
+  commonBodyRules.optionalNumber('scheduleRules.*.dayOfWeek', { min: 0, max: 6 }),
+  commonBodyRules.optionalString('scheduleRules.*.date'),
+  commonBodyRules.optionalString('scheduleRules.*.dateRange.from'),
+  commonBodyRules.optionalString('scheduleRules.*.dateRange.to'),
+  commonBodyRules.optionalString('scheduleRules.*.startTime'),
+  commonBodyRules.optionalString('scheduleRules.*.endTime'),
+  commonBodyRules.optionalObjectId('scheduleRules.*.teacher'),
+  commonBodyRules.optionalObjectId('scheduleRules.*.room'),
+  commonBodyRules.optionalString('scheduleRules.*.note', { minLength: 0, maxLength: 200 }),
+  commonBodyRules.optionalString('scheduleRules.*.reason', { minLength: 0, maxLength: 200 }),
+  // 单条 TimeBlock 完整性校验 (至少给出一种时间范围 + startTime<endTime)
+  body('scheduleRules.*').custom((value) => {
+    if (value && Object.keys(value).length > 0 && !validateTimeBlock(value)) {
+      throw new Error('scheduleRules 单条规则不合法, 需给出 dayOfWeek/date/dateRange 其一, 且 startTime<endTime');
+    }
+    return true;
+  }),
   commonBodyRules.validateObjectId('defaultRoom'),
   commonBodyRules.validateNumber('maxStudents', { min: 0 }),
   commonBodyRules.validateNumber('price', { min: 0 }),
@@ -43,8 +60,21 @@ exports.editVD = [
   commonBodyRules.optionalEnum('frequency', CourseEnums.frequencyEnums),
   commonBodyRules.optionalArray('scheduleRules'),
   commonBodyRules.optionalNumber('scheduleRules.*.dayOfWeek'),
+  commonBodyRules.optionalString('scheduleRules.*.date'),
+  commonBodyRules.optionalString('scheduleRules.*.dateRange.from'),
+  commonBodyRules.optionalString('scheduleRules.*.dateRange.to'),
   commonBodyRules.optionalString('scheduleRules.*.startTime'),
   commonBodyRules.optionalString('scheduleRules.*.endTime'),
+  commonBodyRules.optionalObjectId('scheduleRules.*.teacher'),
+  commonBodyRules.optionalObjectId('scheduleRules.*.room'),
+  commonBodyRules.optionalString('scheduleRules.*.note', { minLength: 0, maxLength: 200 }),
+  commonBodyRules.optionalString('scheduleRules.*.reason', { minLength: 0, maxLength: 200 }),
+  body('scheduleRules.*').custom((value) => {
+    if (value && Object.keys(value).length > 0 && !validateTimeBlock(value)) {
+      throw new Error('scheduleRules 单条规则不合法, 需给出 dayOfWeek/date/dateRange 其一, 且 startTime<endTime');
+    }
+    return true;
+  }),
   commonBodyRules.optionalObjectId('defaultRoom'),
   commonBodyRules.optionalNumber('maxStudents', { min: 0 }),
   commonBodyRules.optionalEnum('status', CourseEnums.statusEnums),

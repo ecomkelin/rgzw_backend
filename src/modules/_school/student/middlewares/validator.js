@@ -1,5 +1,7 @@
 const { validatorErrorHandle, commonBodyRules, commonParamRules, listOptionsValidator, detailOptionsValidator } = require('@utils/validatorHandle');
+const { body } = require('express-validator');
 const { AccountEnums } = require('@models/authorization/Account.dao');
+const { validateTimeBlock } = require('@utils/timeBlock');
 // 注意：这里我们不需要User.model，因为学生模块有自己的验证规则
 
 exports.addVD = [
@@ -47,6 +49,21 @@ exports.editVD = [
   commonBodyRules.optionalEnum('sourceType', ['地推', '传单', '活动', '介绍', '听说', '路过', '抖音', '朋友圈', '其他']),
   commonBodyRules.optionalString('description', { maxLength: 500 }),
 
+  // 排课: 不可用时段
+  commonBodyRules.optionalArray('unavailableSlots'),
+  commonBodyRules.optionalNumber('unavailableSlots.*.dayOfWeek', { min: 0, max: 6 }),
+  commonBodyRules.optionalString('unavailableSlots.*.date'),
+  commonBodyRules.optionalString('unavailableSlots.*.dateRange.from'),
+  commonBodyRules.optionalString('unavailableSlots.*.dateRange.to'),
+  commonBodyRules.optionalString('unavailableSlots.*.startTime'),
+  commonBodyRules.optionalString('unavailableSlots.*.endTime'),
+  commonBodyRules.optionalString('unavailableSlots.*.reason', { minLength: 0, maxLength: 200 }),
+  body('unavailableSlots.*').custom((value) => {
+    if (value && Object.keys(value).length > 0 && !validateTimeBlock(value)) {
+      throw new Error('unavailableSlots 单条不合法, 需给出 dayOfWeek/date/dateRange 其一, 且 startTime<endTime');
+    }
+    return true;
+  }),
 
   validatorErrorHandle
 ];

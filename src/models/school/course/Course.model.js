@@ -4,6 +4,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
+const TimeBlockSchema = require('@models/__global/TimeBlock.schema');
 
 const CourseEnums = {
     statusEnums: ['draft', 'enrolling', 'ongoing', 'finished', 'cancelled'],
@@ -27,12 +28,10 @@ const CourseDOC = {
     totalSessions: { type: Number, required: true, immutable: true },     // 总课次，从 Subject.default_lesson_count 带过来，可覆盖
 
     frequency: { type: String, enum: CourseEnums.frequencyEnums, default: 'weekly' },
-    // 排课规则, 可手动调整, 如果是daily则默认周一到周五上课
-    scheduleRules: [{
-        dayOfWeek: { type: Number, min: 0, max: 6 },      // 0=周日
-        startTime: { type: String },                       // "18:30"
-        endTime: { type: String }                          // "20:00"
-    }],
+    // 排课规则, 每条规则可独立换老师/换教室.
+    // 复用 TimeBlock 子 schema: dayOfWeek / date / dateRange 三选一, 都得给 startTime/endTime.
+    // (frequency 字段仅作 UI 提示, 实际生成 Lesson 走 scheduleRules 显式规则)
+    scheduleRules: [TimeBlockSchema],
 
     // 默认教室（如有变动放在 Lesson 里）
     defaultRoom: { type: ObjectId, ref: 'Room', required: true },

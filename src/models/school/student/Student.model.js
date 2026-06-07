@@ -2,11 +2,12 @@
  * 学生信息主要是为了方便机构了解学生的基本情况，进行统计分析，以及后续的精准营销等使用
  * 一个账号下 可以有多个学生信息 因为 一个家长可能有多个孩子 也可能自己是学生 也可能是员工 也可能是家长 也可能是其他身份
  * 这样一个账号 可以管理多个学生信息
- * 
+ *
  */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
+const TimeBlockSchema = require('@models/__global/TimeBlock.schema');
 
 const StudentEnums = {};
 const StudentDOC = {
@@ -39,6 +40,10 @@ const StudentDOC = {
 
     // 用户来源类型
     sourceType: { type: String, enum: ['地推', '传单', '活动', '介绍', '听说', '路过', '抖音', '朋友圈', '其他'], default: '其他' },
+
+    // 排课: 学生不可用时段 (如"周一三五 19-21 点有学校晚自习")
+    // 可由管理员手动录入, 也可由 AI 解析自然语言后确认写入
+    unavailableSlots: [TimeBlockSchema],
 
     // 其他信息
     isActive: { type: Boolean, default: true },

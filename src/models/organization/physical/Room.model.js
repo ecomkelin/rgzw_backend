@@ -4,6 +4,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
+const TimeBlockSchema = require('@models/__global/TimeBlock.schema');
 
 const RoomEnums = {
   statusEnums: ['available', 'in_use', 'maintenance']  // 可用 / 使用中 / 维护中
@@ -23,6 +24,9 @@ const RoomDOC = {
     default: 'available'
   },
   isActive: { type: Boolean, default: true },
+
+  // 排课: 教室闭馆时段 (维护 / 改用途 / 临时外借)
+  closedSlots: [TimeBlockSchema],
 
   sort: { type: Number, default: 0 },           // 排序字段，数值越大越靠前
 

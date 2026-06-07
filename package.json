@@ -24,6 +24,7 @@
     "test:all": "npm run test && npm run test:e2e",
     "db:seeds": "node scripts/db/index.js",
     "db:seeds:test": "cross-env NODE_ENV=test node scripts/db/index.js",
+    "db:seeds:schedule": "node scripts/db/seeds/Schedule.seed.js",
     "test:load": "node scripts/tests/load-test.js",
     "test:load:quick": "autocannon -c 100 -d 20 http://localhost:8000/api/health",
     "postinstall": "node ./scripts/tests/download-mongodb.js"
