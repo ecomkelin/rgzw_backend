@@ -59,6 +59,6 @@ const docSchema = new Schema(StudentDOC, { timestamps: true });
 docSchema.index({ identityNo: 1 }, { unique: true, partialFilterExpression: { identityNo: { $exists: true, $ne: null } } });
 // docSchema.index({ nameUnicode: 1 }, { unique: true, partialFilterExpression: { nameUnicode: { $exists: true, $ne: null } } });
 
-StudentModel = mongoose.model('Student', docSchema);
+const StudentModel = mongoose.model('Student', docSchema);
 
 module.exports = { StudentModel, StudentEnums, StudentDOC };
