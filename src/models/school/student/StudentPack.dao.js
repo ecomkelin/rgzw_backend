@@ -117,6 +117,7 @@ const add = async (payload, doc, options) => {
     if (!account || !account.isActive) {
       throw ({ code: 404, message: "学生关联的账户不存在或被禁用" });
     }
+    console.log(1111, doc);
 
     // totalLesson 必填 (validator 已校验, 这里再保护一次)
     if (doc.totalLesson === undefined || doc.totalLesson === null) {

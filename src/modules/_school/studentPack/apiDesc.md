@@ -64,7 +64,7 @@
 ## 接口列表
 
 ### 1. 获取学生课包列表
-- **路径**: `POST /api/school/studentPack/list`
+- **路径**: `POST /api/studentPack/list`
 - **中间件链**: `authenticate` → `Permission.read` → `listVD` → `controller.list`
 - **权限**:
   - Student: 放行(DAO 二次过滤 `filter.Student = currentStudent._id`)
@@ -92,7 +92,7 @@
 ---
 
 ### 2. 获取学生课包详情
-- **路径**: `POST /api/school/studentPack/detail/:id`
+- **路径**: `POST /api/studentPack/detail/:id`
 - **中间件链**: `authenticate` → `Permission.read` → `detailVD` → `controller.detail`
 - **权限**:
   - Student: `item.Student === currentStudent._id`, 否则 403
@@ -103,7 +103,7 @@
 ---
 
 ### 3. 手动添加 free 赠送课包
-- **路径**: `POST /api/school/studentPack/add`
+- **路径**: `POST /api/studentPack/add`
 - **中间件链**: `authenticate` → `Permission.add` → `addVD` → `controller.add`
 - **权限**:
   - **仅** User Admin (`isAdmin=true`): ✅
@@ -142,7 +142,7 @@
 ---
 
 ### 4. 编辑学生课包
-- **路径**: `POST /api/school/studentPack/edit/:id`
+- **路径**: `POST /api/studentPack/edit/:id`
 - **中间件链**: `authenticate` → `Permission.edit` → `editVD` → `controller.edit`
 - **权限**:
   - **仅** User Admin (`isAdmin=true`): ✅

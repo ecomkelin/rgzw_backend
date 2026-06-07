@@ -12,13 +12,15 @@ const StudentCourseEnums = {
 };
 
 const StudentCourseDOC = {
-    // ==================== 关联核心 ====================
+    // ==================== 关联核心学生 ====================
     Student: { type: ObjectId, ref: 'Student', required: true },
-    Course: { type: ObjectId, ref: 'Course', required: true },
     Account: { type: ObjectId, ref: 'Account', required: true },  // 家长账户，便于查询
 
+    // ==================== 关联核心课程 ====================
+    Course: { type: ObjectId, ref: 'Course', required: true },
+
     // ==================== 课包绑定 ====================
-    StudentPack: { type: ObjectId, ref: 'StudentPack' },    // 报名时选择的课包，用于消课
+    StudentPack: { type: ObjectId, ref: 'StudentPack' },    // 报名时选择的课包，用于消课, 如果用完 可以换其他的
 
     // ==================== 报名信息 ====================
     enrollmentDate: { type: Date, default: Date.now },            // 报名日期

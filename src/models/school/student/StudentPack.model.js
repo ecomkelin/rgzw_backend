@@ -21,16 +21,17 @@ const StudentPackEnums = {
 const StudentPackDOC = {
   // ==================== 归属 ====================
   resource: { type: String, enum: StudentPackEnums.resourceEnums, required: true, immutable: true },
-  OrderPack: { type: ObjectId, ref: 'OrderPack', immutable: true },     // 来源课包订单, resource='OrderPack' 时必填
   Student: { type: ObjectId, ref: 'Student', required: true, immutable: true },
   Account: { type: ObjectId, ref: 'Account', required: true, immutable: true },  // 由 Student 冗余
-
+  
   // ==================== 课包内容 ====================
+  OrderPack: { type: ObjectId, ref: 'OrderPack', immutable: true },     // 来源课包订单, resource='OrderPack' 时必填
   Pack: { type: ObjectId, ref: 'Pack', immutable: true },    // resource='OrderPack' 时冗余, free 时为 null
-  packName: { type: String, required: true, immutableFront: true },              // OrderPack 冗余 / free 手动
-  totalLesson: { type: Number, required: true, immutableFront: true },           // OrderPack 冗余 / free 必填
+  packName: { type: String, required: true, immutableFront: true },              // Pack 冗余 / free 可手动
+  
+  totalLesson: { type: Number, required: true },           // OrderPack 冗余 / free 必填
   LessonAttendances: [{ type: ObjectId, ref: 'LessonAttendance' }],              // 上过的课程, 前端不可修改
-  remainingLesson: { type: Number, required: true, immutableFront: true },       // 剩余课时, 初始化 = totalLesson
+  remainingLesson: { type: Number, required: true },       // 剩余课时, 初始化 = totalLesson
 
   // ==================== 有效期 ====================
   activeDate: { type: Date, default: Date.now },                // 激活日期

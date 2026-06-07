@@ -53,7 +53,6 @@ class StudentPackSV {
       delete doc.OrderPack;
       delete doc.Account;
       delete doc.Org;
-      delete doc.Student;
       delete doc.Pack;
       delete doc.resource;
       delete doc.createdBy;

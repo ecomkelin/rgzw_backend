@@ -45,7 +45,7 @@ class StudentPackCT {
   add = async (req, res) => {
     try {
       const { item } = await StudentPackSV.add(req.payload, req.validData);
-
+      console.log(999911111, item)
       return res.status(200).json(ApiResponse.success({ data: { item } }));
     } catch (e) {
       console.error('StudentPackCT add error:', e);
